@@ -1,0 +1,26 @@
+{
+  "name": "clear",
+  "version": "1.0.0",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browser-sync": "^2.27.10",
+    "gulp": "^4.0.2",
+    "gulp-sass": "^5.1.0",
+    "sass": "^1.57.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omidfarhangnia/Element-Invaders.git"
+  },
+  "bugs": {
+    "url": "https://github.com/omidfarhangnia/Element-Invaders/issues"
+  },
+  "homepage": "https://github.com/omidfarhangnia/Element-Invaders#readme",
+  "description": ""
+}
