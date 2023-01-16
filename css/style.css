@@ -47,3 +47,125 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+
+.page__container {
+  width: 100%;
+  height: 100vh;
+  background: black;
+  display: flex;
+}
+.page__container > div {
+  width: 20%;
+  height: 100vh;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+.page__container > div > h1 {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: 3rem;
+  text-align: center;
+}
+
+.main__ship {
+  width: 200px;
+  height: 200px;
+  background: green;
+  position: relative;
+}
+.main__ship > * {
+  position: absolute;
+}
+
+div[class*=main__ship--motor] {
+  width: 60%;
+  height: 15%;
+  background: #8c56d0;
+}
+div[class*=main__ship--motor] .main__ship--guns {
+  width: 30%;
+  height: 10%;
+  background: white;
+  position: absolute;
+}
+
+.main__ship--motor__1 .gun__longer {
+  right: -10%;
+  top: 30%;
+}
+.main__ship--motor__1 .gun__shorter {
+  right: -15%;
+  bottom: 30%;
+}
+
+.main__ship--motor__2 .gun__longer {
+  right: -10%;
+  bottom: 30%;
+}
+.main__ship--motor__2 .gun__shorter {
+  right: -15%;
+  top: 30%;
+}
+
+.main__ship--motor__1 {
+  top: 25%;
+  border-radius: 0 30px 0 0;
+}
+
+.main__ship--motor__2 {
+  bottom: 25%;
+  border-radius: 0 0 30px 0;
+}
+
+.main__ship__cabin {
+  width: 70%;
+  height: 20%;
+  top: 40%;
+  right: 0;
+  border-radius: 0 50% 50% 0;
+  background: white;
+}
+
+.main__ship__cabin--glass {
+  width: 30%;
+  height: 70%;
+  position: absolute;
+  border-radius: 60% 100% 100% 60%;
+  top: 15%;
+  right: 15%;
+  background: #29005b;
+}
+
+.main__ship__blasters {
+  width: 50%;
+  height: 5%;
+  background: #ffffff;
+  border-radius: 40%;
+}
+.main__ship__blasters::after {
+  content: "";
+  width: 30%;
+  height: 30%;
+  position: absolute;
+  background: #6a5683;
+  left: 35%;
+  rotate: 90deg;
+}
+
+.main__ship__blaster--1 {
+  top: 15%;
+}
+.main__ship__blaster--1::after {
+  bottom: -80%;
+  z-index: 2;
+}
+
+.main__ship__blaster--2 {
+  bottom: 15%;
+}
+.main__ship__blaster--2::after {
+  top: -80%;
+  z-index: 2;
+}
