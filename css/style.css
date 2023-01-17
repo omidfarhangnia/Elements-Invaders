@@ -48,31 +48,9 @@ table {
   border-spacing: 0;
 }
 
-.page__container {
-  width: 100%;
-  height: 100vh;
-  background: black;
-  display: flex;
-}
-.page__container > div {
-  width: 20%;
-  height: 100vh;
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-}
-.page__container > div > h1 {
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-  font-size: 3rem;
-  text-align: center;
-}
-
 .main__ship {
-  width: 200px;
-  height: 200px;
-  background: green;
+  width: 150px;
+  height: 150px;
   position: relative;
 }
 .main__ship > * {
@@ -168,4 +146,113 @@ div[class*=main__ship--motor] .main__ship--guns {
 .main__ship__blaster--2::after {
   top: -80%;
   z-index: 2;
+}
+
+.fighter__1 {
+  width: 150px;
+  height: 150px;
+  position: relative;
+}
+.fighter__1 > * {
+  position: absolute;
+}
+
+div[class*=fighter__1--motor--] {
+  width: 30%;
+  height: 15%;
+  background: #513b3c;
+}
+
+.fighter__1--motor--1 {
+  top: 20%;
+}
+
+.fighter__1--motor--2 {
+  bottom: 20%;
+}
+
+.fighter__1--main--cabin {
+  width: 80%;
+  height: 70%;
+  background: #c71824;
+  z-index: 1;
+  top: 15%;
+  right: 0;
+}
+.fighter__1--main--cabin::after, .fighter__1--main--cabin::before {
+  content: "";
+  position: absolute;
+  width: 80%;
+  height: 35%;
+  right: -30%;
+  background: black;
+}
+.fighter__1--main--cabin::after {
+  top: -5%;
+  rotate: 35deg;
+}
+.fighter__1--main--cabin::before {
+  bottom: -5%;
+  rotate: -35deg;
+}
+
+div[class*=fighter__1--glasses--] {
+  background: #28074f;
+  width: 20%;
+  height: 23%;
+  position: absolute;
+  transform: rotate(45deg);
+}
+
+.fighter__1--glasses--1 {
+  right: 8%;
+  top: 38.5%;
+}
+
+.fighter__1--glasses--2 {
+  right: 24%;
+  top: 20.5%;
+}
+
+.fighter__1--glasses--3 {
+  right: 24%;
+  bottom: 20.5%;
+}
+
+div[class*=fighter__1--gun--] {
+  width: 40%;
+  height: 5%;
+  right: 3%;
+  z-index: 2;
+  background: #513b3c;
+  border-radius: 0 100% 100% 0;
+}
+
+.fighter__1--gun--1 {
+  top: 15%;
+}
+
+.fighter__1--gun--2 {
+  bottom: 15%;
+}
+
+.page__container {
+  width: 100%;
+  height: 100vh;
+  background: black;
+  display: flex;
+}
+.page__container > div {
+  width: 20%;
+  height: 100vh;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+.page__container > div > h1 {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: 3rem;
+  text-align: center;
 }
