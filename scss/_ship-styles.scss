@@ -164,34 +164,78 @@ div[class *= "fighter__1--glasses--"]{
 }
 
 .fighter__1--glasses--1{
-    right: 8%;
+    right: 15%;
     top: 38.5%;
 }
 
 .fighter__1--glasses--2{
+    transform: rotate(38deg) !important;
     right: 24%;
-    top: 20.5%;
+    top: 22.5%;
 }
 
 .fighter__1--glasses--3{
+    transform: rotate(-38deg) !important;
     right: 24%;
-    bottom: 20.5%;
+    bottom: 22.5%;
 }
 
 
-div[class *= "fighter__1--gun--"]{
+div[class *= "fighter__1--motor--cover--"]{
     width: 40%;
     height: 5%;
-    right: 3%;
+    left: 0%;
     z-index: 2;
     background: #513b3c;
     border-radius: 0 100% 100% 0;
 }
 
-.fighter__1--gun--1{
+.fighter__1--motor--cover--1{
     top: 15%;
 }
 
-.fighter__1--gun--2{
+.fighter__1--motor--cover--2{
     bottom: 15%;
+}
+
+div[class *= "fighter__1--gun--"]{
+    width: 60%;
+    height: 7%;
+    left: 0%;
+    z-index: 0;
+    background: #513b3c;
+    border-radius: 0 100% 100% 0;
+    &::after{
+        content: "";
+        position: absolute;
+        width: 40%;
+        height: 50%;
+        background: #c71824;
+        rotate: 90deg;
+        right: 30%;
+        z-index: 0;
+    }
+    &::before{
+        content: "";
+        position: absolute;
+        width: 40%;
+        height: 50%;
+        background: #c71824;
+        rotate: 90deg;
+        z-index: 0;
+    }
+}
+
+.fighter__1--gun--1{
+    top: 0%;
+    &::after, &::before{
+        bottom: -110%;
+    }
+}
+
+.fighter__1--gun--2{
+    bottom: 0%;
+    &::after, &::before{
+        top: -110%;
+    }
 }
