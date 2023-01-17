@@ -322,3 +322,82 @@ div[class *= "fighter__2--blaster--keeper--"]{
     position: absolute;
     background: #28074f;
 }
+
+// fighter number 3
+
+
+.fighter__3{
+    width: 150px;
+    height: 150px;
+    position: relative;
+    > *{
+        position: absolute;
+    }
+}
+
+.fighter__3--main--cabin{
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    background: #c71824;
+    top: 20%;
+    left: 20%;
+}
+
+.fighter__3--cabin--glass{
+    height: 30%;
+    width: 50%;
+    top: 35%;
+    left: 25%;
+    background: #28074f;
+    position: absolute;
+    border-radius: 10% 60% 60% 10%;
+}
+
+div[class *= "fighter__3--blaster--"]{
+    width: 55%;
+    height: 15%;
+    background: hsl(357, 16%, 27%);
+    z-index: 1;
+    left: 22.5%;
+    border-radius: 35%;
+    &::after{
+        content: "";
+        position: absolute;
+        background-color: #c71824;
+        width: 60%;
+        height: 70%;
+        border-radius: 50%;
+        left: 20%;
+    }
+}
+
+.fighter__3--blaster--1{
+    top: 15%;
+    &::after{
+        top: 15%;
+    }
+}
+
+.fighter__3--blaster--2{
+    bottom: 15%;
+    &::after{
+        bottom: 15%;
+    }
+}
+
+div[class *= "fighter__3--gun--"]{
+    width: 17%;
+    height: 4%;
+    background: #513b3c;
+    right: 10%;
+    z-index: 2;
+}
+
+.fighter__3--gun--1{
+    top: 40%;
+}
+
+.fighter__3--gun--2{
+    bottom: 40%;
+}
