@@ -280,6 +280,87 @@ div[class*=fighter__1--gun--]::before {
   top: -110%;
 }
 
+.fighter__2 {
+  width: 150px;
+  height: 150px;
+  position: relative;
+}
+.fighter__2 > * {
+  position: absolute;
+}
+
+.fighter__2--main--cabin {
+  width: 90%;
+  height: 30%;
+  background: #c71824;
+  z-index: 2;
+  top: 35%;
+  border-radius: 0 50% 50% 0;
+}
+
+div[class*=fighter__2--motor--] {
+  width: 20%;
+  height: 15%;
+  background: #513b3c;
+}
+
+.fighter__2--motor--1 {
+  top: 20%;
+  border-radius: 0 100% 0 0;
+}
+
+.fighter__2--motor--2 {
+  bottom: 20%;
+  border-radius: 0 0 100% 0;
+}
+
+div[class*=fighter__2--blasters--] {
+  width: 50%;
+  height: 10%;
+  background: #c71824;
+  right: 15%;
+  z-index: 3;
+}
+
+.fighter__2--blasters--1 {
+  top: 12%;
+}
+
+.fighter__2--blasters--2 {
+  bottom: 12%;
+}
+
+div[class*=fighter__2--blaster--keeper--] {
+  content: "";
+  height: 5%;
+  width: 30%;
+  position: absolute;
+  background: #513b3c;
+  right: 45%;
+  border-radius: 0 30% 30% 0;
+  border-radius: 30%;
+}
+
+.fighter__2--blaster--keeper--1 {
+  top: 25%;
+  rotate: -65deg;
+}
+
+.fighter__2--blaster--keeper--2 {
+  bottom: 25%;
+  rotate: 65deg;
+}
+
+.fighter__2--main--cabin--glass {
+  width: 40%;
+  height: 60%;
+  top: 20%;
+  left: 30%;
+  border-radius: 30% 60% 60% 30%;
+  position: absolute;
+  background: #28074f;
+}
+
 .page__container {
   width: 100%;
   height: 100vh;
@@ -299,68 +380,4 @@ div[class*=fighter__1--gun--]::before {
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   font-size: 3rem;
   text-align: center;
-}
-
-.fighter__2 {
-  width: 200px;
-  height: 200px;
-  background: green;
-  position: relative;
-}
-.fighter__2 > * {
-  position: absolute;
-}
-
-.fighter__2--main--cabin {
-  width: 90%;
-  height: 30%;
-  background: yellow;
-  z-index: 2;
-  top: 35%;
-  border-radius: 0 50% 50% 0;
-}
-
-div[class*=fighter__2--motor--] {
-  width: 20%;
-  height: 15%;
-  background: blue;
-}
-
-.fighter__2--motor--1 {
-  top: 20%;
-}
-
-.fighter__2--motor--2 {
-  bottom: 20%;
-}
-
-div[class*=fighter__2--blaster--] {
-  width: 50%;
-  height: 10%;
-  background: red;
-  right: 0;
-}
-div[class*=fighter__2--blaster--]::before {
-  content: "";
-  height: 40%;
-  width: 50%;
-  position: absolute;
-  background: rgb(179, 17, 176);
-  left: -25%;
-}
-
-.fighter__2--blaster--1 {
-  top: 12%;
-}
-.fighter__2--blaster--1::before {
-  bottom: -80%;
-  rotate: -65deg;
-}
-
-.fighter__2--blaster--2 {
-  bottom: 12%;
-}
-.fighter__2--blaster--2::before {
-  top: -80%;
-  rotate: 65deg;
 }

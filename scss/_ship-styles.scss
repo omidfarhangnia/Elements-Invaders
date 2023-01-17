@@ -239,3 +239,86 @@ div[class *= "fighter__1--gun--"]{
         top: -110%;
     }
 }
+
+// fighter number 2
+
+.fighter__2{
+    width: 150px;
+    height: 150px;
+    position: relative;
+    > *{
+        position: absolute;
+    }
+}
+
+.fighter__2--main--cabin{
+    width: 90%;
+    height: 30%;
+    background: #c71824;
+    z-index: 2;
+    top: 35%;
+    border-radius: 0 50% 50% 0;
+}
+
+div[class *= "fighter__2--motor--"]{
+    width: 20%;
+    height: 15%;
+    background: #513b3c;
+}
+
+.fighter__2--motor--1{
+    top: 20%;
+    border-radius: 0 100% 0 0;
+}
+
+.fighter__2--motor--2{
+    bottom: 20%;
+    border-radius: 0 0 100% 0;
+}
+
+div[class *= "fighter__2--blasters--"]{
+    width: 50%;
+    height: 10%;
+    background: #c71824;
+    right: 15%;
+    z-index: 3;
+}
+
+.fighter__2--blasters--1{
+    top: 12%;
+}
+
+.fighter__2--blasters--2{
+    bottom: 12%;
+}
+
+div[class *= "fighter__2--blaster--keeper--"]{
+    content: "";
+    height: 5%;
+    width: 30%;
+    position: absolute;
+    background: #513b3c;
+    right: 45%;
+    border-radius: 0 30% 30% 0;
+    border-radius: 30%;
+}
+
+.fighter__2--blaster--keeper--1{
+    top: 25%;
+    rotate: -65deg;
+}
+
+.fighter__2--blaster--keeper--2{
+    bottom: 25%;
+    rotate: 65deg;
+}
+
+.fighter__2--main--cabin--glass{
+    width: 40%;
+    height: 60%;
+    top: 20%;
+    left: 30%;
+    border-radius: 30% 60% 60% 30%;
+    position: absolute;
+    background: #28074f;
+}
