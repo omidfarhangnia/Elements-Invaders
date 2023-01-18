@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+$font-bebas-neue: "Bebas Neue", 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+.page__menu{
+    width: 100%;
+    height: 100vh;
+    background-image: url(../images/background-images/page-menu-bg.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    padding: 10vh 5vw;
+    box-sizing: border-box;
+}
+
+.page__menu--h1{
+    color: #ffffff;
+    text-align: center;
+    font-family: $font-bebas-neue;
+    margin-bottom: 10vh;
+    user-select: none;
+    &--top, &--bottom{
+        display: flex;
+        justify-content: center;
+        text-shadow: 0 1px 0 #FFF, 0 2px 0 #E7EBFA,
+        0 3px 3px #CAD3F5, 0 4px 3px #ADBCF0,
+        0 5px 3px #9FB0ED, 0 6px 3px #91A4EA,
+        0 7px 3px #8399E7, 0 8px 3px #748DE5,
+        0 9px 3px #6681E2, 0 10px 3px #5875DF,
+        0 11px 3px #496ADD, 0 12px 3px #3B5EDA,
+        0 20px 30px rgba(158, 158, 158, 0.5); 
+    }
+    &--top{
+        font-size: 8rem;
+        gap: 2px;
+        transform: translateY(35px);
+        :nth-child(1){
+            transform: skew(5deg, 2deg);
+        }
+        :nth-child(2){
+            transform: skew(2deg, 1deg);
+        
+        }
+        :nth-child(3){
+            transform: skew(3deg, 0deg);
+        
+        }
+        :nth-child(4){
+            transform: skew(0deg, 0deg);
+            
+        }
+        :nth-child(5){
+            transform: skew(0deg, 0deg)
+
+        }
+        :nth-child(6){
+            transform: skew(-3deg, 0deg);
+        
+        }
+        :nth-child(7){
+            transform: skew(-2deg, -1deg);
+        
+        }
+        :nth-child(8){
+            transform: skew(-5deg, -2deg);
+        }
+    }
+    &--bottom{
+        font-size: 10rem;
+        gap: 3px;
+        :nth-child(1){
+            transform: skew(-16deg, -2deg);
+        }
+        :nth-child(2){
+            transform: skew(-13deg, 0deg);
+        }
+        :nth-child(3){
+            transform: skew(-16deg, -1deg);
+        }
+        :nth-child(4){
+            transform: skew(-5deg, -1deg);
+        }
+        :nth-child(5){
+            transform: skew(3deg, 0deg);
+        }
+        :nth-child(6){
+            transform: skew(5deg, 1deg);
+        }
+        :nth-child(7){
+            transform: skew(6deg, 0deg);
+        }
+        :nth-child(8){
+            transform: skew(10deg, 8deg);
+        }
+    }
+}
+
+img{
+    width: 500px;
+    background: black;
+}
