@@ -7,7 +7,7 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
 .page__menu{
     width: 100%;
     height: 100vh;
-    background-image: url(../images/background-images/page-menu-bg.jpg);
+    background-image: url(../images/background-images/page-game-bg.jpg);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -16,6 +16,7 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
     padding: 10vh 5vw;
     box-sizing: border-box;
     align-items: center;
+    cursor: url("../images/fork.png"), pointer;
  
     button{
         width: 30%;
@@ -29,13 +30,13 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
         color: #ffffff;
         border: 3px solid #404F87;
         padding: .3rem 0;
-        cursor: pointer;
+        cursor: url("../images/fork-hovered.png"), pointer !important;
     }
 }
 
 .locked__button{
     opacity: .5;
-    cursor: default !important;
+    cursor: url("../images/fork-hovered.png"), pointer !important;
     > span{
         rotate: -30deg;
         translate: -20px 0px;
@@ -122,9 +123,4 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
             transform: skew(10deg, 8deg);
         }
     }
-}
-
-img{
-    width: 500px;
-    background: black;
 }
