@@ -706,6 +706,29 @@ div[class*=boss__fight--laser--] {
   transform: skew(10deg, 8deg);
 }
 
-.d-none {
-  display: none !important;
+#lock__message {
+  cursor: url("../images/fork.png"), pointer !important;
+}
+#lock__message .modal-title {
+  font-size: 2rem;
+  font-family: "Ubuntu Condensed", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  text-transform: capitalize;
+}
+#lock__message .modal-body p {
+  text-transform: capitalize;
+  font-family: "Ubuntu Condensed", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  line-height: 1.6rem;
+}
+#lock__message .modal-footer button[data-bs-dismiss=modal], #lock__message .modal-footer #go__tutorial {
+  text-transform: uppercase;
+  font-size: 1.3rem;
+  font-family: "Ubuntu Condensed", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  padding: 0.4rem 1rem;
+  cursor: url("../images/fork-hovered.png"), pointer !important;
+}
+#lock__message .modal-footer button[data-bs-dismiss=modal] {
+  background: #a5222b;
+}
+#lock__message .modal-footer #go__tutorial {
+  background: #28074f;
 }
