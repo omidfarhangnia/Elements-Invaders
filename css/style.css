@@ -732,3 +732,49 @@ div[class*=boss__fight--laser--] {
 #lock__message .modal-footer #go__tutorial {
   background: #28074f;
 }
+
+body {
+  overflow: hidden;
+}
+
+.page__tutorial {
+  width: 100%;
+  height: 100vh;
+  background-image: url("../images/background-images/page-tutorial-bg.jpg");
+  background-position: center;
+  background-size: contain;
+  position: absolute;
+  top: 0;
+  right: 100%;
+}
+
+.meteorite__image__container {
+  height: 100vh;
+  width: 90%;
+  position: fixed;
+  left: 110%;
+  top: 0;
+  scale: 1.2;
+}
+.meteorite__image__container .meteorite__image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50vh 0 0 50vh;
+  background: linear-gradient(to right, #be7dff, rgba(190, 125, 255, 0) 97%);
+  position: absolute;
+  z-index: 1;
+}
+.meteorite__image__container img {
+  height: 100vh;
+  position: absolute;
+  animation: rockAnimation 50s linear infinite;
+}
+
+@keyframes rockAnimation {
+  0% {
+    rotate: 0;
+  }
+  100% {
+    rotate: 360deg;
+  }
+}
