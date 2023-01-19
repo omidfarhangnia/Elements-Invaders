@@ -16,7 +16,7 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
     padding: 10vh 5vw;
     box-sizing: border-box;
     align-items: center;
-    cursor: url("../images/fork.png"), pointer;
+    cursor: url("../images/mouse-cursor/fork.png"), pointer;
  
     button{
         width: 30%;
@@ -30,13 +30,13 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
         color: #ffffff;
         border: 3px solid #404F87;
         padding: .3rem 0;
-        cursor: url("../images/fork-hovered.png"), pointer !important;
+        cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
     }
 }
 
 .locked__button{
     opacity: .5;
-    cursor: url("../images/fork-hovered.png"), pointer !important;
+    cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
     > span{
         rotate: -30deg;
         translate: -20px 0px;
@@ -127,7 +127,7 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
 
 // modal style
 #lock__message{
-    cursor: url("../images/fork.png"), pointer !important;
+    cursor: url("../images/mouse-cursor/fork.png"), pointer !important;
     .modal-title{
         font-size: 2rem;
         font-family: $font-roboto-mono;
@@ -146,7 +146,7 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
             font-size: 1.3rem;
             font-family: $font-roboto-mono;
             padding: .4rem 1rem;
-            cursor: url("../images/fork-hovered.png"), pointer !important;
+            cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
         }
         button[data-bs-dismiss = "modal"]{
             background: #a5222b;
