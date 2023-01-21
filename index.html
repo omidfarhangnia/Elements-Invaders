@@ -102,59 +102,89 @@
             </div>
         </div>
     </div> -->
-    <div class="page__menu">
-        <h1 class="page__menu--h1">
-            <span class="page__menu--h1--top">
-                <span>E</span>
-                <span>L</span>
-                <span>E</span>
-                <span>M</span>
-                <span>E</span>
-                <span>N</span>
-                <span>T</span>
-                <span>S</span>
-            </span>
-            <br>
-            <span class="page__menu--h1--bottom">
-                <span>I</span>
-                <span>N</span>
-                <span>V</span>
-                <span>A</span>
-                <span>D</span>
-                <span>E</span>
-                <span>R</span>
-                <span>S</span>
-            </span>
-        </h1>
-        <button type="button" class="locked__button position-relative" data-bs-toggle="modal" data-bs-target="#lock__message">
-            play
-            <span class="position-absolute top-0 start-100 translate-middle badge">
-                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
-                    <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
-                </svg>
-            </span>
-        </button>
-        <button id="tutorial">tutorial</button>
-        <button>about</button>
-    </div>
-    <div class="page__tutorial">
-
-    </div>
-    <div class="meteorite__image__container">
-        <div class="meteorite__image"></div>
-        <img src="./images/background-images/meteorite.png" alt="">
-    </div>
-    <div class="modal fade" id="lock__message" tabindex="-1" aria-labelledby="lock__message__label" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="lock__message__label">its lock</h3>                </div>
-                <div class="modal-body">
-                    <p>please go and see our tutorial first. because you don't know anything and you need a little practice</p>
+    <!-- <div class="main__ship--rifleBullet rifle__1"></div>
+    <div class="main__ship--rifleBullet rifle__2"></div>
+    <div class="main__ship--rifleBullet rifle__3"></div> -->
+    <div class="game__container">
+        <div class="page__menu">
+            <h1 class="page__menu--h1">
+                <span class="page__menu--h1--top">
+                    <span>E</span>
+                    <span>L</span>
+                    <span>E</span>
+                    <span>M</span>
+                    <span>E</span>
+                    <span>N</span>
+                    <span>T</span>
+                    <span>S</span>
+                </span>
+                <br>
+                <span class="page__menu--h1--bottom">
+                    <span>I</span>
+                    <span>N</span>
+                    <span>V</span>
+                    <span>A</span>
+                    <span>D</span>
+                    <span>E</span>
+                    <span>R</span>
+                    <span>S</span>
+                </span>
+            </h1>
+            <button type="button" class="locked__button position-relative" data-bs-toggle="modal" data-bs-target="#lock__message">
+                play
+                <span class="position-absolute top-0 start-100 translate-middle badge">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
+                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+                    </svg>
+                </span>
+            </button>
+            <button id="tutorial">tutorial</button>
+            <button>about</button>
+        </div>
+        <div class="page__tutorial">
+            <div class="main__ship">
+                <div class="main__ship__blasters main__ship__blaster--1"></div>
+                <div class="main__ship--motor__1">
+                    <div class="main__ship--guns gun__longer"></div>
+                    <div class="main__ship--guns gun__shorter"></div>
                 </div>
-                <div class="modal-footer d-flex justify-content-between">
-                    <button type="button" class="btn rounded-pill text-white" data-bs-dismiss="modal">never mind</button>
-                    <button type="button" class="btn rounded-pill text-white" data-bs-dismiss="modal" id="go__tutorial">go tutorial</button>
+                <div class="main__ship__cabin">
+                    <div class="main__ship__cabin--glass"></div>
+                </div>
+                <div class="main__ship--motor__2">
+                    <div class="main__ship--guns gun__longer"></div>
+                    <div class="main__ship--guns gun__shorter"></div>
+                </div>
+                <div class="main__ship__blasters main__ship__blaster--2"></div>
+            </div>
+            <h3 class="tutorial__headers text-white">WELCOME TO ELEMENTS INVADERS</h3>
+            <p class="tutorial__prag__num1 text-white">I hope you enjoy this game.</p>
+            <p class="tutorial__prag__num2 text-white">elements want to destroy the world but we have you.</p>
+            <p class="tutorial__prag__num3 text-white">you are our last chance, you and your ship definitely.</p>
+            <p class="tutorial__prag__num4 text-white">here you are. this is your ship.</p>
+            <p class="tutorial__prag__num5 text-white">you have to destroy all the element and their boss.</p>
+            <p class="tutorial__prag__num6 text-white">controlling your ship is like a peace of cake ( just move your mouse ).</p>
+            <p class="tutorial__prag__num7 text-white">you are armed with two different weapon.</p>
+            <p class="tutorial__prag__num8 text-white">first gun is assault rifle <span class="order">(hold right click)</span></p>
+            <p class="tutorial__prag__num9 text-white">second gun is blaster <span class="order">(hold left click)</span></p>
+            <!-- <p class="tutorial__prag__num10 text-white">are you read for training before starting your fight <span class="order">press any key</span></p> -->
+        </div>
+        <div class="meteorite__image__container">
+            <div class="meteorite__image"></div>
+            <img src="./images/background-images/meteorite.png" alt="">
+        </div>
+        <div class="modal fade" id="lock__message" tabindex="-1" aria-labelledby="lock__message__label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="lock__message__label">its lock</h3>                </div>
+                    <div class="modal-body">
+                        <p>please go and see our tutorial first. because you don't know anything and you need a little practice</p>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn rounded-pill text-white" data-bs-dismiss="modal">never mind</button>
+                        <button type="button" class="btn rounded-pill text-white" data-bs-dismiss="modal" id="go__tutorial">go tutorial</button>
+                    </div>
                 </div>
             </div>
         </div>

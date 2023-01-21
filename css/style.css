@@ -54,6 +54,7 @@ table {
   width: 150px;
   height: 150px;
   position: relative;
+  rotate: -90deg;
 }
 .main__ship > * {
   position: absolute;
@@ -154,6 +155,7 @@ div[class*=main__ship--motor] .main__ship--guns {
   width: 150px;
   height: 150px;
   position: relative;
+  rotate: 90deg;
 }
 .fighter__1 > * {
   position: absolute;
@@ -286,6 +288,7 @@ div[class*=fighter__1--gun--]::before {
   width: 150px;
   height: 150px;
   position: relative;
+  rotate: 90deg;
 }
 .fighter__2 > * {
   position: absolute;
@@ -367,6 +370,7 @@ div[class*=fighter__2--blaster--keeper--] {
   width: 150px;
   height: 150px;
   position: relative;
+  rotate: 90deg;
 }
 .fighter__3 > * {
   position: absolute;
@@ -610,7 +614,7 @@ div[class*=boss__fight--laser--] {
   padding: 10vh 5vw;
   box-sizing: border-box;
   align-items: center;
-  cursor: url("../images/fork.png"), pointer;
+  cursor: url("../images/mouse-cursor/fork.png"), pointer;
 }
 .page__menu button {
   width: 30%;
@@ -624,12 +628,12 @@ div[class*=boss__fight--laser--] {
   color: #ffffff;
   border: 3px solid #404F87;
   padding: 0.3rem 0;
-  cursor: url("../images/fork-hovered.png"), pointer !important;
+  cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
 }
 
 .locked__button {
   opacity: 0.5;
-  cursor: url("../images/fork-hovered.png"), pointer !important;
+  cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
 }
 .locked__button > span {
   rotate: -30deg;
@@ -707,7 +711,7 @@ div[class*=boss__fight--laser--] {
 }
 
 #lock__message {
-  cursor: url("../images/fork.png"), pointer !important;
+  cursor: url("../images/mouse-cursor/fork.png"), pointer !important;
 }
 #lock__message .modal-title {
   font-size: 2rem;
@@ -724,7 +728,7 @@ div[class*=boss__fight--laser--] {
   font-size: 1.3rem;
   font-family: "Ubuntu Condensed", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   padding: 0.4rem 1rem;
-  cursor: url("../images/fork-hovered.png"), pointer !important;
+  cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
 }
 #lock__message .modal-footer button[data-bs-dismiss=modal] {
   background: #a5222b;
@@ -733,8 +737,9 @@ div[class*=boss__fight--laser--] {
   background: #28074f;
 }
 
-body {
+.game__container {
   overflow: hidden;
+  position: relative;
 }
 
 .page__tutorial {
@@ -744,8 +749,24 @@ body {
   background-position: center;
   background-size: contain;
   position: absolute;
+  padding: 10vh 5vw;
+  user-select: none;
   top: 0;
   right: 100%;
+}
+.page__tutorial .main__ship {
+  width: 100px;
+  height: 100px;
+}
+.page__tutorial .tutorial__headers {
+  font-size: 3rem;
+  font-family: "Bebas Neue", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  margin-bottom: 1rem;
+}
+.page__tutorial p {
+  font-size: 1.3rem;
+  font-family: "Bebas Neue", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  margin: 1rem 0;
 }
 
 .meteorite__image__container {
