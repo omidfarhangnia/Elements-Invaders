@@ -60,6 +60,21 @@ table {
   position: absolute;
 }
 
+.main__ship--rifleContainer {
+  position: absolute;
+  display: flex;
+  gap: 6px;
+  height: 55px;
+  align-items: flex-end;
+}
+
+.main__ship--rifleBullet {
+  width: 5px;
+  height: 50px;
+  background: linear-gradient(to bottom, #FFA, #FF4);
+  border-radius: 50% 50% 3px 3px;
+}
+
 div[class*=main__ship--motor] {
   width: 60%;
   height: 15%;

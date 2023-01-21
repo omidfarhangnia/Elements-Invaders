@@ -38,8 +38,10 @@ gsap.registerEffect({
 })
 
 const gameContainer = $(".game__container");
+const mainShipRifleBulletContainer = $("<div class='main__ship--rifleContainer'></div>");
 const mainShipRifleBullet = $("<div class='main__ship--rifleBullet'></div>");
-const mainShipBlasterBullet = $("<div class='main__ship--blasterBullet'></div>");
+mainShipRifleBullet.data("gunLevel", 3);
+// const mainShipBlasterBullet = $("<div class='main__ship--blasterBullet'></div>");
 
 $('#go__tutorial, #tutorial').click(goToTutorial)
 
@@ -73,21 +75,22 @@ function goToTutorial() {
     }}, "+=2.5")
     .showText(".tutorial__prag__num7", {duration: .5}, "+=4")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
-        // makeGunRightClick();
+        makeGunRightClick();
         TutorialAnime.pause();
     }}, "+=2.5")
+    .showText(".tutorial__prag__num9", {duration: .5}, "+=4")
 }
 
-// goToTutorial();
+goToTutorial();
 
 let xPos = gsap.quickTo(".main__ship", "x", {duration: .3, ease: "power4.out"}),
     yPos = gsap.quickTo(".main__ship", "y", {duration: .3, ease: "power4.out"})
 
 function makeMovementForShip() {
-    $('.page__tutorial').css("cursor", "none")
+    // $('.page__tutorial').css("cursor", "none")
     $("body").on("mousemove", (event) => {
         xPos(event.pageX - 120)
-        yPos(event.pageY - 120)
+        yPos(event.pageY - 145)
     })
     $(".page__tutorial").one("mousemove", () => {
         TutorialAnime.resume()
@@ -96,10 +99,27 @@ function makeMovementForShip() {
 
 function makeGunRightClick() {
     gameContainer.click(function(event) {
-        mainShipBullet.position(event.pageX, event.pageY)
-        gameContainer.append(mainShipBullet);
+        gsap.set(mainShipRifleBulletContainer, {y: 0})
+        let halfOfBulletHeight = 25;
+        let halfOfBulletWidth = 2.5;
+
+        mainShipRifleBulletContainer.css({
+            top: event.pageY - halfOfBulletHeight,
+            left: event.pageX - halfOfBulletWidth,
+        })
+        
+        mainShipRifleBulletContainer.empty();
+
+        for(var i = 0; i < mainShipRifleBullet.data("gunLevel"); i++){
+            mainShipRifleBulletContainer.append("<div class='main__ship--rifleBullet'></div>");   
+        }
+
+        gameContainer.append(mainShipRifleBulletContainer);
+    
+        gsap.to(mainShipRifleBulletContainer, {
+            y: -1000,
+            duration: .3,
+            ease: "power4.in",
+        })
     })
 }
-
-
-makeGunRightClick();

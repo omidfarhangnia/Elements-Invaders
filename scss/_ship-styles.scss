@@ -9,31 +9,19 @@
     }
 }
 
-// .main__ship--rifleBullet{
-//     width: 5px;
-//     height: 50px;
-//     background: linear-gradient(to bottom, #FFA, #FF4);
-//     position: absolute;
-//     border-radius: 50% 50% 3px 3px;
-// }
+.main__ship--rifleContainer{
+    position: absolute;
+    display: flex;
+    gap: 6px;
+    height: 55px;
+    align-items: flex-end;
+}
 
-// .rifle__1{
-//     left: calc(10% - 8.5px);
-//     top: calc(10% + 5px);
-// }
-
-// .rifle__2{
-//     left: 10%;
-//     top: 10%;
-// }
-
-// .rifle__3{
-//     left: calc(10% + 8px);
-//     top: calc(10% + 5px);
-// }
-
-.main__ship--blasterBullet{
-
+.main__ship--rifleBullet{
+    width: 5px;
+    height: 50px;
+    background: linear-gradient(to bottom, #FFA, #FF4);
+    border-radius: 50% 50% 3px 3px;
 }
 
 div[class *= "main__ship--motor"]{
