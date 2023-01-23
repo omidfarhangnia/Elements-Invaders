@@ -45,8 +45,11 @@ const mainShipSize = {
 };
 
 const mainShipBulletContainer = $(".main__ship--bullet__container");
+const mainShipBlasterContainer = $(".main__ship--blaster__container");
 mainShipBulletContainer.data("gunLevel", 3);
-var id = 1,
+var BulletId = 1,
+    BlasterId = 1,
+    isBlasterReady = true,
     RightClickTimeOut = 0,
     RightClickSetInterval = 0;
 
@@ -106,8 +109,43 @@ function makeMovementForShip() {
     // $(".page__tutorial").one("mousemove", () => {
     //     TutorialAnime.resume()
     // })
+
+    $("body").on("keydown", function(event) {
+        if(event.originalEvent.code === "Space"){
+            blasterShoot()
+        }
+    })
 }
 makeMovementForShip();
+
+
+function blasterShoot() {
+    if(isBlasterReady !== true) return;
+
+    let BlastersId = giveCurrentId(BlasterId);
+
+    putBlasters(BlastersId)
+
+    addAnimeToBlaster(BlastersId);
+
+    BlasterId++;
+}
+
+function addAnimeToBlaster(id) {
+    gsap.to(`.mainShip__blaster[id="${id}"]`, {
+        x: 1000,
+        duration: .55,
+        onComplete: () => {
+            $(`.mainShip__blaster[id="${id}"]`).remove();
+        }
+    })
+}
+
+function putBlasters(id) {
+    let $blaster1 = $(`<div class="mainShip__blaster mainShip__blaster--num--1"></div>`).attr("id", id);
+    let $blaster2 = $(`<div class="mainShip__blaster mainShip__blaster--num--2"></div>`).attr("id", id);
+    mainShipBlasterContainer.append([$blaster1, $blaster2])
+}
 
 function makeGunRightClick() {
     $("body").on("click", bulletShoot)
@@ -125,53 +163,51 @@ function makeGunRightClick() {
 makeGunRightClick()
 
 function bulletShoot() {
-    let BulletsId = giveBulletsId();
+    let BulletsId = giveCurrentId(BulletId);
     
     if(mainShipBulletContainer.data("gunLevel") >= 1){
-        firstGunShoot(BulletsId)
+        putFirstBullet(BulletsId)
         if(mainShipBulletContainer.data("gunLevel") >= 2){
-            secondGunShoot(BulletsId)
+            putSecondBullet(BulletsId)
             if(mainShipBulletContainer.data("gunLevel") === 3){
-                thirdGunShoot(BulletsId)
+                putThirdBullet(BulletsId)
             }
         }
     }
 
     addAnimeToBullet(BulletsId)
 
-    id++;
+    BulletId++;
 }
 
-function giveBulletsId() {
-    let idLength = `${id}`.length,
-    BulletId = id;
+function giveCurrentId(customId) {
+    let idLength = `${customId}`.length,
+    customIdContainer = customId;
     for(var i = 0; i < (9 - idLength); i++){
-        BulletId = "0" + BulletId
+        customIdContainer = "0" + customIdContainer
     }
-    return BulletId;
+    return customIdContainer;
 }
 
-function firstGunShoot(id) {
+function putFirstBullet(id) {
     let $bullet1 = $(`<div class="mainShip__bullet mainShip__bullet--num--1"></div>`);
     $bullet1.attr("id", id)
     mainShipBulletContainer.append($bullet1)
 }
 
-function secondGunShoot(id) {
+function putSecondBullet(id) {
     let $bullet2 = $(`<div class="mainShip__bullet mainShip__bullet--num--2"></div>`);
     $bullet2.attr("id", id)
     mainShipBulletContainer.append($bullet2)
 }
 
-function thirdGunShoot(id) {
+function putThirdBullet(id) {
     let $bullet3 = $(`<div class="mainShip__bullet mainShip__bullet--num--3"></div>`);
     $bullet3.attr("id", id)
     mainShipBulletContainer.append($bullet3)
 }
 
 function addAnimeToBullet(id) {
-    $(`.mainShip__bullet[id="${id}"]`)
-    gsap.set(`.mainShip__bullet[id="${id}"]`, {position: "fixed"});
     gsap.to(`.mainShip__bullet[id="${id}"]`, {
         x: 1000,
         duration: .55,
