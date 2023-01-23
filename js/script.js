@@ -37,15 +37,19 @@ gsap.registerEffect({
     extendTimeline: true
 })
 
+const mainShipSize = {
+    width: 100, 
+    halfOfWidth: (100 / 2),
+    height: 100,
+    halfOfHeight: (100 / 2),
+};
 const gameContainer = $(".game__container");
-const mainShipRifleBulletContainer = $("<div class='main__ship--rifleContainer'></div>");
-const mainShipRifleBullet = $("<div class='main__ship--rifleBullet'></div>");
-mainShipRifleBullet.data("gunLevel", 3);
-// const mainShipBlasterBullet = $("<div class='main__ship--blasterBullet'></div>");
+const mainShipBulletContainer = $(".main__ship--bullet__container");
+mainShipBulletContainer.data("gunLevel", 1);
 
 $('#go__tutorial, #tutorial').click(goToTutorial)
 
-let TutorialAnime = gsap.timeline().timeScale(15);
+let TutorialAnime = gsap.timeline();
 
 function goToTutorial() {
     TutorialAnime
@@ -81,45 +85,42 @@ function goToTutorial() {
     .showText(".tutorial__prag__num9", {duration: .5}, "+=4")
 }
 
-goToTutorial();
-
 let xPos = gsap.quickTo(".main__ship", "x", {duration: .3, ease: "power4.out"}),
     yPos = gsap.quickTo(".main__ship", "y", {duration: .3, ease: "power4.out"})
 
 function makeMovementForShip() {
     // $('.page__tutorial').css("cursor", "none")
     $("body").on("mousemove", (event) => {
-        xPos(event.pageX - 120)
-        yPos(event.pageY - 145)
+        let page__width = window.innerWidth,
+            page__height = window.innerHeight
+
+        xPos(gsap.utils.clamp(0, (page__width - mainShipSize.width) , (event.pageX - mainShipSize.halfOfWidth)))
+        yPos(gsap.utils.clamp(0, (page__height - mainShipSize.height), (event.pageY - mainShipSize.halfOfHeight)))
+
+        // i used utils.clamp for having a condition for controlling the ship without
+        // this condition my ship will gone out of VIEW PORT 
     })
-    $(".page__tutorial").one("mousemove", () => {
-        TutorialAnime.resume()
-    })
+    // $(".page__tutorial").one("mousemove", () => {
+    //     TutorialAnime.resume()
+    // })
 }
+makeMovementForShip();
 
 function makeGunRightClick() {
     gameContainer.click(function(event) {
-        gsap.set(mainShipRifleBulletContainer, {y: 0})
-        let halfOfBulletHeight = 25;
-        let halfOfBulletWidth = 2.5;
 
-        mainShipRifleBulletContainer.css({
-            top: event.pageY - halfOfBulletHeight,
-            left: event.pageX - halfOfBulletWidth,
-        })
-        
-        mainShipRifleBulletContainer.empty();
-
-        for(var i = 0; i < mainShipRifleBullet.data("gunLevel"); i++){
-            mainShipRifleBulletContainer.append("<div class='main__ship--rifleBullet'></div>");   
-        }
-
-        gameContainer.append(mainShipRifleBulletContainer);
-    
-        gsap.to(mainShipRifleBulletContainer, {
-            y: -1000,
-            duration: .3,
-            ease: "power4.in",
-        })
+        switch (mainShipBulletContainer.data("gunLevel")) {
+            case 1:
+              day = "Sunday";
+              break;
+            case 2:
+               day = "Tuesday";
+              break;
+            case 3:
+              day = "Wednesday";
+              break;
+          }
+        mainShipBulletContainer.append()
     })
 }
+// makeGunRightClick();
