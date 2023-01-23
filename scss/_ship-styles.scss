@@ -11,7 +11,7 @@
         width: 100%;
         height: 100%;
         // z-index: -1;
-        .bullet{
+        .mainShip__bullet{
             height: 5px;
             width: 50%;
             background: linear-gradient(to bottom, #FFA, #FF4);
@@ -19,15 +19,15 @@
             z-index: 100;
             position: absolute;
         }
-        .bullet__num__1{
+        .mainShip__bullet--num--1{
             right: 5%;
             top: calc(50% - 2.5px);
         }
-        .bullet__num__2{
+        .mainShip__bullet--num--2{
             left: 5%;
             top: calc(33% - 2.5px);
         }
-        .bullet__num__3{
+        .mainShip__bullet--num--3{
             left: 5%;
             bottom: calc(33% - 2.5px);
         }

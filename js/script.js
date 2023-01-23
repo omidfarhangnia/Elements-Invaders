@@ -43,9 +43,12 @@ const mainShipSize = {
     height: 100,
     halfOfHeight: (100 / 2),
 };
-const gameContainer = $(".game__container");
+
 const mainShipBulletContainer = $(".main__ship--bullet__container");
-mainShipBulletContainer.data("gunLevel", 1);
+mainShipBulletContainer.data("gunLevel", 3);
+var id = 1,
+    RightClickTimeOut = 0,
+    RightClickSetInterval = 0;
 
 $('#go__tutorial, #tutorial').click(goToTutorial)
 
@@ -107,20 +110,73 @@ function makeMovementForShip() {
 makeMovementForShip();
 
 function makeGunRightClick() {
-    gameContainer.click(function(event) {
-
-        switch (mainShipBulletContainer.data("gunLevel")) {
-            case 1:
-              day = "Sunday";
-              break;
-            case 2:
-               day = "Tuesday";
-              break;
-            case 3:
-              day = "Wednesday";
-              break;
-          }
-        mainShipBulletContainer.append()
+    $("body").on("click", bulletShoot)
+    $("body").on("mousedown", function() {
+        timeOutId = setTimeout(function() {
+            RightClickSetInterval = setInterval(() => {
+                bulletShoot()
+            }, 100);
+        }, 500)
+    }).on("mouseup click", function() {
+        clearTimeout(timeOutId);
+        clearTimeout(RightClickSetInterval);
     })
 }
-// makeGunRightClick();
+makeGunRightClick()
+
+function bulletShoot() {
+    let BulletsId = giveBulletsId();
+    
+    if(mainShipBulletContainer.data("gunLevel") >= 1){
+        firstGunShoot(BulletsId)
+        if(mainShipBulletContainer.data("gunLevel") >= 2){
+            secondGunShoot(BulletsId)
+            if(mainShipBulletContainer.data("gunLevel") === 3){
+                thirdGunShoot(BulletsId)
+            }
+        }
+    }
+
+    addAnimeToBullet(BulletsId)
+
+    id++;
+}
+
+function giveBulletsId() {
+    let idLength = `${id}`.length,
+    BulletId = id;
+    for(var i = 0; i < (9 - idLength); i++){
+        BulletId = "0" + BulletId
+    }
+    return BulletId;
+}
+
+function firstGunShoot(id) {
+    let $bullet1 = $(`<div class="mainShip__bullet mainShip__bullet--num--1"></div>`);
+    $bullet1.attr("id", id)
+    mainShipBulletContainer.append($bullet1)
+}
+
+function secondGunShoot(id) {
+    let $bullet2 = $(`<div class="mainShip__bullet mainShip__bullet--num--2"></div>`);
+    $bullet2.attr("id", id)
+    mainShipBulletContainer.append($bullet2)
+}
+
+function thirdGunShoot(id) {
+    let $bullet3 = $(`<div class="mainShip__bullet mainShip__bullet--num--3"></div>`);
+    $bullet3.attr("id", id)
+    mainShipBulletContainer.append($bullet3)
+}
+
+function addAnimeToBullet(id) {
+    $(`.mainShip__bullet[id="${id}"]`)
+    gsap.set(`.mainShip__bullet[id="${id}"]`, {position: "fixed"});
+    gsap.to(`.mainShip__bullet[id="${id}"]`, {
+        x: 1000,
+        duration: .55,
+        onComplete: () => {
+            $(`.mainShip__bullet[id="${id}"]`).remove();
+        }
+    })
+}

@@ -63,7 +63,7 @@ table {
   width: 100%;
   height: 100%;
 }
-.main__ship--bullet__container .bullet {
+.main__ship--bullet__container .mainShip__bullet {
   height: 5px;
   width: 50%;
   background: linear-gradient(to bottom, #FFA, #FF4);
@@ -71,15 +71,15 @@ table {
   z-index: 100;
   position: absolute;
 }
-.main__ship--bullet__container .bullet__num__1 {
+.main__ship--bullet__container .mainShip__bullet--num--1 {
   right: 5%;
   top: calc(50% - 2.5px);
 }
-.main__ship--bullet__container .bullet__num__2 {
+.main__ship--bullet__container .mainShip__bullet--num--2 {
   left: 5%;
   top: calc(33% - 2.5px);
 }
-.main__ship--bullet__container .bullet__num__3 {
+.main__ship--bullet__container .mainShip__bullet--num--3 {
   left: 5%;
   bottom: calc(33% - 2.5px);
 }
