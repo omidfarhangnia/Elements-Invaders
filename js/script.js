@@ -79,7 +79,7 @@ function idMaker(num) {
 let xPos = gsap.quickTo(".main__ship", "x", {duration: .3, ease: "power4.out"}),
     yPos = gsap.quickTo(".main__ship", "y", {duration: .3, ease: "power4.out"});
 
-let TutorialAnime = gsap.timeline().timeScale(1.2);
+let TutorialAnime = gsap.timeline().timeScale(12);
 
 class mainShipRifle {
     constructor (level, BulletsId) {
@@ -197,18 +197,20 @@ function makeRifleReady() {
             let rifle = new mainShipRifle(3, rifle__num);
             rifle.fireRifle();
             rifle__num++;
+        },
+        "mousedown" : function() {
+            timeOutId = setTimeout(function() {
+                RightClickSetInterval = setInterval(() => {
+                    let rifle = new mainShipRifle(3, rifle__num);
+                    rifle.fireRifle();
+                    rifle__num++;
+                }, 100);
+            }, 500)
+        },
+        "mouseup" : function() {
+            clearTimeout(timeOutId);
+            clearTimeout(RightClickSetInterval);
         }
-        // "mousedown" : function() {
-        //     timeOutId = setTimeout(function() {
-        //         RightClickSetInterval = setInterval(() => {
-        //             bulletShoot()
-        //         }, 100);
-        //     }, 500)
-        // },
-        // "mouseup click" : function() {
-        //     clearTimeout(timeOutId);
-        //     clearTimeout(RightClickSetInterval);
-        // }
     })
 
     $(".page__tutorial").one("click", () => {
