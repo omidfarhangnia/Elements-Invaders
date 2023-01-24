@@ -31,11 +31,26 @@ gsap.registerEffect({
             opacity: 1,
             duration: config.duration,
             onComplete: config.onComplete,
+            onStart: config.onStart,
             ease: "expo.out",
         })
     },
     extendTimeline: true
 })
+
+gsap.registerEffect({
+    name: "orderAnime",
+    effect: (target, config) => {
+        return gsap.to(target,{
+            opacity: 0,
+            duration: .5,
+            repeat: -1,
+            yoyo: true,
+            id: config.id
+        })
+    },
+    extendTimeline: true
+});
 
 const mainShipSize = {
     width: 100, 
@@ -55,8 +70,9 @@ var BulletId = 1,
 
 $('#go__tutorial, #tutorial').click(goToTutorial)
 
-let TutorialAnime = gsap.timeline();
+let TutorialAnime = gsap.timeline().timeScale(11);
 
+goToTutorial()
 function goToTutorial() {
     TutorialAnime
     .changePage(".page__tutorial")
@@ -67,6 +83,7 @@ function goToTutorial() {
         duration: 1,
         opacity: 0
     }, "+=2")
+    // i want to hide my wish
     .showText(".tutorial__prag__num2", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num3", {duration: .5}, "+=2.5")
     .fromTo(".main__ship", {
@@ -76,19 +93,34 @@ function goToTutorial() {
         duration: 1.3,
         y: "-=500",
         ease: "back.out(.6)"
-    },)
-    .showText(".tutorial__prag__num4", {duration: .5}, "+=2.5")
+    })
+    .showText(".tutorial__prag__num4", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num5", {duration: .5}, "+=2.5")
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
         makeMovementForShip();
         TutorialAnime.pause();
+        gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
     }}, "+=2.5")
-    .showText(".tutorial__prag__num7", {duration: .5}, "+=4")
+    .showText(".tutorial__prag__num7", {duration: .5, onStart: function() {
+        gsap.getById("prag__6__order").seek(0).kill();
+    }}, "+=2")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
         makeGunReady();
         TutorialAnime.pause();
+        gsap.effects.orderAnime(".tutorial__prag__num8 .order", {id: "prag__8__order"})
     }}, "+=2.5")
-    .showText(".tutorial__prag__num9", {duration: .5}, "+=4")
+    .showText(".tutorial__prag__num9", {duration: .5, onComplete: function() {
+        makeBlasterReady()
+        TutorialAnime.pause();
+        gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
+    }, onStart: function() {
+        gsap.getById("prag__8__order").seek(0).kill()
+    }}, "+=3")
+    .showText(".tutorial__prag__num10", {duration: .5, onComplete: function(){    
+        gsap.effects.orderAnime(".tutorial__prag__num10 .order", {id: "prag__10__order"})
+    }, onStart: function(){
+        gsap.getById("prag__9__order").seek(0).kill()
+    }}, "+=3")
 }
 
 let xPos = gsap.quickTo(".main__ship", "x", {duration: .3, ease: "power4.out"}),
@@ -111,11 +143,19 @@ function makeMovementForShip() {
     })
 }
 
-// $("body").on("keydown", function(event) {
-//     if(event.originalEvent.code === "Space"){
-//         blasterShoot()
-//     }
-// })
+function makeBlasterReady() {
+    $("body").on("keydown", function(event) {
+        if(event.originalEvent.code === "Space"){
+            blasterShoot()
+        }
+    })
+
+    $("body").one("keydown", function(event) {
+        if(event.originalEvent.code === "Space"){
+            TutorialAnime.resume()
+        }
+    }) 
+}
 
 function blasterShoot() {
     if(isBlasterReady !== true) return;
@@ -146,19 +186,25 @@ function putBlasters(id) {
 }
 
 function makeGunReady() {
-    $("body").on("click", bulletShoot)
-    $("body").on("mousedown", function() {
-        timeOutId = setTimeout(function() {
-            RightClickSetInterval = setInterval(() => {
-                bulletShoot()
-            }, 100);
-        }, 500)
-    }).on("mouseup click", function() {
-        clearTimeout(timeOutId);
-        clearTimeout(RightClickSetInterval);
+    $("body").on({
+        "click": bulletShoot,
+        // "mousedown" : function() {
+        //     timeOutId = setTimeout(function() {
+        //         RightClickSetInterval = setInterval(() => {
+        //             bulletShoot()
+        //         }, 100);
+        //     }, 500)
+        // },
+        // "mouseup click" : function() {
+        //     clearTimeout(timeOutId);
+        //     clearTimeout(RightClickSetInterval);
+        // }
+    })
+
+    $(".page__tutorial").one("click", () => {
+        TutorialAnime.resume()
     })
 }
-makeGunReady()
 
 function bulletShoot() {
     let BulletsId = giveCurrentId(BulletId);
