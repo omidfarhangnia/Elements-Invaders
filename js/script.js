@@ -19,7 +19,6 @@ gsap.registerEffect({
     },
     extendTimeline: true
 })
-
 gsap.registerEffect({
     name: "showText",
     effect: (targets, config) => {
@@ -37,7 +36,6 @@ gsap.registerEffect({
     },
     extendTimeline: true
 })
-
 gsap.registerEffect({
     name: "orderAnime",
     effect: (target, config) => {
@@ -52,6 +50,16 @@ gsap.registerEffect({
     extendTimeline: true
 });
 
+const mainShipBulletContainer = $(".main__ship--bullet__container");
+const mainShipBlasterContainer = $(".main__ship--blaster__container");
+
+var blaster__num = 0,
+    rifle__num = 0,  
+    RightClickTimeOut = 0,
+    RightClickSetInterval = 0;
+
+$('#go__tutorial, #tutorial').click(goToTutorial)
+
 const mainShipSize = {
     width: 100, 
     halfOfWidth: (100 / 2),
@@ -59,20 +67,80 @@ const mainShipSize = {
     halfOfHeight: (100 / 2),
 };
 
-const mainShipBulletContainer = $(".main__ship--bullet__container");
-const mainShipBlasterContainer = $(".main__ship--blaster__container");
-mainShipBulletContainer.data("gunLevel", 3);
-var BulletId = 1,
-    BlasterId = 1,
-    isBlasterReady = true,
-    RightClickTimeOut = 0,
-    RightClickSetInterval = 0;
+function idMaker(num) {
+    let idLength = `${num}`.length,
+    numContainer = num;
+    for(var i = 0; i < (9 - idLength); i++){
+        numContainer = "0" + numContainer
+    }
+    return numContainer;
+}
 
-$('#go__tutorial, #tutorial').click(goToTutorial)
+let xPos = gsap.quickTo(".main__ship", "x", {duration: .3, ease: "power4.out"}),
+    yPos = gsap.quickTo(".main__ship", "y", {duration: .3, ease: "power4.out"});
 
-let TutorialAnime = gsap.timeline().timeScale(11);
+let TutorialAnime = gsap.timeline().timeScale(1.2);
 
-goToTutorial()
+class mainShipRifle {
+    constructor (level, BulletsId) {
+        this.level = level;
+        this.BulletsId = BulletsId
+    }
+    fireRifle() {
+        let currentBulletsId = idMaker(this.BulletsId);
+    
+        if(this.level >= 1){
+            let $bullet1 = $(`<div class="mainShip__bullet mainShip__bullet--num--1"></div>`);
+            $bullet1.attr("id", currentBulletsId)
+            mainShipBulletContainer.append($bullet1)
+            
+            if(this.level >= 2){
+                let $bullet2 = $(`<div class="mainShip__bullet mainShip__bullet--num--2"></div>`);
+                $bullet2.attr("id", currentBulletsId)
+                mainShipBulletContainer.append($bullet2)
+                
+                if(this.level === 3){
+                    let $bullet3 = $(`<div class="mainShip__bullet mainShip__bullet--num--3"></div>`);
+                    $bullet3.attr("id", currentBulletsId)
+                    mainShipBulletContainer.append($bullet3)
+                }
+            }
+        }
+        
+        gsap.to(`.mainShip__bullet[id="${currentBulletsId}"]`, {
+            x: 1000,
+            duration: .55,
+            onComplete: () => {
+                $(`.mainShip__bullet[id="${currentBulletsId}"]`).remove();
+            }
+        })
+        
+    }
+} 
+
+class mainShipBlaster {
+    constructor(isBlasterReady, BulletsId) {
+        this.isBlasterReady = isBlasterReady;
+        this.BulletsId = BulletsId
+    }
+    fireBlaster() {
+        if(this.isBlasterReady !== true) return;
+
+        let currentBlastersId = idMaker(this.BulletsId);
+        let $blaster1 = $(`<div class="mainShip__blaster mainShip__blaster--num--1"></div>`).attr("id", currentBlastersId);
+        let $blaster2 = $(`<div class="mainShip__blaster mainShip__blaster--num--2"></div>`).attr("id", currentBlastersId);
+        mainShipBlasterContainer.append([$blaster1, $blaster2])
+
+        gsap.to(`.mainShip__blaster[id="${currentBlastersId}"]`, {
+            x: 1000,
+            duration: .55,
+            onComplete: () => {
+                $(`.mainShip__blaster[id="${currentBlastersId}"]`).remove();
+            }
+        })
+    }
+}
+
 function goToTutorial() {
     TutorialAnime
     .changePage(".page__tutorial")
@@ -97,7 +165,7 @@ function goToTutorial() {
     .showText(".tutorial__prag__num4", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num5", {duration: .5}, "+=2.5")
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
-        makeMovementForShip();
+        shipMovement()
         TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
     }}, "+=2.5")
@@ -105,12 +173,12 @@ function goToTutorial() {
         gsap.getById("prag__6__order").seek(0).kill();
     }}, "+=2")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
-        makeGunReady();
+        makeRifleReady();
         TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num8 .order", {id: "prag__8__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num9", {duration: .5, onComplete: function() {
-        makeBlasterReady()
+        makeBlasterReady();
         TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
     }, onStart: function() {
@@ -123,71 +191,13 @@ function goToTutorial() {
     }}, "+=3")
 }
 
-let xPos = gsap.quickTo(".main__ship", "x", {duration: .3, ease: "power4.out"}),
-    yPos = gsap.quickTo(".main__ship", "y", {duration: .3, ease: "power4.out"})
-
-function makeMovementForShip() {
-    // $('.page__tutorial').css("cursor", "none")
-    $(".page__tutorial").on("mousemove", (event) => {
-        let page__width = window.innerWidth,
-            page__height = window.innerHeight
-
-        xPos(gsap.utils.clamp(0, (page__width - mainShipSize.width) , (event.pageX - mainShipSize.halfOfWidth)))
-        yPos(gsap.utils.clamp(0, (page__height - mainShipSize.height), (event.pageY - mainShipSize.halfOfHeight)))
-
-        // i used utils.clamp for having a condition for controlling the ship without
-        // this condition my ship will gone out of VIEW PORT 
-    })
-    $(".page__tutorial").one("mousemove", () => {
-        TutorialAnime.resume()
-    })
-}
-
-function makeBlasterReady() {
-    $("body").on("keydown", function(event) {
-        if(event.originalEvent.code === "Space"){
-            blasterShoot()
-        }
-    })
-
-    $("body").one("keydown", function(event) {
-        if(event.originalEvent.code === "Space"){
-            TutorialAnime.resume()
-        }
-    }) 
-}
-
-function blasterShoot() {
-    if(isBlasterReady !== true) return;
-
-    let BlastersId = giveCurrentId(BlasterId);
-
-    putBlasters(BlastersId)
-
-    addAnimeToBlaster(BlastersId);
-
-    BlasterId++;
-}
-
-function addAnimeToBlaster(id) {
-    gsap.to(`.mainShip__blaster[id="${id}"]`, {
-        x: 1000,
-        duration: .55,
-        onComplete: () => {
-            $(`.mainShip__blaster[id="${id}"]`).remove();
-        }
-    })
-}
-
-function putBlasters(id) {
-    let $blaster1 = $(`<div class="mainShip__blaster mainShip__blaster--num--1"></div>`).attr("id", id);
-    let $blaster2 = $(`<div class="mainShip__blaster mainShip__blaster--num--2"></div>`).attr("id", id);
-    mainShipBlasterContainer.append([$blaster1, $blaster2])
-}
-
-function makeGunReady() {
+function makeRifleReady() {
     $("body").on({
-        "click": bulletShoot,
+        "click": function() {
+            let rifle = new mainShipRifle(3, rifle__num);
+            rifle.fireRifle();
+            rifle__num++;
+        }
         // "mousedown" : function() {
         //     timeOutId = setTimeout(function() {
         //         RightClickSetInterval = setInterval(() => {
@@ -206,57 +216,35 @@ function makeGunReady() {
     })
 }
 
-function bulletShoot() {
-    let BulletsId = giveCurrentId(BulletId);
-    
-    if(mainShipBulletContainer.data("gunLevel") >= 1){
-        putFirstBullet(BulletsId)
-        if(mainShipBulletContainer.data("gunLevel") >= 2){
-            putSecondBullet(BulletsId)
-            if(mainShipBulletContainer.data("gunLevel") === 3){
-                putThirdBullet(BulletsId)
-            }
+function makeBlasterReady() {
+    $("body").on("keydown", function(event) {
+        if(event.originalEvent.code === "Space"){
+            let blaster = new mainShipBlaster(true, blaster__num);
+            blaster.fireBlaster();
+            blaster__num++;
         }
-    }
+    })
 
-    addAnimeToBullet(BulletsId)
-
-    BulletId++;
-}
-
-function giveCurrentId(customId) {
-    let idLength = `${customId}`.length,
-    customIdContainer = customId;
-    for(var i = 0; i < (9 - idLength); i++){
-        customIdContainer = "0" + customIdContainer
-    }
-    return customIdContainer;
-}
-
-function putFirstBullet(id) {
-    let $bullet1 = $(`<div class="mainShip__bullet mainShip__bullet--num--1"></div>`);
-    $bullet1.attr("id", id)
-    mainShipBulletContainer.append($bullet1)
-}
-
-function putSecondBullet(id) {
-    let $bullet2 = $(`<div class="mainShip__bullet mainShip__bullet--num--2"></div>`);
-    $bullet2.attr("id", id)
-    mainShipBulletContainer.append($bullet2)
-}
-
-function putThirdBullet(id) {
-    let $bullet3 = $(`<div class="mainShip__bullet mainShip__bullet--num--3"></div>`);
-    $bullet3.attr("id", id)
-    mainShipBulletContainer.append($bullet3)
-}
-
-function addAnimeToBullet(id) {
-    gsap.to(`.mainShip__bullet[id="${id}"]`, {
-        x: 1000,
-        duration: .55,
-        onComplete: () => {
-            $(`.mainShip__bullet[id="${id}"]`).remove();
+    $("body").one("keydown", function(event) {
+        if(event.originalEvent.code === "Space"){
+            TutorialAnime.resume()
         }
+    }) 
+};
+
+function shipMovement() {
+    $('.page__tutorial').css("cursor", "none")
+    $(".page__tutorial").on("mousemove", (event) => {
+        let page__width = window.innerWidth,
+            page__height = window.innerHeight
+
+        xPos(gsap.utils.clamp(0, (page__width - mainShipSize.width) , (event.pageX - mainShipSize.halfOfWidth)))
+        yPos(gsap.utils.clamp(0, (page__height - mainShipSize.height), (event.pageY - mainShipSize.halfOfHeight)))
+
+        // i used utils.clamp for having a condition for controlling the ship without
+        // this condition my ship will gone out of VIEW PORT 
+    })
+    $(".page__tutorial").one("mousemove", () => {
+        TutorialAnime.resume()
     })
 }
