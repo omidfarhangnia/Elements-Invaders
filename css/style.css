@@ -804,7 +804,6 @@ div[class*=boss__fight--laser--] {
   background-position: center;
   background-size: contain;
   position: absolute;
-  padding: 10vh 5vw;
   user-select: none;
   top: 0;
   right: 100%;
@@ -812,6 +811,9 @@ div[class*=boss__fight--laser--] {
 .page__tutorial .main__ship {
   width: 100px;
   height: 100px;
+}
+.page__tutorial .text__container {
+  margin: 10vh 5vw;
 }
 .page__tutorial .tutorial__headers {
   font-size: 3rem;
@@ -853,10 +855,4 @@ div[class*=boss__fight--laser--] {
   100% {
     rotate: 360deg;
   }
-}
-body {
-  width: 100%;
-  height: 100vh;
-  background: black;
-  overflow: hidden;
 }

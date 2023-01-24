@@ -70,11 +70,11 @@ function goToTutorial() {
     .showText(".tutorial__prag__num2", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num3", {duration: .5}, "+=2.5")
     .fromTo(".main__ship", {
-        y: window.innerHeight + 300,
-        x: (window.innerWidth / 2) - 120
+        y: window.innerHeight,
+        x: (window.innerWidth / 2) - mainShipSize.halfOfWidth
     },{
-        y: "-=600",
         duration: 1.3,
+        y: "-=500",
         ease: "back.out(.6)"
     },)
     .showText(".tutorial__prag__num4", {duration: .5}, "+=2.5")
@@ -85,7 +85,7 @@ function goToTutorial() {
     }}, "+=2.5")
     .showText(".tutorial__prag__num7", {duration: .5}, "+=4")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
-        makeGunRightClick();
+        makeGunReady();
         TutorialAnime.pause();
     }}, "+=2.5")
     .showText(".tutorial__prag__num9", {duration: .5}, "+=4")
@@ -96,7 +96,7 @@ let xPos = gsap.quickTo(".main__ship", "x", {duration: .3, ease: "power4.out"}),
 
 function makeMovementForShip() {
     // $('.page__tutorial').css("cursor", "none")
-    $("body").on("mousemove", (event) => {
+    $(".page__tutorial").on("mousemove", (event) => {
         let page__width = window.innerWidth,
             page__height = window.innerHeight
 
@@ -106,18 +106,16 @@ function makeMovementForShip() {
         // i used utils.clamp for having a condition for controlling the ship without
         // this condition my ship will gone out of VIEW PORT 
     })
-    // $(".page__tutorial").one("mousemove", () => {
-    //     TutorialAnime.resume()
-    // })
-
-    $("body").on("keydown", function(event) {
-        if(event.originalEvent.code === "Space"){
-            blasterShoot()
-        }
+    $(".page__tutorial").one("mousemove", () => {
+        TutorialAnime.resume()
     })
 }
-makeMovementForShip();
 
+// $("body").on("keydown", function(event) {
+//     if(event.originalEvent.code === "Space"){
+//         blasterShoot()
+//     }
+// })
 
 function blasterShoot() {
     if(isBlasterReady !== true) return;
@@ -147,7 +145,7 @@ function putBlasters(id) {
     mainShipBlasterContainer.append([$blaster1, $blaster2])
 }
 
-function makeGunRightClick() {
+function makeGunReady() {
     $("body").on("click", bulletShoot)
     $("body").on("mousedown", function() {
         timeOutId = setTimeout(function() {
@@ -160,7 +158,7 @@ function makeGunRightClick() {
         clearTimeout(RightClickSetInterval);
     })
 }
-makeGunRightClick()
+makeGunReady()
 
 function bulletShoot() {
     let BulletsId = giveCurrentId(BulletId);
