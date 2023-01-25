@@ -1,4 +1,7 @@
 // main ship
+
+@use "sass:color";
+
 .main__ship{
     width: 100px;
     height: 100px;
@@ -67,6 +70,65 @@
             bottom: 15%;
             left: 5%;
         }
+    }
+}
+$data-bg: color.scale(rgba(142, 87, 209, 0.3), $lightness: 50%);
+
+.main__ship__fuelData{
+    width: 80px;
+    height: 350px;
+    background: $data-bg;
+    position: absolute;
+    right: -80px;
+    bottom: 0;
+    gap: 20px;
+    border-radius: 50px 0 0 0;
+    .fuel__icon{
+        font-size: 40px;
+    }
+    .fuel__level{
+        width: 70%;
+        height: 262.5px;
+        background: radial-gradient(#c0c0c0, #898886);
+        border-radius: 30px;
+        overflow: hidden;
+        .current__fuel__level{
+            width: 100%;
+            height: 0%;
+            transition: height .1s, background-color .3s;
+            background: #ffe436;
+        }
+    }
+}
+
+.main__ship__blasterData{
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    background: $data-bg;
+    border-radius: 0 50px 0 0;
+    bottom: 0;
+    left: -150px;
+    gap: 5px;
+    .blaster__icon{
+        font-size: 40px;
+    }
+    .blaster__num{
+        font-size: 35px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+}
+
+.blasterAlarm{
+    animation: BlasterAlarm .3s 6 alternate both;
+}
+
+@keyframes BlasterAlarm {
+    0%{
+        background: $data-bg;
+    }
+    100%{
+        background-color: rgba(218, 0, 44, 0.9);
     }
 }
 

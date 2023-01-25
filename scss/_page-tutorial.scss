@@ -11,6 +11,7 @@
     background-size: contain;
     position: absolute;
     user-select: none;
+    overflow: hidden;
     top: 0;
     right: 100%;
     .main__ship{
@@ -18,7 +19,7 @@
         height: 100px;
     }
     .text__container{
-        margin: 10vh 5vw;
+        margin: -5vh 5vw;
     }
     .tutorial__headers{
         font-size: 3rem;

@@ -53,10 +53,12 @@ gsap.registerEffect({
 const mainShipBulletContainer = $(".main__ship--bullet__container");
 const mainShipBlasterContainer = $(".main__ship--blaster__container");
 
-var blaster__num = 0,
-    rifle__num = 0,  
+var blaster__num = 1,
+    rifle__num = 1,  
     RightClickTimeOut = 0,
-    RightClickSetInterval = 0;
+    RightClickSetInterval = 0,
+    blasterCountingSituation = false,
+    isFuelEndless = true;
 
 $('#go__tutorial, #tutorial').click(goToTutorial)
 
@@ -79,14 +81,38 @@ function idMaker(num) {
 let xPos = gsap.quickTo(".main__ship", "x", {duration: .3, ease: "power4.out"}),
     yPos = gsap.quickTo(".main__ship", "y", {duration: .3, ease: "power4.out"});
 
-let TutorialAnime = gsap.timeline().timeScale(12);
+let TutorialAnime = gsap.timeline();
 
 class mainShipRifle {
-    constructor (level, BulletsId) {
+    constructor (level, BulletsId, isFuelEndless) {
         this.level = level;
-        this.BulletsId = BulletsId
+        this.BulletsId = BulletsId;
+        this.isFuelEndless = isFuelEndless;
     }
     fireRifle() {
+        let fuelContainerHeight = 262.5;
+        let fuelContainer = $(".current__fuel__level");
+        if(this.isFuelEndless === false){
+            let currentFuelLevel = fuelContainer.height();
+            let newFuelLevel = currentFuelLevel + (fuelContainerHeight / 100 * 2);
+            let newPercent = currentFuelLevel / fuelContainerHeight * 100;
+            console.log(currentFuelLevel)
+            if(newPercent >= 25){
+                fuelContainer.css("background", `#ffe436`);
+                if(newPercent >= 50){
+                    fuelContainer.css("background", `#ff721b`);
+                    if(newPercent >= 75){
+                        fuelContainer.css("background", `#ff4c12`);
+                        if(newPercent >= 100){
+                            fuelContainer.css({"background": `#FF0000`});
+                            return;
+                        }
+                    }
+                }
+            }
+            fuelContainer.css("height", `${newFuelLevel}px`);
+        }
+
         let currentBulletsId = idMaker(this.BulletsId);
     
         if(this.level >= 1){
@@ -116,17 +142,28 @@ class mainShipRifle {
         })
         
     }
-} 
+}
 
 class mainShipBlaster {
-    constructor(isBlasterReady, BulletsId) {
+    constructor(isBlasterReady, blastersId, isCountingActive, allowableBlasterNumber) {
         this.isBlasterReady = isBlasterReady;
-        this.BulletsId = BulletsId
+        this.blastersId = blastersId;
+        this.isCountingActive = isCountingActive;
+        this.allowableBlasterNumber = allowableBlasterNumber;
     }
     fireBlaster() {
         if(this.isBlasterReady !== true) return;
 
-        let currentBlastersId = idMaker(this.BulletsId);
+        if(this.isCountingActive === true){  
+            if(this.allowableBlasterNumber < this.blastersId){
+                $(".main__ship__blasterData").addClass("blasterAlarm")
+                return;
+            }else{
+                $(".blaster__num .num").text(`${this.allowableBlasterNumber - this.blastersId}`)
+            }
+        }
+
+        let currentBlastersId = idMaker(this.blastersId);
         let $blaster1 = $(`<div class="mainShip__blaster mainShip__blaster--num--1"></div>`).attr("id", currentBlastersId);
         let $blaster2 = $(`<div class="mainShip__blaster mainShip__blaster--num--2"></div>`).attr("id", currentBlastersId);
         mainShipBlasterContainer.append([$blaster1, $blaster2])
@@ -141,6 +178,7 @@ class mainShipBlaster {
     }
 }
 
+goToTutorial()
 function goToTutorial() {
     TutorialAnime
     .changePage(".page__tutorial")
@@ -166,7 +204,7 @@ function goToTutorial() {
     .showText(".tutorial__prag__num5", {duration: .5}, "+=2.5")
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
         shipMovement()
-        TutorialAnime.pause();
+        // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num7", {duration: .5, onStart: function() {
@@ -174,34 +212,53 @@ function goToTutorial() {
     }}, "+=2")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
         makeRifleReady();
-        TutorialAnime.pause();
+        // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num8 .order", {id: "prag__8__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num9", {duration: .5, onComplete: function() {
         makeBlasterReady();
-        TutorialAnime.pause();
+        // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
     }, onStart: function() {
         gsap.getById("prag__8__order").seek(0).kill()
     }}, "+=3")
-    .showText(".tutorial__prag__num10", {duration: .5, onComplete: function(){    
-        gsap.effects.orderAnime(".tutorial__prag__num10 .order", {id: "prag__10__order"})
-    }, onStart: function(){
+    .showText(".tutorial__prag__num10", {duration: .5, onStart: function(){
         gsap.getById("prag__9__order").seek(0).kill()
     }}, "+=3")
+    .to(".main__ship__fuelData", {
+        right: "0",
+        duration: .5,
+        ease: "power4.out",
+        onStart: fuelContainerIsReady,
+    }, "showShipDataContainer")
+    .to(".main__ship__blasterData", {
+        left: "0",
+        duration: .5,
+        ease: "power4.out",
+        onStart: blasterCounterIsReady,
+    }, "showShipDataContainer")
+
+    // .to(".tutorial__texts", {
+    //     y: -50,
+    //     opacity: 0,
+    //     stagger: .1,
+    //     ease: "linear"
+    // }, "+=3")
+
+    TutorialAnime.progress(1)
 }
 
 function makeRifleReady() {
     $("body").on({
         "click": function() {
-            let rifle = new mainShipRifle(3, rifle__num);
+            let rifle = new mainShipRifle(3, rifle__num, isFuelEndless);
             rifle.fireRifle();
             rifle__num++;
         },
         "mousedown" : function() {
             timeOutId = setTimeout(function() {
                 RightClickSetInterval = setInterval(() => {
-                    let rifle = new mainShipRifle(3, rifle__num);
+                    let rifle = new mainShipRifle(3, rifle__num, isFuelEndless);
                     rifle.fireRifle();
                     rifle__num++;
                 }, 100);
@@ -221,7 +278,7 @@ function makeRifleReady() {
 function makeBlasterReady() {
     $("body").on("keydown", function(event) {
         if(event.originalEvent.code === "Space"){
-            let blaster = new mainShipBlaster(true, blaster__num);
+            let blaster = new mainShipBlaster(true, blaster__num, isCountingActive, 30);
             blaster.fireBlaster();
             blaster__num++;
         }
@@ -249,4 +306,12 @@ function shipMovement() {
     $(".page__tutorial").one("mousemove", () => {
         TutorialAnime.resume()
     })
+}
+
+function blasterCounterIsReady() {
+    isCountingActive = true;
+}
+
+function fuelContainerIsReady() {
+    isFuelEndless = false;
 }

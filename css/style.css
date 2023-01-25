@@ -115,6 +115,63 @@ table {
   left: 5%;
 }
 
+.main__ship__fuelData {
+  width: 80px;
+  height: 350px;
+  background: rgba(199, 171, 232, 0.3);
+  position: absolute;
+  right: -80px;
+  bottom: 0;
+  gap: 20px;
+  border-radius: 50px 0 0 0;
+}
+.main__ship__fuelData .fuel__icon {
+  font-size: 40px;
+}
+.main__ship__fuelData .fuel__level {
+  width: 70%;
+  height: 262.5px;
+  background: radial-gradient(#c0c0c0, #898886);
+  border-radius: 30px;
+  overflow: hidden;
+}
+.main__ship__fuelData .fuel__level .current__fuel__level {
+  width: 100%;
+  height: 0%;
+  transition: height 0.1s, background-color 0.3s;
+  background: #ffe436;
+}
+
+.main__ship__blasterData {
+  width: 150px;
+  height: 150px;
+  position: absolute;
+  background: rgba(199, 171, 232, 0.3);
+  border-radius: 0 50px 0 0;
+  bottom: 0;
+  left: -150px;
+  gap: 5px;
+}
+.main__ship__blasterData .blaster__icon {
+  font-size: 40px;
+}
+.main__ship__blasterData .blaster__num {
+  font-size: 35px;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+.blasterAlarm {
+  animation: BlasterAlarm 0.3s 6 alternate both;
+}
+
+@keyframes BlasterAlarm {
+  0% {
+    background: rgba(199, 171, 232, 0.3);
+  }
+  100% {
+    background-color: rgba(218, 0, 44, 0.9);
+  }
+}
 div[class*=main__ship--motor] {
   width: 60%;
   height: 15%;
@@ -805,6 +862,7 @@ div[class*=boss__fight--laser--] {
   background-size: contain;
   position: absolute;
   user-select: none;
+  overflow: hidden;
   top: 0;
   right: 100%;
 }
@@ -813,7 +871,7 @@ div[class*=boss__fight--laser--] {
   height: 100px;
 }
 .page__tutorial .text__container {
-  margin: 10vh 5vw;
+  margin: -5vh 5vw;
 }
 .page__tutorial .tutorial__headers {
   font-size: 3rem;
