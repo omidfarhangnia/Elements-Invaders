@@ -24,12 +24,13 @@
     .tutorial__headers{
         font-size: 3rem;
         font-family: $font-bebas-neue;
-        margin-bottom: 1rem;
     }
     p{
         font-size: 1.3rem;
         font-family: $font-bebas-neue;
-        margin: 1rem 0;
+        margin: .8rem 0;
+        max-width: 500px;
+        text-align: justify;
     }
 }
 

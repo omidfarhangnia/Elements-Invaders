@@ -138,7 +138,7 @@ table {
 .main__ship__fuelData .fuel__level .current__fuel__level {
   width: 100%;
   height: 0%;
-  transition: height 0.1s, background-color 0.3s;
+  transition: height 0.2s, background-color 0.3s;
   background: #ffe436;
 }
 
@@ -876,12 +876,13 @@ div[class*=boss__fight--laser--] {
 .page__tutorial .tutorial__headers {
   font-size: 3rem;
   font-family: "Bebas Neue", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
-  margin-bottom: 1rem;
 }
 .page__tutorial p {
   font-size: 1.3rem;
   font-family: "Bebas Neue", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
-  margin: 1rem 0;
+  margin: 0.8rem 0;
+  max-width: 500px;
+  text-align: justify;
 }
 
 .meteorite__image__container {
