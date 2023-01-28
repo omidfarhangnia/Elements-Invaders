@@ -62,7 +62,8 @@ var blaster__num = 0,
     isFuelEndless = true,
     isCountingActive = false,
     recoverFuelContainer, reloading,
-    checkPosStepByStep = null;
+    checkPosStepByStep = null,
+    CurrentPositionEnemies = [];
 
 $('#go__tutorial, #tutorial').click(goToTutorial)
 
@@ -130,70 +131,61 @@ class mainShipRifle {
         }
         
         let currentBulletsId = idMaker(rifle__num);
-        
+        let mainShipBulletContainerClone = mainShipBulletContainer.clone();
+
         if(this.level >= 1){
             let $bullet1 = $(`<div class="mainShip__bullet mainShip__bullet--num--1"></div>`);
-            $bullet1.attr("id", currentBulletsId)
             mainShipBulletContainer.append($bullet1)
             
             if(this.level >= 2){
                 let $bullet2 = $(`<div class="mainShip__bullet mainShip__bullet--num--2"></div>`);
-                $bullet2.attr("id", currentBulletsId)
                 mainShipBulletContainer.append($bullet2)
                 
                 if(this.level === 3){
                     let $bullet3 = $(`<div class="mainShip__bullet mainShip__bullet--num--3"></div>`);
-                    $bullet3.attr("id", currentBulletsId)
                     mainShipBulletContainer.append($bullet3)
                 }
             }
+
+            mainShipBulletContainerClone.attr("id", currentBulletsId)
         }
         
+        mainShipBulletContainerClone.appendTo($(".game__container"));
 
-        gsap.to(`.mainShip__bullet[id="${currentBulletsId}"]`, {
-            x: 1000,
-            duration: .55,
+        gsap.set(mainShipBulletContainerClone, {
+            top: mainShip.position().top,
+            left: mainShip.position().left,
+            zIndex: 1,
+            rotate: -90
+        })
+
+        gsap.to(mainShipBulletContainerClone, {
+            top: "-=1000",
+            duration: .45,
         })
     }
     calcDamage() {
         let currentBulletsId = idMaker(rifle__num);
-        let shottedBullet = $(`.mainShip__bullet[id=${currentBulletsId}]`);
-         
-        let activeEnemies = $(".enemy__container > div");
-        let CurrentPositionEnemies = [];
-
-        activeEnemies.each(function( idx, element){
-            let obj = {
-                "enemyPos": $(element).position(),
-                "enemyNum": idx
-            }
-
-            CurrentPositionEnemies.push(obj);
-        });
-
-        $(".main__ship .main__ship--bullet__container");
-
-    // use append and clone and after any click put a copy of bullet container on the page and useing left or top for moving it
+        let shottedContainer = $(`.main__ship--bullet__container[id="${currentBulletsId}"]`);
 
         checkPosStepByStep = setInterval(() => {
-
             for(var i = 0; i < CurrentPositionEnemies.length; i++){
-                if(mainShip.position().left <= CurrentPositionEnemies[i].enemyPos.left + 60 &&
-                   mainShip.position().left >= CurrentPositionEnemies[i].enemyPos.left - 60){
-                    if(shottedBullet.position().top <= CurrentPositionEnemies[i].enemyPos.top + 20 &&
-                       shottedBullet.position().top >= CurrentPositionEnemies[i].enemyPos.top - 20){
-                        console.log("hello there")
+                if(shottedContainer.position().left <= CurrentPositionEnemies[i].enemyPos.left + 60 &&
+                   shottedContainer.position().left >= CurrentPositionEnemies[i].enemyPos.left - 60){
+                    if(shottedContainer.position().top <= CurrentPositionEnemies[i].enemyPos.top + 350 &&
+                       shottedContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){
+                        shottedContainer.remove();
+                        $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).hide();
+                        clearInterval(checkPosStepByStep);
                     }
                 }
             }
-
-            console.log(shottedBullet.position().top)
-            console.log(CurrentPositionEnemies[0].enemyPos.top)
-        }, 10);
+        }, 20);
         
         setTimeout(() => {
-            clearInterval(checkPosStepByStep)            
-        }, 550);
+            clearInterval(checkPosStepByStep);
+            shottedContainer.remove();
+        }, 750);
 
         rifle__num++;
     }
@@ -392,4 +384,15 @@ function startPractice() {
         duration: .5,
         stagger: .2
     })
+
+    let activeEnemies = $(".enemy__container > div");
+
+    activeEnemies.each(function( idx, element){
+        let obj = {
+            "enemyPos": $(element).position(),
+            "enemyNum": idx + 1
+        }
+
+        CurrentPositionEnemies.push(obj);
+    });
 }

@@ -60,9 +60,10 @@ table {
   position: absolute;
 }
 .main__ship--bullet__container {
-  width: 100%;
-  height: 100%;
+  width: 100px;
+  height: 100px;
   z-index: -1;
+  position: absolute;
 }
 .main__ship--bullet__container .mainShip__bullet {
   height: 5px;
