@@ -14,6 +14,26 @@
     overflow: hidden;
     top: 0;
     right: 100%;
+    .enemy__container{
+        margin: 0 auto;
+        .fighter__1{
+            position: absolute;
+            top: 15vh;
+            translate: 0 -300px;
+        }
+        .enemy__num__1{
+            left: 20%;
+        }
+        .enemy__num__2{
+            left: 35%;
+        }
+        .enemy__num__3{
+            right: 35%;
+        }
+        .enemy__num__4{
+            right: 20%;
+        }
+    }
     .main__ship{
         width: 100px;
         height: 100px;

@@ -50,17 +50,19 @@ gsap.registerEffect({
     extendTimeline: true
 });
 
+const mainShip = $(".main__ship")
 const mainShipBulletContainer = $(".main__ship--bullet__container");
 const mainShipBlasterContainer = $(".main__ship--blaster__container");
 
-var blaster__num = 1,
-    rifle__num = 1,  
+var blaster__num = 0,
+    rifle__num = 0,  
     RightClickTimeOut = 0,
     RightClickSetInterval = 0,
     blasterCountingSituation = false,
     isFuelEndless = true,
     isCountingActive = false,
-    recoverFuelContainer, reloading;
+    recoverFuelContainer, reloading,
+    checkPosStepByStep = null;
 
 $('#go__tutorial, #tutorial').click(goToTutorial)
 
@@ -80,20 +82,20 @@ function idMaker(num) {
     return numContainer;
 }
 
-let xPos = gsap.quickTo(".main__ship", "x", {duration: .3, ease: "power4.out"}),
-    yPos = gsap.quickTo(".main__ship", "y", {duration: .3, ease: "power4.out"});
+let xPos = gsap.quickTo(mainShip, "x", {duration: .3, ease: "power4.out"}),
+    yPos = gsap.quickTo(mainShip, "y", {duration: .3, ease: "power4.out"});
 
 let TutorialAnime = gsap.timeline();
 
 class mainShipRifle {
-    constructor (level, BulletsId, isFuelEndless) {
+    constructor (level, isFuelEndless) {
         this.level = level;
-        this.BulletsId = BulletsId;
         this.isFuelEndless = isFuelEndless;
     }
     fireRifle() {
         let fuelContainerHeight = 262.5;
         let fuelContainer = $(".current__fuel__level");
+        
         if(this.isFuelEndless === false){
             let currentFuelLevel = fuelContainer.height();
             let newFuelLevel = currentFuelLevel + (fuelContainerHeight / 100 * 4);
@@ -108,7 +110,6 @@ class mainShipRifle {
                     newFuelLevel = newFuelLevel - (fuelContainerHeight / 100 * 1);
                     fuelContainer.css("height", `${newFuelLevel}px`);
                 }, 50);
-                console.log("hello there")
             }, 1000);
             if(newPercent >= 25){
                 fuelContainer.css("background", `#ffe436`);
@@ -127,9 +128,9 @@ class mainShipRifle {
             }
             fuelContainer.css("height", `${newFuelLevel}px`);
         }
-
-        let currentBulletsId = idMaker(this.BulletsId);
-    
+        
+        let currentBulletsId = idMaker(rifle__num);
+        
         if(this.level >= 1){
             let $bullet1 = $(`<div class="mainShip__bullet mainShip__bullet--num--1"></div>`);
             $bullet1.attr("id", currentBulletsId)
@@ -148,14 +149,53 @@ class mainShipRifle {
             }
         }
         
+
         gsap.to(`.mainShip__bullet[id="${currentBulletsId}"]`, {
             x: 1000,
             duration: .55,
-            onComplete: () => {
-                $(`.mainShip__bullet[id="${currentBulletsId}"]`).remove();
-            }
         })
+    }
+    calcDamage() {
+        let currentBulletsId = idMaker(rifle__num);
+        let shottedBullet = $(`.mainShip__bullet[id=${currentBulletsId}]`);
+         
+        let activeEnemies = $(".enemy__container > div");
+        let CurrentPositionEnemies = [];
+
+        activeEnemies.each(function( idx, element){
+            let obj = {
+                "enemyPos": $(element).position(),
+                "enemyNum": idx
+            }
+
+            CurrentPositionEnemies.push(obj);
+        });
+
+        $(".main__ship .main__ship--bullet__container");
+
+    // use append and clone and after any click put a copy of bullet container on the page and useing left or top for moving it
+
+        checkPosStepByStep = setInterval(() => {
+
+            for(var i = 0; i < CurrentPositionEnemies.length; i++){
+                if(mainShip.position().left <= CurrentPositionEnemies[i].enemyPos.left + 60 &&
+                   mainShip.position().left >= CurrentPositionEnemies[i].enemyPos.left - 60){
+                    if(shottedBullet.position().top <= CurrentPositionEnemies[i].enemyPos.top + 20 &&
+                       shottedBullet.position().top >= CurrentPositionEnemies[i].enemyPos.top - 20){
+                        console.log("hello there")
+                    }
+                }
+            }
+
+            console.log(shottedBullet.position().top)
+            console.log(CurrentPositionEnemies[0].enemyPos.top)
+        }, 10);
         
+        setTimeout(() => {
+            clearInterval(checkPosStepByStep)            
+        }, 550);
+
+        rifle__num++;
     }
 }
 
@@ -194,6 +234,7 @@ class mainShipBlaster {
     }
 }
 
+goToTutorial()
 function goToTutorial() {
     TutorialAnime
     .changePage(".page__tutorial")
@@ -207,7 +248,7 @@ function goToTutorial() {
     // i want to hide my wish
     .showText(".tutorial__prag__num2", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num3", {duration: .5}, "+=2.5")
-    .fromTo(".main__ship", {
+    .fromTo(mainShip, {
         y: window.innerHeight,
         x: (window.innerWidth / 2) - mainShipSize.halfOfWidth
     },{
@@ -219,26 +260,26 @@ function goToTutorial() {
     .showText(".tutorial__prag__num5", {duration: .5}, "+=2.5")
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
         shipMovement()
-        TutorialAnime.pause();
+        // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num7", {duration: .5, onStart: function() {
-        gsap.getById("prag__6__order").seek(0).kill();
+        // gsap.getById("prag__6__order").seek(0).kill();
     }}, "+=2")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
         makeRifleReady();
-        TutorialAnime.pause();
+        // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num8 .order", {id: "prag__8__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num9", {duration: .5, onComplete: function() {
         makeBlasterReady();
-        TutorialAnime.pause();
+        // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
     }, onStart: function() {
-        gsap.getById("prag__8__order").seek(0).kill()
+        // gsap.getById("prag__8__order").seek(0).kill()
     }}, "+=3")
     .showText(".tutorial__prag__num10", {duration: .5, onStart: function(){
-        gsap.getById("prag__9__order").seek(0).kill()
+        // gsap.getById("prag__9__order").seek(0).kill()
     }}, "+=3")
     .to(".main__ship__fuelData", {
         right: "0",
@@ -256,7 +297,7 @@ function goToTutorial() {
     .showText(".tutorial__prag__num12", {duration: .5}, "+=3")
     .showText(".tutorial__prag__num13", {duration: .5, onComplete: function(){
         goToPractice()
-        TutorialAnime.pause();
+        // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num13 .order", {id: "prag__13__order"})
     }}, "+=3")
     .to(".tutorial__texts", {
@@ -265,28 +306,26 @@ function goToTutorial() {
         stagger: .1,
         ease: "linear",
         onStart: function() {
-            gsap.getById("prag__13__order").seek(0).kill()
+            // gsap.getById("prag__13__order").seek(0).kill()
         },
-        onComplete: function(){
-            startPractice()
-        }
+        onComplete: startPractice
     }, "+=3")
-    TutorialAnime.progress(.96)
+    TutorialAnime.timeScale(150)
 }
 
 function makeRifleReady() {
     $("body").on({
         "click": function() {
-            let rifle = new mainShipRifle(3, rifle__num, isFuelEndless);
+            let rifle = new mainShipRifle(3, isFuelEndless);
             rifle.fireRifle();
-            rifle__num++;
+            rifle.calcDamage();
         },
         "mousedown" : function() {
             timeOutId = setTimeout(function() {
                 RightClickSetInterval = setInterval(() => {
-                    let rifle = new mainShipRifle(3, rifle__num, isFuelEndless);
+                    let rifle = new mainShipRifle(3, isFuelEndless);
                     rifle.fireRifle();
-                    rifle__num++;
+                    rifle.calcDamage();
                 }, 100);
             }, 500)
         },
@@ -348,5 +387,9 @@ function goToPractice() {
 }
 
 function startPractice() {
-    
+    gsap.to(".enemy__container .fighter__1", {
+        y: 0,
+        duration: .5,
+        stagger: .2
+    })
 }

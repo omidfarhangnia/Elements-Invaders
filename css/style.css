@@ -264,8 +264,8 @@ div[class*=main__ship--motor] .main__ship--guns {
 }
 
 .fighter__1 {
-  width: 150px;
-  height: 150px;
+  width: 70px;
+  height: 70px;
   position: relative;
   rotate: 90deg;
 }
@@ -280,11 +280,11 @@ div[class*=fighter__1--motor--] {
 }
 
 .fighter__1--motor--1 {
-  top: 20%;
+  top: 19%;
 }
 
 .fighter__1--motor--2 {
-  bottom: 20%;
+  bottom: 19%;
 }
 
 .fighter__1--main--cabin {
@@ -298,18 +298,21 @@ div[class*=fighter__1--motor--] {
 .fighter__1--main--cabin::after, .fighter__1--main--cabin::before {
   content: "";
   position: absolute;
-  width: 80%;
+  width: 60%;
   height: 35%;
   right: -30%;
-  background: black;
+  background: #513b3c;
+  right: -21%;
 }
 .fighter__1--main--cabin::after {
-  top: -5%;
-  rotate: 35deg;
+  top: -6%;
+  rotate: 45deg;
+  border-radius: 30px 30px 5px 5px;
 }
 .fighter__1--main--cabin::before {
-  bottom: -5%;
-  rotate: -35deg;
+  bottom: -6%;
+  rotate: -45deg;
+  border-radius: 5px 5px 30px 30px;
 }
 
 div[class*=fighter__1--glasses--] {
@@ -397,8 +400,8 @@ div[class*=fighter__1--gun--]::before {
 }
 
 .fighter__2 {
-  width: 150px;
-  height: 150px;
+  width: 70px;
+  height: 70px;
   position: relative;
   rotate: 90deg;
 }
@@ -479,8 +482,8 @@ div[class*=fighter__2--blaster--keeper--] {
 }
 
 .fighter__3 {
-  width: 150px;
-  height: 150px;
+  width: 70px;
+  height: 70px;
   position: relative;
   rotate: 90deg;
 }
@@ -865,6 +868,26 @@ div[class*=boss__fight--laser--] {
   overflow: hidden;
   top: 0;
   right: 100%;
+}
+.page__tutorial .enemy__container {
+  margin: 0 auto;
+}
+.page__tutorial .enemy__container .fighter__1 {
+  position: absolute;
+  top: 15vh;
+  translate: 0 -300px;
+}
+.page__tutorial .enemy__container .enemy__num__1 {
+  left: 20%;
+}
+.page__tutorial .enemy__container .enemy__num__2 {
+  left: 35%;
+}
+.page__tutorial .enemy__container .enemy__num__3 {
+  right: 35%;
+}
+.page__tutorial .enemy__container .enemy__num__4 {
+  right: 20%;
 }
 .page__tutorial .main__ship {
   width: 100px;
