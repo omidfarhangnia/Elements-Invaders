@@ -15,6 +15,7 @@
         height: 100px;
         z-index: -1;
         position: absolute;
+        scale: .8;
         .mainShip__bullet{
             height: 5px;
             width: 50%;
@@ -37,9 +38,12 @@
         }
     }
     &--blaster__container{
-        width: 100%;
-        height: 100%;
-        
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        z-index: -1;
+        scale: .8;
+
         .mainShip__blaster{
             width: 50%;
             height: 5%;
@@ -75,7 +79,41 @@
 }
 $data-bg: color.scale(rgba(142, 87, 209, 0.3), $lightness: 50%);
 
-.main__ship__fuelData{
+.blasterExplosion{
+    width: 80px;
+    height: 80px;
+    background: #ffff44;
+    position: absolute;
+    z-index: 3;
+    border-radius: 50%;
+}
+
+@keyframes explosionAnimation {
+    0%{
+        outline-offset: 10px;
+        outline: 70px solid #b12105;
+        scale: 0;
+        border: 30px solid #ff9436;
+    }
+    30%{
+        outline: 30px solid #b12105;
+    }
+    50%{
+        outline-offset: 0;
+    }
+    80%{
+        outline: 1px solid #ff9436;
+        border: 1px solid #ff9436;
+        opacity: 1;
+    }
+    100%{
+        background: rgb(250, 104, 12);
+        opacity: 0;
+    }
+}
+
+
+#main__ship__fuelData{
     width: 80px;
     height: 350px;
     background: $data-bg;

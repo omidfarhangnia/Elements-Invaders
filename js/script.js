@@ -50,9 +50,12 @@ gsap.registerEffect({
     extendTimeline: true
 });
 
+const gameContainer = $("#game__container")
 const mainShip = $(".main__ship")
 const mainShipBulletContainer = $(".main__ship--bullet__container");
 const mainShipBlasterContainer = $(".main__ship--blaster__container");
+const fuelContainer = $("#main__ship__fuelData div.current__fuel__level");
+const pageTutorial = $(".page__tutorial")
 
 var blaster__num = 0,
     rifle__num = 0,  
@@ -62,7 +65,8 @@ var blaster__num = 0,
     isFuelEndless = true,
     isCountingActive = false,
     recoverFuelContainer, reloading,
-    checkPosStepByStep = null,
+    checkRiflePosStepByStep = null,
+    checkBlasterPosStepByStep = null,
     CurrentPositionEnemies = [];
 
 $('#go__tutorial, #tutorial').click(goToTutorial)
@@ -95,8 +99,8 @@ class mainShipRifle {
     }
     fireRifle() {
         let fuelContainerHeight = 262.5;
-        let fuelContainer = $(".current__fuel__level");
-        
+        let currentBulletsId = idMaker(rifle__num);
+
         if(this.isFuelEndless === false){
             let currentFuelLevel = fuelContainer.height();
             let newFuelLevel = currentFuelLevel + (fuelContainerHeight / 100 * 4);
@@ -130,7 +134,6 @@ class mainShipRifle {
             fuelContainer.css("height", `${newFuelLevel}px`);
         }
         
-        let currentBulletsId = idMaker(rifle__num);
         let mainShipBulletContainerClone = mainShipBulletContainer.clone();
 
         if(this.level >= 1){
@@ -147,10 +150,10 @@ class mainShipRifle {
                 }
             }
 
-            mainShipBulletContainerClone.attr("id", currentBulletsId)
+            mainShipBulletContainerClone.attr("id", `${currentBulletsId}-rifleBullet`)
         }
         
-        mainShipBulletContainerClone.appendTo($(".game__container"));
+        mainShipBulletContainerClone.appendTo(gameContainer);
 
         gsap.set(mainShipBulletContainerClone, {
             top: mainShip.position().top,
@@ -161,35 +164,57 @@ class mainShipRifle {
 
         gsap.to(mainShipBulletContainerClone, {
             top: "-=1000",
-            duration: .45,
+            duration: .75,
         })
     }
     calcDamage() {
         let currentBulletsId = idMaker(rifle__num);
-        let shottedContainer = $(`.main__ship--bullet__container[id="${currentBulletsId}"]`);
+        let rifleBulletContainer = $(`#${currentBulletsId}-rifleBullet`);
 
-        checkPosStepByStep = setInterval(() => {
+        checkRiflePosStepByStep = setInterval(() => {
             for(var i = 0; i < CurrentPositionEnemies.length; i++){
-                if(shottedContainer.position().left <= CurrentPositionEnemies[i].enemyPos.left + 60 &&
-                   shottedContainer.position().left >= CurrentPositionEnemies[i].enemyPos.left - 60){
-                    if(shottedContainer.position().top <= CurrentPositionEnemies[i].enemyPos.top + 350 &&
-                       shottedContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){
-                        shottedContainer.remove();
-                        $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).hide();
-                        clearInterval(checkPosStepByStep);
+                if(rifleBulletContainer.position().left <= CurrentPositionEnemies[i].enemyPos.left + 60 &&
+                   rifleBulletContainer.position().left >= CurrentPositionEnemies[i].enemyPos.left - 60){
+                    if(rifleBulletContainer.position().top <= CurrentPositionEnemies[i].enemyPos.top + 350 &&
+                       rifleBulletContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){
+                        
+                        // explosion animation and the element
+                        let blasterExplosion = $(`<div class='blasterExplosion'></div>`);
+                        blasterExplosion.appendTo(gameContainer);
+                        gsap.set(blasterExplosion , {
+                            "top": CurrentPositionEnemies[i].enemyPos.top,
+                            "left": CurrentPositionEnemies[i].enemyPos.left
+                        })
+                        // .css({
+                        //     // "animation": "explosionAnimation 2s ease-in-out both",
+                        //     "top": CurrentPositionEnemies[i].enemyPos.top,
+                        //     "left": CurrentPositionEnemies[i].enemyPos.left
+                        // });
+                        
+                        rifleBulletContainer.remove();
+                        $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).remove();
+                        clearInterval(checkRiflePosStepByStep);
                     }
                 }
             }
-        }, 20);
+        }, 10);
         
         setTimeout(() => {
-            clearInterval(checkPosStepByStep);
-            shottedContainer.remove();
+            clearInterval(checkRiflePosStepByStep);
+            rifleBulletContainer.remove();
         }, 750);
 
         rifle__num++;
     }
 }
+
+// gsap.fromTo(".blasterExplosion", {
+//     scale: 0,
+// },{
+//     scale: 1,
+//     duration: .6,
+//     loop: 3,
+// })
 
 class mainShipBlaster {
     constructor(isBlasterReady, blastersId, isCountingActive, allowableBlasterNumber) {
@@ -211,25 +236,59 @@ class mainShipBlaster {
             blaster__num++;
         }
 
+
+        let mainShipBlasterContainerClone = mainShipBlasterContainer.clone();
         let currentBlastersId = idMaker(this.blastersId);
         let $blaster1 = $(`<div class="mainShip__blaster mainShip__blaster--num--1"></div>`).attr("id", currentBlastersId);
         let $blaster2 = $(`<div class="mainShip__blaster mainShip__blaster--num--2"></div>`).attr("id", currentBlastersId);
-        mainShipBlasterContainer.append([$blaster1, $blaster2])
+        mainShipBlasterContainerClone.append([$blaster1, $blaster2]);
 
-        gsap.to(`.mainShip__blaster[id="${currentBlastersId}"]`, {
-            x: 1000,
-            duration: .55,
-            onComplete: () => {
-                $(`.mainShip__blaster[id="${currentBlastersId}"]`).remove();
-            }
+        mainShipBlasterContainerClone.attr("id", `${currentBlastersId}-blasterBullet`)
+
+        mainShipBlasterContainerClone.appendTo(gameContainer);
+
+
+        gsap.set(mainShipBlasterContainerClone, {
+            top: mainShip.position().top,
+            left: mainShip.position().left,
+            zIndex: 1,
+            rotate: -90
         })
+
+        gsap.to(mainShipBlasterContainerClone, {
+            top: "-=1000",
+            duration: 1.2 ,
+        }) 
+    }
+    calcDamage() {
+        let currentBlastersId = idMaker(this.blastersId);
+        let blasterBulletContainer = $(`#${currentBlastersId}-blasterBullet`);
+
+        checkBlasterPosStepByStep = setInterval(() => {
+            for(var i = 0; i < CurrentPositionEnemies.length; i++){
+                if(blasterBulletContainer.position().left <= CurrentPositionEnemies[i].enemyPos.left + 60 &&
+                   blasterBulletContainer.position().left >= CurrentPositionEnemies[i].enemyPos.left - 60){
+                    if(blasterBulletContainer.position().top <= CurrentPositionEnemies[i].enemyPos.top + 350 &&
+                       blasterBulletContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){
+                        blasterBulletContainer.remove();
+                        $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).hide();
+                        clearInterval(checkBlasterPosStepByStep);
+                    }
+                }
+            }
+        }, 20);
+        
+        setTimeout(() => {
+            clearInterval(checkBlasterPosStepByStep);
+            blasterBulletContainer.remove();
+        }, 750);  
     }
 }
 
 goToTutorial()
 function goToTutorial() {
     TutorialAnime
-    .changePage(".page__tutorial")
+    .changePage(pageTutorial)
     .showText(".tutorial__headers", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num1", {duration: .5}, "+=2")
     .to(".tutorial__prag__num1", {
@@ -273,7 +332,7 @@ function goToTutorial() {
     .showText(".tutorial__prag__num10", {duration: .5, onStart: function(){
         // gsap.getById("prag__9__order").seek(0).kill()
     }}, "+=3")
-    .to(".main__ship__fuelData", {
+    .to("#main__ship__fuelData", {
         right: "0",
         duration: .5,
         ease: "power4.out",
@@ -318,7 +377,7 @@ function makeRifleReady() {
                     let rifle = new mainShipRifle(3, isFuelEndless);
                     rifle.fireRifle();
                     rifle.calcDamage();
-                }, 100);
+                }, 250);
             }, 500)
         },
         "mouseup" : function() {
@@ -327,7 +386,7 @@ function makeRifleReady() {
         }
     })
 
-    $(".page__tutorial").one("click", () => {
+    pageTutorial.one("click", () => {
         TutorialAnime.resume()
     })
 }
@@ -337,6 +396,7 @@ function makeBlasterReady() {
         if(event.originalEvent.code === "Space"){
             let blaster = new mainShipBlaster(true, blaster__num, isCountingActive, 100);
             blaster.fireBlaster();
+            blaster.calcDamage();
         }
     })
 
@@ -348,8 +408,8 @@ function makeBlasterReady() {
 };
 
 function shipMovement() {
-    $('.page__tutorial').css("cursor", "none")
-    $(".page__tutorial").on("mousemove", (event) => {
+    pageTutorial.css("cursor", "none")
+    pageTutorial.on("mousemove", (event) => {
         let page__width = window.innerWidth,
             page__height = window.innerHeight
 
@@ -359,7 +419,7 @@ function shipMovement() {
         // i used utils.clamp for having a condition for controlling the ship without
         // this condition my ship will gone out of VIEW PORT 
     })
-    $(".page__tutorial").one("mousemove", () => {
+    pageTutorial.one("mousemove", () => {
         TutorialAnime.resume()
     })
 }
