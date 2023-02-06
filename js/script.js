@@ -67,7 +67,7 @@ var blaster__num = 0,
     recoverFuelContainer, reloading,
     checkRiflePosStepByStep = null,
     checkBlasterPosStepByStep = null,
-    CurrentPositionEnemies = [];
+    CurrentEnemiesData = [];
 
 $('#go__tutorial, #tutorial').click(goToTutorial)
 
@@ -93,9 +93,10 @@ let xPos = gsap.quickTo(mainShip, "x", {duration: .3, ease: "power4.out"}),
 let TutorialAnime = gsap.timeline();
 
 class mainShipRifle {
-    constructor (level, isFuelEndless) {
+    constructor (level, isFuelEndless, endFunction) {
         this.level = level;
         this.isFuelEndless = isFuelEndless;
+        this.endFunction = endFunction;
     }
     fireRifle() {
         let fuelContainerHeight = 262.5;
@@ -133,8 +134,6 @@ class mainShipRifle {
             }
             fuelContainer.css("height", `${newFuelLevel}px`);
         }
-        
-        let mainShipBulletContainerClone = mainShipBulletContainer.clone();
 
         if(this.level >= 1){
             let $bullet1 = $(`<div class="mainShip__bullet mainShip__bullet--num--1"></div>`);
@@ -149,9 +148,10 @@ class mainShipRifle {
                     mainShipBulletContainer.append($bullet3)
                 }
             }
-
-            mainShipBulletContainerClone.attr("id", `${currentBulletsId}-rifleBullet`)
         }
+
+        let mainShipBulletContainerClone = mainShipBulletContainer.clone();
+        mainShipBulletContainerClone.attr("id", `${currentBulletsId}-rifleBullet`)
         
         mainShipBulletContainerClone.appendTo(gameContainer);
 
@@ -172,24 +172,24 @@ class mainShipRifle {
         let rifleBulletContainer = $(`#${currentBulletsId}-rifleBullet`);
 
         checkRiflePosStepByStep = setInterval(() => {
-            for(var i = 0; i < CurrentPositionEnemies.length; i++){
-                if(rifleBulletContainer.position().left <= CurrentPositionEnemies[i].enemyPos.left + 60 &&
-                   rifleBulletContainer.position().left >= CurrentPositionEnemies[i].enemyPos.left - 60){
-                    if(rifleBulletContainer.position().top <= CurrentPositionEnemies[i].enemyPos.top + 350 &&
-                       rifleBulletContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){    
-                        if(CurrentPositionEnemies[i].isEnemyAlive === true){
-                            let newHealth = CurrentPositionEnemies[i].enemyHealth.current - this.level;
-                            let mainFirstHealth = CurrentPositionEnemies[i].enemyHealth.first;
+            for(var i = 0; i < CurrentEnemiesData.length; i++){
+                if(rifleBulletContainer.position().left <= CurrentEnemiesData[i].enemyPos.left + 60 &&
+                   rifleBulletContainer.position().left >= CurrentEnemiesData[i].enemyPos.left - 60){
+                    if(rifleBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top + 350 &&
+                       rifleBulletContainer.position().top >= CurrentEnemiesData[i].enemyPos.top){    
+                        if(CurrentEnemiesData[i].isEnemyAlive === true){
+                            let newHealth = CurrentEnemiesData[i].enemyHealth.current - this.level;
+                            let mainFirstHealth = CurrentEnemiesData[i].enemyHealth.first;
 
-                            $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum} .current__health`).css(
+                            $(`.enemy__num__${CurrentEnemiesData[i].enemyNum} .current__health`).css(
                                 "height", `${(newHealth * 100 / mainFirstHealth)}%`)
                             
-                            CurrentPositionEnemies[i].enemyHealth.current = newHealth;
+                            CurrentEnemiesData[i].enemyHealth.current = newHealth;
                             rifleBulletContainer.remove();
 
-                            if(CurrentPositionEnemies[i].enemyHealth.current <= 0){
-                                $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).remove();
-                                CurrentPositionEnemies[i].isEnemyAlive = false;
+                            if(CurrentEnemiesData[i].enemyHealth.current <= 0){
+                                $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).remove();
+                                CurrentEnemiesData[i].isEnemyAlive = false;
                             }
                             clearInterval(checkRiflePosStepByStep);
                         }    
@@ -204,27 +204,32 @@ class mainShipRifle {
         }, 750);
 
         rifle__num++;
+
+        isGameEnded(this.endFunction)
     }
 }
 
 class mainShipBlaster {
-    constructor(isBlasterReady, blastersId, isCountingActive, allowableBlasterNumber) {
+    constructor(isBlasterReady, blastersId, isCountingActive, allowableBlasterNumber, endFunction) {
         this.isBlasterReady = isBlasterReady;
         this.blastersId = blastersId;
         this.isCountingActive = isCountingActive;
         this.allowableBlasterNumber = allowableBlasterNumber;
+        this.endFunction = endFunction;
     }
     fireBlaster() {
         if(this.isBlasterReady !== true) return;
 
         if(this.isCountingActive === true){
-            if(this.allowableBlasterNumber < this.blastersId){
+            blaster__num++;
+            if(this.allowableBlasterNumber <= this.blastersId){
                 $(".main__ship__blasterData").addClass("blasterAlarm")
                 return;
             }else{
-                $(".blaster__num .num").text(`${this.allowableBlasterNumber - this.blastersId}`)
+                $(".blaster__num .num").text(`${this.allowableBlasterNumber - 1 - this.blastersId}`);
+                // this one is here because we are decreasing the number but not the number that is available here
+                // the outer number is changing and we need a change for this number
             }
-            blaster__num++;
         }
 
 
@@ -257,33 +262,33 @@ class mainShipBlaster {
         let blasterBulletContainer = $(`#${currentBlastersId}-blasterBullet`);
 
         checkBlasterPosStepByStep = setInterval(() => {
-            for(var i = 0; i < CurrentPositionEnemies.length; i++){
-                if(blasterBulletContainer.position().left <= CurrentPositionEnemies[i].enemyPos.left + 60 &&
-                   blasterBulletContainer.position().left >= CurrentPositionEnemies[i].enemyPos.left - 60){
-                    if(blasterBulletContainer.position().top <= CurrentPositionEnemies[i].enemyPos.top + 350 &&
-                       blasterBulletContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){
-                        if(CurrentPositionEnemies[i].isEnemyAlive === true){
-                            let newHealth = CurrentPositionEnemies[i].enemyHealth.current - blasterDamage;
-                            let mainFirstHealth = CurrentPositionEnemies[i].enemyHealth.first;
+            for(var i = 0; i < CurrentEnemiesData.length; i++){
+                if(blasterBulletContainer.position().left <= CurrentEnemiesData[i].enemyPos.left + 60 &&
+                   blasterBulletContainer.position().left >= CurrentEnemiesData[i].enemyPos.left - 60){
+                    if(blasterBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top + 350 &&
+                       blasterBulletContainer.position().top >= CurrentEnemiesData[i].enemyPos.top){
+                        if(CurrentEnemiesData[i].isEnemyAlive === true){
+                            let newHealth = CurrentEnemiesData[i].enemyHealth.current - blasterDamage;
+                            let mainFirstHealth = CurrentEnemiesData[i].enemyHealth.first;
 
-                            $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum} .current__health`).css(
+                            $(`.enemy__num__${CurrentEnemiesData[i].enemyNum} .current__health`).css(
                                 "height", `${(newHealth * 100 / mainFirstHealth)}%`)
                             
-                            CurrentPositionEnemies[i].enemyHealth.current = newHealth;
+                            CurrentEnemiesData[i].enemyHealth.current = newHealth;
                             blasterBulletContainer.remove();
 
-                            if(CurrentPositionEnemies[i].enemyHealth.current <= 0){
-                                $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).remove();
-                                CurrentPositionEnemies[i].isEnemyAlive = false;
+                            if(CurrentEnemiesData[i].enemyHealth.current <= 0){
+                                $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).remove();
+                                CurrentEnemiesData[i].isEnemyAlive = false;
                                 // explosion animation and the element
                                 let blasterExplosion = $(`<div class='blasterExplosion'></div>`);
                                 blasterExplosion.appendTo(gameContainer);
                                 
                                 blasterExplosion.css({
                                     "animation": "explosionAnimation 2s ease-in-out both",
-                                    "top": (CurrentPositionEnemies[i].enemyPos.top * -1) - 60,
+                                    "top": (CurrentEnemiesData[i].enemyPos.top * -1) - 60,
                                     // the top value that i give is negative and i should make in positive
-                                    "left": CurrentPositionEnemies[i].enemyPos.left
+                                    "left": CurrentEnemiesData[i].enemyPos.left
                                 });
 
                                 setTimeout(() => {
@@ -301,7 +306,9 @@ class mainShipBlaster {
         setTimeout(() => {
             clearInterval(checkBlasterPosStepByStep);
             blasterBulletContainer.remove();
-        }, 750);  
+        }, 750);
+        
+        isGameEnded(this.endFunction)
     }
 }
 
@@ -352,25 +359,25 @@ function goToTutorial() {
     .showText(".tutorial__prag__num10", {duration: .5, onStart: function(){
         // gsap.getById("prag__9__order").seek(0).kill()
     }}, "+=3")
-    .to("#main__ship__fuelData", {
-        right: "0",
-        duration: .5,
-        ease: "power4.out",
-        onStart: fuelContainerIsReady,
-    }, "+=1")
-    .showText(".tutorial__prag__num11", {duration: .5}, "+=2")
+    .showText(".tutorial__prag__num11", {duration: .5}, "fuelContainerAnime+=3")
     .to(".main__ship__blasterData", {
         left: "0",
         duration: .5,
         ease: "power4.out",
         onStart: blasterCounterIsReady,
-    }, "+=1")
-    .showText(".tutorial__prag__num12", {duration: .5}, "+=3")
+    }, "fuelContainerAnime+=3")
+    .showText(".tutorial__prag__num12", {duration: .5}, "blasterContainerAnime+=3")
+    .to("#main__ship__fuelData", {
+        right: "0",
+        duration: .5,
+        ease: "power4.out",
+        onStart: fuelContainerIsReady,
+    }, "blasterContainerAnime+=3")
     .showText(".tutorial__prag__num13", {duration: .5, onComplete: function(){
         goToPractice()
         // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num13 .order", {id: "prag__13__order"})
-    }}, "+=3")
+    }}, "+=5")
     .to(".tutorial__texts", {
         y: -50,
         opacity: 0,
@@ -381,20 +388,20 @@ function goToTutorial() {
         },
         onComplete: startPractice
     }, "+=3")
-    TutorialAnime.timeScale(150)
+    TutorialAnime.timeScale(150);
 }
 
 function makeRifleReady() {
     $("body").on({
         "click": function() {
-            let rifle = new mainShipRifle(3, isFuelEndless);
+            let rifle = new mainShipRifle(3, isFuelEndless, tutorialItsOver);
             rifle.fireRifle();
             rifle.calcDamage();
         },
         "mousedown" : function() {
             timeOutId = setTimeout(function() {
                 RightClickSetInterval = setInterval(() => {
-                    let rifle = new mainShipRifle(3, isFuelEndless);
+                    let rifle = new mainShipRifle(3, isFuelEndless, tutorialItsOver);
                     rifle.fireRifle();
                     rifle.calcDamage();
                 }, 250);
@@ -412,19 +419,19 @@ function makeRifleReady() {
 }
 
 function makeBlasterReady() {
-    $("body").on("keydown", function(event) {
-        if(event.originalEvent.code === "Space"){
-            let blaster = new mainShipBlaster(true, blaster__num, isCountingActive, 100);
-            blaster.fireBlaster();
-            blaster.calcDamage();
-        }
-    })
-
     $("body").one("keydown", function(event) {
         if(event.originalEvent.code === "Space"){
             TutorialAnime.resume()
         }
     }) 
+
+    $("body").on("keydown", function(event) {
+        if(event.originalEvent.code === "Space"){
+            let blaster = new mainShipBlaster(true, blaster__num, isCountingActive, 20 , tutorialItsOver);
+            blaster.fireBlaster();
+            blaster.calcDamage();
+        }
+    })
 };
 
 function shipMovement() {
@@ -478,6 +485,27 @@ function startPractice() {
             }
         }
 
-        CurrentPositionEnemies.push(obj);
+        CurrentEnemiesData.push(obj);
     });
 };
+
+function isGameEnded(callback) {
+    let isAnyAlive;
+
+    $.each(CurrentEnemiesData, function(index, value){
+        if(value.isEnemyAlive === false){
+            isAnyAlive = false;
+        }else{
+            isAnyAlive = true;
+        }
+    })
+
+    if(isAnyAlive === false){
+        callback();
+    }
+}
+
+
+function tutorialItsOver() {
+    alert("you won")
+}
