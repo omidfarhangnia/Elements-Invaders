@@ -176,24 +176,21 @@ class mainShipRifle {
                 if(rifleBulletContainer.position().left <= CurrentPositionEnemies[i].enemyPos.left + 60 &&
                    rifleBulletContainer.position().left >= CurrentPositionEnemies[i].enemyPos.left - 60){
                     if(rifleBulletContainer.position().top <= CurrentPositionEnemies[i].enemyPos.top + 350 &&
-                       rifleBulletContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){
-                        
-                        // explosion animation and the element
-                        let blasterExplosion = $(`<div class='blasterExplosion'></div>`);
-                        blasterExplosion.appendTo(gameContainer);
-                        gsap.set(blasterExplosion , {
-                            "top": CurrentPositionEnemies[i].enemyPos.top,
-                            "left": CurrentPositionEnemies[i].enemyPos.left
-                        })
-                        // .css({
-                        //     // "animation": "explosionAnimation 2s ease-in-out both",
-                        //     "top": CurrentPositionEnemies[i].enemyPos.top,
-                        //     "left": CurrentPositionEnemies[i].enemyPos.left
-                        // });
-                        
-                        rifleBulletContainer.remove();
-                        $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).remove();
-                        clearInterval(checkRiflePosStepByStep);
+                       rifleBulletContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){    
+                        if(CurrentPositionEnemies[i].isEnemyAlive === true){
+                            if(CurrentPositionEnemies[i].enemyHealth >= 0){
+                                rifleBulletContainer.remove();
+                                $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).remove();
+                                CurrentPositionEnemies[i].isEnemyAlive = false;
+                                clearInterval(checkRiflePosStepByStep);
+                            }else{
+                                let newHealth = CurrentPositionEnemies[i].enemyHealth - this.level;
+
+                                newHealth * 100 /  
+
+                                CurrentPositionEnemies[i].enemyHealth
+                            }
+                        }    
                     }
                 }
             }
@@ -207,14 +204,6 @@ class mainShipRifle {
         rifle__num++;
     }
 }
-
-// gsap.fromTo(".blasterExplosion", {
-//     scale: 0,
-// },{
-//     scale: 1,
-//     duration: .6,
-//     loop: 3,
-// })
 
 class mainShipBlaster {
     constructor(isBlasterReady, blastersId, isCountingActive, allowableBlasterNumber) {
@@ -270,14 +259,33 @@ class mainShipBlaster {
                    blasterBulletContainer.position().left >= CurrentPositionEnemies[i].enemyPos.left - 60){
                     if(blasterBulletContainer.position().top <= CurrentPositionEnemies[i].enemyPos.top + 350 &&
                        blasterBulletContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){
-                        blasterBulletContainer.remove();
-                        $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).hide();
-                        clearInterval(checkBlasterPosStepByStep);
+                        if(CurrentPositionEnemies[i].isEnemyAlive === true){
+                            blasterBulletContainer.remove();
+
+                            // explosion animation and the element
+                            let blasterExplosion = $(`<div class='blasterExplosion'></div>`);
+                            blasterExplosion.appendTo(gameContainer);
+                            blasterExplosion.css({
+                                "animation": "explosionAnimation 2s ease-in-out both",
+                                "top": (CurrentPositionEnemies[i].enemyPos.top * -1) - 60,
+                                // the top value that i give is negative and i should make in positive
+                                "left": CurrentPositionEnemies[i].enemyPos.left
+                            });
+
+                            setTimeout(() => {
+                                blasterExplosion.remove();
+                            }, 2000);
+
+
+                            $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).hide();
+                            CurrentPositionEnemies[i].isEnemyAlive = false;
+                            clearInterval(checkBlasterPosStepByStep);
+                        }
                     }
                 }
             }
         }, 20);
-        
+
         setTimeout(() => {
             clearInterval(checkBlasterPosStepByStep);
             blasterBulletContainer.remove();
@@ -450,9 +458,14 @@ function startPractice() {
     activeEnemies.each(function( idx, element){
         let obj = {
             "enemyPos": $(element).position(),
-            "enemyNum": idx + 1
+            "enemyNum": idx + 1,
+            "isEnemyAlive": true,
+            "enemyHealth": {
+                current: 9,
+                main: 9
+            }
         }
 
         CurrentPositionEnemies.push(obj);
     });
-}
+};
