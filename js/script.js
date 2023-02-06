@@ -178,18 +178,20 @@ class mainShipRifle {
                     if(rifleBulletContainer.position().top <= CurrentPositionEnemies[i].enemyPos.top + 350 &&
                        rifleBulletContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){    
                         if(CurrentPositionEnemies[i].isEnemyAlive === true){
-                            if(CurrentPositionEnemies[i].enemyHealth >= 0){
-                                rifleBulletContainer.remove();
+                            let newHealth = CurrentPositionEnemies[i].enemyHealth.current - this.level;
+                            let mainFirstHealth = CurrentPositionEnemies[i].enemyHealth.first;
+
+                            $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum} .current__health`).css(
+                                "height", `${(newHealth * 100 / mainFirstHealth)}%`)
+                            
+                            CurrentPositionEnemies[i].enemyHealth.current = newHealth;
+                            rifleBulletContainer.remove();
+
+                            if(CurrentPositionEnemies[i].enemyHealth.current <= 0){
                                 $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).remove();
                                 CurrentPositionEnemies[i].isEnemyAlive = false;
-                                clearInterval(checkRiflePosStepByStep);
-                            }else{
-                                let newHealth = CurrentPositionEnemies[i].enemyHealth - this.level;
-
-                                newHealth * 100 /  
-
-                                CurrentPositionEnemies[i].enemyHealth
                             }
+                            clearInterval(checkRiflePosStepByStep);
                         }    
                     }
                 }
@@ -251,6 +253,7 @@ class mainShipBlaster {
     }
     calcDamage() {
         let currentBlastersId = idMaker(this.blastersId);
+        let blasterDamage = 10;
         let blasterBulletContainer = $(`#${currentBlastersId}-blasterBullet`);
 
         checkBlasterPosStepByStep = setInterval(() => {
@@ -260,25 +263,34 @@ class mainShipBlaster {
                     if(blasterBulletContainer.position().top <= CurrentPositionEnemies[i].enemyPos.top + 350 &&
                        blasterBulletContainer.position().top >= CurrentPositionEnemies[i].enemyPos.top){
                         if(CurrentPositionEnemies[i].isEnemyAlive === true){
+                            let newHealth = CurrentPositionEnemies[i].enemyHealth.current - blasterDamage;
+                            let mainFirstHealth = CurrentPositionEnemies[i].enemyHealth.first;
+
+                            $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum} .current__health`).css(
+                                "height", `${(newHealth * 100 / mainFirstHealth)}%`)
+                            
+                            CurrentPositionEnemies[i].enemyHealth.current = newHealth;
                             blasterBulletContainer.remove();
 
-                            // explosion animation and the element
-                            let blasterExplosion = $(`<div class='blasterExplosion'></div>`);
-                            blasterExplosion.appendTo(gameContainer);
-                            blasterExplosion.css({
-                                "animation": "explosionAnimation 2s ease-in-out both",
-                                "top": (CurrentPositionEnemies[i].enemyPos.top * -1) - 60,
-                                // the top value that i give is negative and i should make in positive
-                                "left": CurrentPositionEnemies[i].enemyPos.left
-                            });
+                            if(CurrentPositionEnemies[i].enemyHealth.current <= 0){
+                                $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).remove();
+                                CurrentPositionEnemies[i].isEnemyAlive = false;
+                                // explosion animation and the element
+                                let blasterExplosion = $(`<div class='blasterExplosion'></div>`);
+                                blasterExplosion.appendTo(gameContainer);
+                                
+                                blasterExplosion.css({
+                                    "animation": "explosionAnimation 2s ease-in-out both",
+                                    "top": (CurrentPositionEnemies[i].enemyPos.top * -1) - 60,
+                                    // the top value that i give is negative and i should make in positive
+                                    "left": CurrentPositionEnemies[i].enemyPos.left
+                                });
 
-                            setTimeout(() => {
-                                blasterExplosion.remove();
-                            }, 2000);
+                                setTimeout(() => {
+                                    blasterExplosion.remove();
+                                }, 2000);
+                            }
 
-
-                            $(`.enemy__num__${CurrentPositionEnemies[i].enemyNum}`).hide();
-                            CurrentPositionEnemies[i].isEnemyAlive = false;
                             clearInterval(checkBlasterPosStepByStep);
                         }
                     }
@@ -461,8 +473,8 @@ function startPractice() {
             "enemyNum": idx + 1,
             "isEnemyAlive": true,
             "enemyHealth": {
-                current: 9,
-                main: 9
+                "current": 9,
+                "first": 9
             }
         }
 
