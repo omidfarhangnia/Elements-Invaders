@@ -169,86 +169,6 @@
                 </div>
                 <div class="main__ship__blasters main__ship__blaster--2"></div>
             </div>
-            <div class="enemy__container">
-                <div class="fighter__1 enemy__num__1">
-                    <div class="health__container">
-                        <div class="current__health"></div>
-                    </div>
-                    <div class="fighter__1--gun--1"></div>
-                    <div class="fighter__1--gun--2"></div>
-                    <div class="fighter__1--motor--1"></div>
-                    <div class="fighter__1--motor--cover--1"></div>
-                    <div class="fighter__1--main--cabin">
-                        <div class="fighter__1--glasses--1"></div>
-                        <div class="fighter__1--glasses--2"></div>
-                        <div class="fighter__1--glasses--3"></div>
-                    </div>
-                    <div class="fighter__1--motor--2"></div>
-                    <div class="fighter__1--motor--cover--2"></div>
-                </div>
-                <div class="fighter__1 enemy__num__2">
-                    <div class="health__container">
-                        <div class="current__health"></div>
-                    </div>
-                    <div class="fighter__1--gun--1"></div>
-                    <div class="fighter__1--gun--2"></div>
-                    <div class="fighter__1--motor--1"></div>
-                    <div class="fighter__1--motor--cover--1"></div>
-                    <div class="fighter__1--main--cabin">
-                        <div class="fighter__1--glasses--1"></div>
-                        <div class="fighter__1--glasses--2"></div>
-                        <div class="fighter__1--glasses--3"></div>
-                    </div>
-                    <div class="fighter__1--motor--2"></div>
-                    <div class="fighter__1--motor--cover--2"></div>
-                </div>
-                <div class="fighter__1 enemy__num__3">
-                    <div class="health__container">
-                        <div class="current__health"></div>
-                    </div>
-                    <div class="fighter__1--gun--1"></div>
-                    <div class="fighter__1--gun--2"></div>
-                    <div class="fighter__1--motor--1"></div>
-                    <div class="fighter__1--motor--cover--1"></div>
-                    <div class="fighter__1--main--cabin">
-                        <div class="fighter__1--glasses--1"></div>
-                        <div class="fighter__1--glasses--2"></div>
-                        <div class="fighter__1--glasses--3"></div>
-                    </div>
-                    <div class="fighter__1--motor--2"></div>
-                    <div class="fighter__1--motor--cover--2"></div>
-                </div>
-                <div class="fighter__1 enemy__num__4">
-                    <div class="health__container">
-                        <div class="current__health"></div>
-                    </div>
-                    <div class="fighter__1--gun--1"></div>
-                    <div class="fighter__1--gun--2"></div>
-                    <div class="fighter__1--motor--1"></div>
-                    <div class="fighter__1--motor--cover--1"></div>
-                    <div class="fighter__1--main--cabin">
-                        <div class="fighter__1--glasses--1"></div>
-                        <div class="fighter__1--glasses--2"></div>
-                        <div class="fighter__1--glasses--3"></div>
-                    </div>
-                    <div class="fighter__1--motor--2"></div>
-                    <div class="fighter__1--motor--cover--2"></div>
-                </div>
-            </div>
-            <div id="main__ship__fuelData" class="d-flex flex-column justify-content-center align-items-center">
-                <div class="fuel__icon">
-                    <i class='fab fa-gripfire text-white'></i>
-                </div>
-                <div class="fuel__level d-flex align-items-end">
-                    <div class="current__fuel__level"></div>
-                </div>
-            </div>
-            <div class="main__ship__blasterData d-flex flex-column justify-content-center align-items-center">
-                <div class="blaster__icon">
-                    <i class='fas fa-bomb text-white'></i>
-                </div> 
-                <div class="blaster__num text-white"><span class="num">100</span>X</div>
-            </div>
             <div class="text__container">
                 <h3 class="tutorial__texts tutorial__headers text-white">WELCOME TO ELEMENTS INVADERS</h3>
                 <p class="tutorial__texts tutorial__prag__num1 text-white">I hope you enjoy this game.</p>
@@ -263,7 +183,7 @@
                 <p class="tutorial__texts tutorial__prag__num10 text-white">but we have very very bad news your armaments are not endless</p>
                 <p class="tutorial__texts tutorial__prag__num11 text-white">the number of your blaster will show here. blasters are lifesaver don't waste them.</p>
                 <p class="tutorial__texts tutorial__prag__num12 text-white">the level of your fuel it will show there. but don't worry if you use all of your fuel it will reload but it needs time.</p>
-                <p class="tutorial__texts tutorial__prag__num13 text-white"></p>
+                <p class="tutorial__texts tutorial__prag__num13 text-white">and finally we have your health condition if you crash to any enemy ship or if you get shot you will loose your heart.</p>
                 <p class="tutorial__texts tutorial__prag__num14 text-white">are you read for training before starting your fight <span class="order">( press any key )</span></p>
             </div>
             <div class="over__message">
@@ -288,6 +208,92 @@
                         <button type="button" class="btn rounded-pill text-white" data-bs-dismiss="modal" id="go__tutorial">go tutorial</button>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div id="main__ship__fuelData" class="d-flex flex-column justify-content-center align-items-center">
+            <div class="fuel__icon">
+                <i class='fab fa-gripfire text-white'></i>
+            </div>
+            <div class="fuel__level d-flex align-items-end">
+                <div class="current__fuel__level"></div>
+            </div>
+        </div>
+        <div id="main__ship__blasterData" class="d-flex flex-column justify-content-center align-items-center">
+            <div class="blaster__icon">
+                <i class='fas fa-bomb text-white'></i>
+            </div> 
+            <div class="blaster__num text-white"><span class="num">100</span>X</div>
+        </div>
+        <div id="main__ship__healthData" class="d-flex flex-column justify-content-around align-items-center">
+            <span class="heart__num__1"><i class='fas fa-heart heart__icon'></i></span>
+            <span class="heart__num__2"><i class='fas fa-heart heart__icon'></i></span>
+            <span class="heart__num__3"><i class='fas fa-heart heart__icon'></i></span>
+            <span class="heart__num__4"><i class='fas fa-heart heart__icon'></i></span>
+        </div>
+        <div class="enemy__container">
+            <div class="fighter__1 enemy__num__1">
+                <div class="health__container">
+                    <div class="current__health"></div>
+                </div>
+                <div class="fighter__1--gun--1"></div>
+                <div class="fighter__1--gun--2"></div>
+                <div class="fighter__1--motor--1"></div>
+                <div class="fighter__1--motor--cover--1"></div>
+                <div class="fighter__1--main--cabin">
+                    <div class="fighter__1--glasses--1"></div>
+                    <div class="fighter__1--glasses--2"></div>
+                    <div class="fighter__1--glasses--3"></div>
+                </div>
+                <div class="fighter__1--motor--2"></div>
+                <div class="fighter__1--motor--cover--2"></div>
+            </div>
+            <div class="fighter__1 enemy__num__2">
+                <div class="health__container">
+                    <div class="current__health"></div>
+                </div>
+                <div class="fighter__1--gun--1"></div>
+                <div class="fighter__1--gun--2"></div>
+                <div class="fighter__1--motor--1"></div>
+                <div class="fighter__1--motor--cover--1"></div>
+                <div class="fighter__1--main--cabin">
+                    <div class="fighter__1--glasses--1"></div>
+                    <div class="fighter__1--glasses--2"></div>
+                    <div class="fighter__1--glasses--3"></div>
+                </div>
+                <div class="fighter__1--motor--2"></div>
+                <div class="fighter__1--motor--cover--2"></div>
+            </div>
+            <div class="fighter__1 enemy__num__3">
+                <div class="health__container">
+                    <div class="current__health"></div>
+                </div>
+                <div class="fighter__1--gun--1"></div>
+                <div class="fighter__1--gun--2"></div>
+                <div class="fighter__1--motor--1"></div>
+                <div class="fighter__1--motor--cover--1"></div>
+                <div class="fighter__1--main--cabin">
+                    <div class="fighter__1--glasses--1"></div>
+                    <div class="fighter__1--glasses--2"></div>
+                    <div class="fighter__1--glasses--3"></div>
+                </div>
+                <div class="fighter__1--motor--2"></div>
+                <div class="fighter__1--motor--cover--2"></div>
+            </div>
+            <div class="fighter__1 enemy__num__4">
+                <div class="health__container">
+                    <div class="current__health"></div>
+                </div>
+                <div class="fighter__1--gun--1"></div>
+                <div class="fighter__1--gun--2"></div>
+                <div class="fighter__1--motor--1"></div>
+                <div class="fighter__1--motor--cover--1"></div>
+                <div class="fighter__1--main--cabin">
+                    <div class="fighter__1--glasses--1"></div>
+                    <div class="fighter__1--glasses--2"></div>
+                    <div class="fighter__1--glasses--3"></div>
+                </div>
+                <div class="fighter__1--motor--2"></div>
+                <div class="fighter__1--motor--cover--2"></div>
             </div>
         </div>
     </div>

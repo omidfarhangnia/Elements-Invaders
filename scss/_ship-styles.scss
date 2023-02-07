@@ -140,7 +140,7 @@ $data-bg: color.scale(rgba(142, 87, 209, 0.3), $lightness: 50%);
     }
 }
 
-.main__ship__blasterData{
+#main__ship__blasterData{
     width: 150px;
     height: 150px;
     position: absolute;
@@ -155,6 +155,21 @@ $data-bg: color.scale(rgba(142, 87, 209, 0.3), $lightness: 50%);
     .blaster__num{
         font-size: 35px;
         font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+}
+
+#main__ship__healthData{
+    width: 80px;
+    height: 200px;
+    position: absolute;
+    right: -80px;
+    top: 0;
+    background: $data-bg;
+    border-radius: 0 0 0 50px;
+    padding: 20px 0;
+    span{
+        font-size: 25px;
+        color: #ff0000;
     }
 }
 
@@ -266,6 +281,28 @@ div[class *= "main__ship--motor"]{
         top: -80%;
         z-index: 2;
     }
+}
+
+// enemy container
+
+.enemy__container{
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    position: absolute;
+    display: flex;
+    padding: 15vh 20vw 0 20vw;
+    justify-content: space-between;
+    // .fighter__1{
+    //     // translate: 0 -300px;
+    // }
+}
+
+// destroyed style
+
+.destroyed__ship{
+    visibility: hidden;
 }
 
 // fighter number 1

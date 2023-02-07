@@ -179,7 +179,7 @@ table {
   background: #ffe436;
 }
 
-.main__ship__blasterData {
+#main__ship__blasterData {
   width: 150px;
   height: 150px;
   position: absolute;
@@ -189,12 +189,27 @@ table {
   left: -150px;
   gap: 5px;
 }
-.main__ship__blasterData .blaster__icon {
+#main__ship__blasterData .blaster__icon {
   font-size: 40px;
 }
-.main__ship__blasterData .blaster__num {
+#main__ship__blasterData .blaster__num {
   font-size: 35px;
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+#main__ship__healthData {
+  width: 80px;
+  height: 200px;
+  position: absolute;
+  right: -80px;
+  top: 0;
+  background: rgba(199, 171, 232, 0.3);
+  border-radius: 0 0 0 50px;
+  padding: 20px 0;
+}
+#main__ship__healthData span {
+  font-size: 25px;
+  color: #ff0000;
 }
 
 .blasterAlarm {
@@ -298,6 +313,21 @@ div[class*=main__ship--motor] .main__ship--guns {
 .main__ship__blaster--2::after {
   top: -80%;
   z-index: 2;
+}
+
+.enemy__container {
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  position: absolute;
+  display: flex;
+  padding: 15vh 20vw 0 20vw;
+  justify-content: space-between;
+}
+
+.destroyed__ship {
+  visibility: hidden;
 }
 
 .fighter__1 {
@@ -924,26 +954,6 @@ div[class*=boss__fight--laser--] {
   top: 0;
   right: 100%;
 }
-.page__tutorial .enemy__container {
-  margin: 0 auto;
-}
-.page__tutorial .enemy__container .fighter__1 {
-  position: absolute;
-  top: 15vh;
-  translate: 0 -300px;
-}
-.page__tutorial .enemy__container .enemy__num__1 {
-  left: 20%;
-}
-.page__tutorial .enemy__container .enemy__num__2 {
-  left: 35%;
-}
-.page__tutorial .enemy__container .enemy__num__3 {
-  right: 35%;
-}
-.page__tutorial .enemy__container .enemy__num__4 {
-  right: 20%;
-}
 .page__tutorial .main__ship {
   width: 100px;
   height: 100px;
@@ -955,12 +965,13 @@ div[class*=boss__fight--laser--] {
   font-size: 3rem;
   font-family: "Bebas Neue", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
-.page__tutorial p {
+.page__tutorial p[class*=tutorial__texts] {
   font-size: 1.3rem;
   font-family: "Bebas Neue", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   margin: 0.8rem 0;
   max-width: 500px;
   text-align: justify;
+  transition: 2s;
 }
 
 .meteorite__image__container {

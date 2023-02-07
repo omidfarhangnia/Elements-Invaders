@@ -67,7 +67,10 @@ var blaster__num = 0,
     recoverFuelContainer, reloading,
     checkRiflePosStepByStep = null,
     checkBlasterPosStepByStep = null,
-    CurrentEnemiesData = [];
+    CurrentEnemiesData = [],
+    isShipDamageActive = false,
+    currentHeartNumber = 4,
+    isShipInImmortalMode = false;
 
 $('#go__tutorial, #tutorial').click(goToTutorial)
 
@@ -188,7 +191,7 @@ class mainShipRifle {
                             rifleBulletContainer.remove();
 
                             if(CurrentEnemiesData[i].enemyHealth.current <= 0){
-                                $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).remove();
+                                $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).addClass("destroyed__ship");
                                 CurrentEnemiesData[i].isEnemyAlive = false;
                             }
                             isGameEnded(this.endFunction);
@@ -222,7 +225,7 @@ class mainShipBlaster {
         if(this.isCountingActive === true){
             blaster__num++;
             if(this.allowableBlasterNumber <= this.blastersId){
-                $(".main__ship__blasterData").addClass("blasterAlarm")
+                $("#main__ship__blasterData").addClass("blasterAlarm")
                 return;
             }else{
                 $(".blaster__num .num").text(`${this.allowableBlasterNumber - 1 - this.blastersId}`);
@@ -277,7 +280,7 @@ class mainShipBlaster {
                             blasterBulletContainer.remove();
 
                             if(CurrentEnemiesData[i].enemyHealth.current <= 0){
-                                $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).remove();
+                                $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).addClass("destroyed__ship");
                                 CurrentEnemiesData[i].isEnemyAlive = false;
                                 // explosion animation and the element
                                 let blasterExplosion = $(`<div class='blasterExplosion'></div>`);
@@ -313,6 +316,27 @@ class mainShipBlaster {
 
 goToTutorial()
 function goToTutorial() {
+    let groupOneTexts = [
+        ".tutorial__prag__num9",
+        ".tutorial__prag__num8",
+        ".tutorial__prag__num7",
+        ".tutorial__prag__num6",
+        ".tutorial__prag__num5",
+        ".tutorial__prag__num4",
+        ".tutorial__prag__num3",
+        ".tutorial__prag__num2",
+        ".tutorial__prag__num1"
+    ];
+
+    let groupTwoTexts = [
+        ".tutorial__prag__num14",
+        ".tutorial__prag__num13",
+        ".tutorial__prag__num12",
+        ".tutorial__prag__num11",
+        ".tutorial__prag__num10",
+        ".tutorial__headers",
+    ];
+
     TutorialAnime
     .changePage(pageTutorial)
     .showText(".tutorial__headers", {duration: .5}, "+=1")
@@ -336,8 +360,8 @@ function goToTutorial() {
     .showText(".tutorial__prag__num4", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num5", {duration: .5}, "+=2.5")
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
-        shipMovement()
-        TutorialAnime.pause();
+        shipMovement(isShipDamageActive)
+        // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num7", {duration: .5, onStart: function() {
@@ -345,21 +369,32 @@ function goToTutorial() {
     }}, "+=2")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
         makeRifleReady();
-        TutorialAnime.pause();
+        // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num8 .order", {id: "prag__8__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num9", {duration: .5, onComplete: function() {
         makeBlasterReady();
-        TutorialAnime.pause();
+        // TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
     }, onStart: function() {
         // gsap.getById("prag__8__order").seek(0).kill()
     }}, "+=3")
+    .to(groupOneTexts, {
+        y: 50,
+        opacity: 0,
+        stagger: .5,
+        ease: "linear",
+        onComplete: function() {
+            $.each(groupOneTexts, function(index, element) {
+                $(`${element}`).remove();
+            })
+        }
+    }, "+=3")
     .showText(".tutorial__prag__num10", {duration: .5, onStart: function(){
         // gsap.getById("prag__9__order").seek(0).kill()
     }}, "+=3")
     .showText(".tutorial__prag__num11", {duration: .5}, "fuelContainerAnime+=3")
-    .to(".main__ship__blasterData", {
+    .to("#main__ship__blasterData", {
         left: "0",
         duration: .5,
         ease: "power4.out",
@@ -372,28 +407,46 @@ function goToTutorial() {
         ease: "power4.out",
         onStart: fuelContainerIsReady,
     }, "blasterContainerAnime+=3")
+    .showText(".tutorial__prag__num13", {duration: .5}, "healthContainerAnime+=3")
+    .to("#main__ship__healthData", {
+        right: "0",
+        duration: .5,
+        ease: "power4.out",
+        onStart: healthContainerIsReady,
+    }, "healthContainerAnime+=3")
     .showText(".tutorial__prag__num14", {duration: .5, onComplete: function(){
         goToPractice()
-        TutorialAnime.pause();
-        gsap.effects.orderAnime(".tutorial__prag__num13 .order", {id: "prag__13__order"})
+        // TutorialAnime.pause();
+        gsap.effects.orderAnime(".tutorial__prag__num14 .order", {id: "prag__13__order"})
     }}, "+=5")
-    .to(".tutorial__texts", {
-        y: -50,
+    .to(groupTwoTexts, {
+        y: 50,
         opacity: 0,
-        stagger: .1,
+        stagger: .2,
         ease: "linear",
         onStart: function() {
             // gsap.getById("prag__13__order").seek(0).kill()
         },
         onComplete: function(){
             makeEnemyReady();
-            TutorialAnime.pause();
         },
     }, "+=3")
+    .fromTo(".enemy__container > div", 
+    {
+        y: -300,
+    },{
+        y: 0,
+        duration: .5,
+        stagger: .2,
+        onComplete: function() {
+            TutorialAnime.pause();
+        }
+    }, "+=1")
     .showText(".tutorial__over__message", {duration: .75})
     .showText(".tutorial__over__btn", {duration: .75})
 
     TutorialAnime.timeScale(150);
+    // TutorialAnime.progress(.93);
 }
 
 function makeRifleReady() {
@@ -419,14 +472,14 @@ function makeRifleReady() {
     })
 
     pageTutorial.one("click", () => {
-        TutorialAnime.resume()
+        // TutorialAnime.resume()
     })
 }
 
 function makeBlasterReady() {
     $("body").one("keydown", function(event) {
         if(event.originalEvent.code === "Space"){
-            TutorialAnime.resume()
+            // TutorialAnime.resume()
         }
     }) 
 
@@ -440,8 +493,8 @@ function makeBlasterReady() {
 };
 
 function shipMovement() {
-    pageTutorial.css("cursor", "none")
-    pageTutorial.on("mousemove", (event) => {
+    gameContainer.css("cursor", "none")
+    gameContainer.on("mousemove", (event) => {
         let page__width = window.innerWidth,
             page__height = window.innerHeight
 
@@ -450,9 +503,51 @@ function shipMovement() {
 
         // i used utils.clamp for having a condition for controlling the ship without
         // this condition my ship will gone out of VIEW PORT 
+
+        if(isShipDamageActive === true){
+            for(var i = 0; i < CurrentEnemiesData.length; i++){
+                if(mainShip.position().left <= CurrentEnemiesData[i].enemyPos.left + 50 &&
+                   mainShip.position().left >= CurrentEnemiesData[i].enemyPos.left - 50){
+                    if(mainShip.position().top <= CurrentEnemiesData[i].enemyPos.top + 400 &&
+                       mainShip.position().top >= CurrentEnemiesData[i].enemyPos.top + 300){
+                        // plus 300 is for the line 432 in this line we have an animation for 
+                        // putting element in the page with an animation
+                        // and 75 is the size of element
+                        if(CurrentEnemiesData[i].isEnemyAlive === true){
+                            if(isShipInImmortalMode === false){
+                                let currentHealth = $(`.heart__num__${currentHeartNumber}`);
+                                gsap.to(currentHealth, {
+                                    opacity: 0,
+                                    duration: .3,
+                                    ease: "power4.out",
+                                    repeat: 1,
+                                    yoyo: true,
+                                });
+                                currentHealth.html("<i class='far fa-heart'></i>");
+                                currentHeartNumber--;
+                                isShipInImmortalMode = true;
+                                gsap.to(mainShip, {
+                                    opacity: 0,
+                                    duration: .2,
+                                    ease: "linear",
+                                    repeat: 5,
+                                    onComplete: function(){
+                                        gsap.set(mainShip, {opacity: 1});
+                                    }
+                                })
+                                setTimeout(() => {
+                                    isShipInImmortalMode = false;
+                                }, 2000);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     })
-    pageTutorial.one("mousemove", () => {
-        TutorialAnime.resume()
+
+    gameContainer.one("mousemove", () => {
+        // TutorialAnime.resume()
     })
 }
 
@@ -466,17 +561,11 @@ function fuelContainerIsReady() {
 
 function goToPractice() {
     $("body").one("keydown", () => {
-        TutorialAnime.resume()
+        // TutorialAnime.resume()
     })
 }
 
 function makeEnemyReady() {
-    gsap.to(".enemy__container > div", {
-        y: 0,
-        duration: .5,
-        stagger: .2
-    })
-
     let activeEnemies = $(".enemy__container > div");
 
     activeEnemies.each(function( idx, element){
@@ -512,5 +601,9 @@ function isGameEnded(callback) {
 }
 
 function tutorialItsOver() {
-    TutorialAnime.resume();
+    // TutorialAnime.resume();
+}
+
+function healthContainerIsReady() {
+    isShipDamageActive = true;
 }
