@@ -76,6 +76,23 @@
     }
 }
 
+.tutorial__over__message{
+    top: 12vh;
+    left: 0;
+    font-family: $font-bebas-neue;
+    text-align: center;
+    font-size: 6rem;
+    width: 100%;
+    max-width: 100%;
+    position: absolute;
+}
+
+.tutorial__over__btn{
+    @include gameBtn();
+    position: absolute;
+    left: 35%;
+}
+
 @keyframes rockAnimation {
     0%{
         rotate: 0;

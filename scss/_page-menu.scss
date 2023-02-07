@@ -4,6 +4,21 @@
 $font-bebas-neue: "Bebas Neue", 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 
+@mixin gameBtn() {
+    width: 30%;
+    margin-bottom: .5rem;
+    background: transparent;
+    border: 0;
+    background: hsla(223, 92%, 10%, 0.5);
+    font-size: 2rem;
+    border-radius: 50px;
+    font-family: $font-roboto-mono;
+    color: #ffffff;
+    border: 3px solid #404F87;
+    padding: .3rem 0;
+    cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
+}
+
 .page__menu{
     width: 100%;
     height: 100vh;
@@ -19,18 +34,7 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
     cursor: url("../images/mouse-cursor/fork.png"), pointer;
  
     button{
-        width: 30%;
-        margin-bottom: .5rem;
-        background: transparent;
-        border: 0;
-        background: hsla(223, 92%, 10%, 0.5);
-        font-size: 2rem;
-        border-radius: 50px;
-        font-family: $font-roboto-mono;
-        color: #ffffff;
-        border: 3px solid #404F87;
-        padding: .3rem 0;
-        cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
+        @include gameBtn();
     }
 }
 

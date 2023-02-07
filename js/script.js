@@ -191,21 +191,20 @@ class mainShipRifle {
                                 $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).remove();
                                 CurrentEnemiesData[i].isEnemyAlive = false;
                             }
+                            isGameEnded(this.endFunction);
                             clearInterval(checkRiflePosStepByStep);
-                        }    
+                        }
                     }
                 }
             }
         }, 10);
         
         setTimeout(() => {
-            clearInterval(checkRiflePosStepByStep);
             rifleBulletContainer.remove();
+            clearInterval(checkRiflePosStepByStep);
         }, 750);
 
         rifle__num++;
-
-        isGameEnded(this.endFunction)
     }
 }
 
@@ -295,7 +294,6 @@ class mainShipBlaster {
                                     blasterExplosion.remove();
                                 }, 2000);
                             }
-
                             clearInterval(checkBlasterPosStepByStep);
                         }
                     }
@@ -307,8 +305,9 @@ class mainShipBlaster {
             clearInterval(checkBlasterPosStepByStep);
             blasterBulletContainer.remove();
         }, 750);
-        
-        isGameEnded(this.endFunction)
+        setTimeout(() => {
+            isGameEnded(this.endFunction); 
+        }, 2000);
     }
 }
 
@@ -338,7 +337,7 @@ function goToTutorial() {
     .showText(".tutorial__prag__num5", {duration: .5}, "+=2.5")
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
         shipMovement()
-        // TutorialAnime.pause();
+        TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num7", {duration: .5, onStart: function() {
@@ -346,12 +345,12 @@ function goToTutorial() {
     }}, "+=2")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
         makeRifleReady();
-        // TutorialAnime.pause();
+        TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num8 .order", {id: "prag__8__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num9", {duration: .5, onComplete: function() {
         makeBlasterReady();
-        // TutorialAnime.pause();
+        TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
     }, onStart: function() {
         // gsap.getById("prag__8__order").seek(0).kill()
@@ -373,9 +372,9 @@ function goToTutorial() {
         ease: "power4.out",
         onStart: fuelContainerIsReady,
     }, "blasterContainerAnime+=3")
-    .showText(".tutorial__prag__num13", {duration: .5, onComplete: function(){
+    .showText(".tutorial__prag__num14", {duration: .5, onComplete: function(){
         goToPractice()
-        // TutorialAnime.pause();
+        TutorialAnime.pause();
         gsap.effects.orderAnime(".tutorial__prag__num13 .order", {id: "prag__13__order"})
     }}, "+=5")
     .to(".tutorial__texts", {
@@ -386,8 +385,14 @@ function goToTutorial() {
         onStart: function() {
             // gsap.getById("prag__13__order").seek(0).kill()
         },
-        onComplete: startPractice
+        onComplete: function(){
+            makeEnemyReady();
+            TutorialAnime.pause();
+        },
     }, "+=3")
+    .showText(".tutorial__over__message", {duration: .75})
+    .showText(".tutorial__over__btn", {duration: .75})
+
     TutorialAnime.timeScale(150);
 }
 
@@ -465,8 +470,8 @@ function goToPractice() {
     })
 }
 
-function startPractice() {
-    gsap.to(".enemy__container .fighter__1", {
+function makeEnemyReady() {
+    gsap.to(".enemy__container > div", {
         y: 0,
         duration: .5,
         stagger: .2
@@ -497,6 +502,7 @@ function isGameEnded(callback) {
             isAnyAlive = false;
         }else{
             isAnyAlive = true;
+            return false;  
         }
     })
 
@@ -505,7 +511,6 @@ function isGameEnded(callback) {
     }
 }
 
-
 function tutorialItsOver() {
-    alert("you won")
+    TutorialAnime.resume();
 }
