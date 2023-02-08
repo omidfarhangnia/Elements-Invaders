@@ -326,6 +326,10 @@ div[class*=main__ship--motor] .main__ship--guns {
   justify-content: space-between;
 }
 
+.enemy__container--lower {
+  z-index: -1;
+}
+
 .destroyed__ship {
   visibility: hidden;
 }
@@ -803,7 +807,7 @@ div[class*=boss__fight--laser--] {
 }
 
 .page__menu {
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   background-image: url(../images/background-images/page-game-bg.jpg);
   background-size: cover;

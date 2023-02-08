@@ -1,8 +1,10 @@
 // register change page effect
 gsap.registerEffect({
-    name: "changePage",
+    name: "bringThePage",
     effect: (targets) => {
-        return gsap.timeline().fromTo(".meteorite__image__container", {
+        return gsap.timeline()
+        .set(".meteorite__image__container", {rotate: 0})
+        .fromTo(".meteorite__image__container", {
             left: "110%"
         },{
             left: "-110%",
@@ -13,6 +15,28 @@ gsap.registerEffect({
             left: "100%"
         },{
             left: "0",
+            duration: 2,
+            ease: "linear",
+        }, "-=3.5")
+    },
+    extendTimeline: true
+})
+gsap.registerEffect({
+    name: "takeThePage",
+    effect: (targets) => {
+        return gsap.timeline()
+        .set(".meteorite__image__container", {rotate: 180})
+        .fromTo(".meteorite__image__container", {
+            left: "-110%"
+        },{
+            left: "110%",
+            duration: 4,
+            ease: "linear",
+            delay: 1
+        }).fromTo(targets, {
+            left: "0"
+        },{
+            left: "100%",
             duration: 2,
             ease: "linear",
         }, "-=3.5")
@@ -64,14 +88,17 @@ gsap.registerEffect({
     extendTimeline: true
 });
 
-const gameContainer = $("#game__container")
-const mainShip = $(".main__ship")
+const pageMenu = $(".page__menu");
+const gameContainer = $("#game__container");
+const mainShip = $(".main__ship");
 const mainShipBulletContainer = $(".main__ship--bullet__container");
 const mainShipBlasterContainer = $(".main__ship--blaster__container");
 const fuelContainer = $("#main__ship__fuelData div.current__fuel__level");
-const pageTutorial = $(".page__tutorial")
+const pageTutorial = $(".page__tutorial");
+const enemyContainer = $(".enemy__container");
 
-var blaster__num = 0,
+var isGamePlaying = false,
+    blaster__num = 0,
     rifle__num = 0,  
     RightClickTimeOut = 0,
     RightClickSetInterval = 0,
@@ -114,6 +141,14 @@ const pauseTutorialAnime = () => {
 
 const resumeTutorialAnime = () => {
     TutorialAnime.resume();
+}
+
+const playSituation = (situation) => {
+    if(situation === "pause"){
+        isGamePlaying = false;
+    }else if(situation === "play"){
+        isGamePlaying = true;
+    }
 }
 
 const pauseOrderAnime = (id) => {
@@ -362,8 +397,10 @@ function goToTutorial() {
         ".tutorial__headers",
     ];
 
+    // TutorialAnime.restart();
+
     TutorialAnime
-    .changePage(pageTutorial)
+    .bringThePage(pageTutorial, 0)
     .showText(".tutorial__headers", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num1", {duration: .5}, "+=2")
     .to(".tutorial__prag__num1", {
@@ -385,6 +422,7 @@ function goToTutorial() {
     .showText(".tutorial__prag__num4", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num5", {duration: .5}, "+=2.5")
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
+        playSituation("play");
         shipMovement()
         pauseTutorialAnime();
         gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
@@ -430,9 +468,10 @@ function goToTutorial() {
     .showText(".tutorial__prag__num14", {duration: .5, onComplete: function(){
         pressToContinue()
         pauseTutorialAnime();
-        gsap.effects.orderAnime(".tutorial__prag__num14 .order", {id: "prag__13__order"})
+        gsap.effects.orderAnime(".tutorial__prag__num14 .order", {id: "prag__13__order"});
+        enemyContainer.toggleClass("enemy__container--lower");
     }}, "+=5")
-    .hidePrevTexts(groupTwoTexts, {stagger: .2, onComplete: makeEnemyReady, onstart: function() {pauseOrderAnime(13)}}, "+=3")
+    .hidePrevTexts(groupTwoTexts, {stagger: .2, onComplete: makeEnemyReady(["fighter__1", "fighter__1", "fighter__1", "fighter__1"])}, "+=3")
     .fromTo(".enemy__container > div", 
     {
         y: -300,
@@ -442,17 +481,34 @@ function goToTutorial() {
         stagger: .2,
         onComplete: pauseTutorialAnime
     }, "+=1")
-    .showText(".tutorial__over__message", {duration: .75})
+    .showText(".tutorial__over__message", {duration: .75, onComplete: clearEnemyContainer})
     .showText(".tutorial__over__btn", {duration: .75, onComplete: pressToContinue})
-    .hidePrevTexts(".tutorial__over__message, .tutorial__over__btn", {stagger: .4, onComplete: controllersAnime})
-
-    TutorialAnime.timeScale(3);
-    // TutorialAnime.progress(.93);
+    .hidePrevTexts(".tutorial__over__message, .tutorial__over__btn", {stagger: .4, onComplete: function() {
+        controllersAnime();
+        gameContainer.css("cursor", "default");
+        playSituation("pause");
+    }})
+    .to(mainShip, {
+        opacity: 0,
+        duration: 2,
+        ease: "elastic.out(1.5, 0.3)",
+        onStart: function() {
+            enemyContainer.toggleClass("enemy__container--lower");
+        }
+    })
+    .takeThePage(pageTutorial)
+    TutorialAnime.timeScale(15)
 }
+
+    // TutorialAnime.progress(.95)
+    // TutorialAnime.timeScale(8)
 
 function makeRifleReady() {
     $("body").on({
         "click": function() {
+            if(isGamePlaying === false) return;
+            // for controlling functions and their behavior
+
             rifle = new mainShipRifle(3, isFuelEndless, resumeTutorialAnime);
             rifle.fireRifle();
             rifle.calcDamage();
@@ -460,6 +516,9 @@ function makeRifleReady() {
         "mousedown" : function() {
             timeOutId = setTimeout(function() {
                 RightClickSetInterval = setInterval(() => {
+                    if(isGamePlaying === false) return;
+                    // for controlling functions and their behavior
+
                     let rifle = new mainShipRifle(3, isFuelEndless, resumeTutorialAnime);
                     rifle.fireRifle();
                     rifle.calcDamage();
@@ -484,6 +543,9 @@ function makeBlasterReady() {
 
     $("body").on("keydown", function(event) {
         if(event.originalEvent.code === "Space"){
+            if(isGamePlaying === false) return;
+            // for controlling functions and their behavior
+
             let blaster = new mainShipBlaster(true, blaster__num, isCountingActive, 20 , resumeTutorialAnime);
             blaster.fireBlaster();
             blaster.calcDamage();
@@ -494,6 +556,9 @@ function makeBlasterReady() {
 function shipMovement() {
     gameContainer.css("cursor", "none")
     gameContainer.on("mousemove", (event) => {
+        if(isGamePlaying === false) return;
+        // for controlling functions and their behavior
+
         let page__width = window.innerWidth,
             page__height = window.innerHeight
 
@@ -567,7 +632,9 @@ function pressToContinue() {
     $("body").one("keydown", resumeTutorialAnime)
 }
 
-function makeEnemyReady() {
+function makeEnemyReady(listOfEnemies) {
+    let fighters = giveFightersCode(listOfEnemies);
+    enemyContainer.html(fighters);
     let activeEnemies = $(".enemy__container > div");
 
     activeEnemies.each(function( idx, element){
@@ -584,6 +651,91 @@ function makeEnemyReady() {
         CurrentEnemiesData.push(obj);
     });
 };
+
+function giveFightersCode(listOfEnemies) {
+    let allFighterContainer = "";
+
+    for(var i = 0; i <= listOfEnemies.length; i++){
+        if(listOfEnemies[i] === "fighter__1"){
+            allFighterContainer += `
+            <div class="fighter__1">
+                <div class="health__container">
+                    <div class="current__health"></div>
+                </div>
+                <div class="fighter__1--gun--1"></div>
+                <div class="fighter__1--gun--2"></div>
+                <div class="fighter__1--motor--1"></div>
+                <div class="fighter__1--motor--cover--1"></div>
+                <div class="fighter__1--main--cabin">
+                    <div class="fighter__1--glasses--1"></div>
+                    <div class="fighter__1--glasses--2"></div>
+                    <div class="fighter__1--glasses--3"></div>
+                </div>
+                <div class="fighter__1--motor--2"></div>
+                <div class="fighter__1--motor--cover--2"></div>
+            </div>`;
+        }else if(listOfEnemies[i] === "fighter__2"){
+            allFighterContainer += `            
+            <div class="fighter__2">
+                <div class="health__container">
+                    <div class="current__health"></div>
+                </div>
+                <div class="fighter__2--blasters--1"></div>
+                <div class="fighter__2--blasters--2"></div>
+                <div class="fighter__2--motor--1"></div>
+                <div class="fighter__2--main--cabin">
+                    <div class="fighter__2--main--cabin--glass"></div>
+                </div>
+                <div class="fighter__2--motor--2"></div>
+                <div class="fighter__2--blaster--keeper--1"></div>
+                <div class="fighter__2--blaster--keeper--2"></div>
+            </div>`;
+        }else if(listOfEnemies[i] === "fighter__3"){
+            allFighterContainer += `
+            <div class="fighter__3">
+                <div class="health__container">
+                    <div class="current__health"></div>
+                </div>
+                <div class="fighter__3--gun--1"></div>
+                <div class="fighter__3--gun--2"></div>
+                <div class="fighter__3--blaster--1"></div>
+                <div class="fighter__3--blaster--2"></div>
+                <div class="fighter__3--main--cabin">
+                    <div class="fighter__3--cabin--glass"></div>
+                </div>
+            </div>`;
+        }else if(listOfEnemies[i] === "boss__fight"){
+            allFighterContainer += `
+            <div class="boss__fight">
+                <div class="boss__fight--blaster--1"></div>
+                <div class="boss__fight--blaster--2"></div>
+                <div class="boss__fight--blaster--3"></div>
+                <div class="boss__fight--blaster--4"></div>
+                <div class="boss__fight--blaster--5"></div>
+                <div class="boss__fight--blaster--6"></div>
+                <div class="boss__fight--blaster--7"></div>
+                <div class="boss__fight--blaster--8"></div>
+                <div class="boss__fight--gun--1"></div>
+                <div class="boss__fight--gun--2"></div>
+                <div class="boss__fight--gun--3"></div>
+                <div class="boss__fight--gun--4"></div>
+                <div class="boss__fight--gun--5"></div>
+                <div class="boss__fight--gun--6"></div>
+                <div class="boss__fight--gun--7"></div>
+                <div class="boss__fight--gun--8"></div>
+                <div class="boss__fight--laser--1"></div>
+                <div class="boss__fight--laser--2"></div>
+                <div class="boss__fight--laser--3"></div>
+                <div class="boss__fight--laser--4"></div>
+                <div class="outer__box">
+                    <div class="inner__box"></div>
+                </div>
+            </div>`;
+        }
+    }
+
+    return allFighterContainer;
+}
 
 function isGameEnded(callback) {
     let isAnyAlive;
@@ -617,8 +769,8 @@ function controllersAnime() {
     .to("#main__ship__blasterData", {
         left: "-150"
     }, "controllersLabel");
+}
 
-    gameContainer.on({
-        "mousemove": function() {$("*").off()},
-    })
+function clearEnemyContainer() {
+    enemyContainer.empty();
 }
