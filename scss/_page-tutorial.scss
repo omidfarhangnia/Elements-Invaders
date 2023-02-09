@@ -13,7 +13,7 @@
     user-select: none;
     overflow: hidden;
     top: 0;
-    right: 100%;
+    left: 100%;
     .main__ship{
         width: 100px;
         height: 100px;
@@ -31,7 +31,6 @@
         margin: .8rem 0;
         max-width: 500px;
         text-align: justify;
-        transition: 2s;
     }
 }
 
@@ -66,12 +65,6 @@
     width: 100%;
     max-width: 100%;
     position: absolute;
-}
-
-.tutorial__over__btn{
-    @include gameBtn();
-    position: absolute;
-    left: 35%;
 }
 
 @keyframes rockAnimation {

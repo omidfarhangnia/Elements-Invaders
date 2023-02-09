@@ -4,6 +4,7 @@ gsap.registerEffect({
     effect: (targets) => {
         return gsap.timeline()
         .set(".meteorite__image__container", {rotate: 0})
+        .set(targets, {left: "100%"})
         .fromTo(".meteorite__image__container", {
             left: "110%"
         },{
@@ -11,9 +12,7 @@ gsap.registerEffect({
             duration: 4,
             ease: "linear",
             delay: 1
-        }).fromTo(targets, {
-            left: "100%"
-        },{
+        }).to(targets, {
             left: "0",
             duration: 2,
             ease: "linear",
@@ -25,6 +24,7 @@ gsap.registerEffect({
     name: "takeThePage",
     effect: (targets) => {
         return gsap.timeline()
+        .set(targets, {left: "0"})
         .set(".meteorite__image__container", {rotate: 180})
         .fromTo(".meteorite__image__container", {
             left: "-110%"
@@ -33,9 +33,7 @@ gsap.registerEffect({
             duration: 4,
             ease: "linear",
             delay: 1
-        }).fromTo(targets, {
-            left: "0"
-        },{
+        }).to(targets, {
             left: "100%",
             duration: 2,
             ease: "linear",
@@ -96,20 +94,21 @@ const mainShipBlasterContainer = $(".main__ship--blaster__container");
 const fuelContainer = $("#main__ship__fuelData div.current__fuel__level");
 const pageTutorial = $(".page__tutorial");
 const enemyContainer = $(".enemy__container");
+const blasterNum = $("#blaster__num .num");
 
 var isGamePlaying = false,
     blaster__num = 0,
     rifle__num = 0,  
     RightClickTimeOut = 0,
     RightClickSetInterval = 0,
-    blasterCountingSituation = false,
-    isFuelEndless = true,
-    isCountingActive = false,
+    blasterCountingSituation,
+    isFuelEndless,
+    isCountingActive,
     recoverFuelContainer, reloading,
     checkRiflePosStepByStep = null,
     checkBlasterPosStepByStep = null,
     CurrentEnemiesData = [],
-    isShipDamageActive = false,
+    isShipDamageActive,
     currentHeartNumber = 4,
     isShipInImmortalMode = false;
 
@@ -238,7 +237,7 @@ class mainShipRifle {
             for(var i = 0; i < CurrentEnemiesData.length; i++){
                 if(rifleBulletContainer.position().left <= CurrentEnemiesData[i].enemyPos.left + 60 &&
                    rifleBulletContainer.position().left >= CurrentEnemiesData[i].enemyPos.left - 60){
-                    if(rifleBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top + 350 &&
+                    if(rifleBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top + 60 &&
                        rifleBulletContainer.position().top >= CurrentEnemiesData[i].enemyPos.top){    
                         if(CurrentEnemiesData[i].isEnemyAlive === true){
                             let newHealth = CurrentEnemiesData[i].enemyHealth.current - this.level;
@@ -288,7 +287,7 @@ class mainShipBlaster {
                 $("#main__ship__blasterData").addClass("blasterAlarm")
                 return;
             }else{
-                $(".blaster__num .num").text(`${this.allowableBlasterNumber - 1 - this.blastersId}`);
+                blasterNum.text(`${this.allowableBlasterNumber - 1 - this.blastersId}`);
                 // this one is here because we are decreasing the number but not the number that is available here
                 // the outer number is changing and we need a change for this number
             }
@@ -327,7 +326,7 @@ class mainShipBlaster {
             for(var i = 0; i < CurrentEnemiesData.length; i++){
                 if(blasterBulletContainer.position().left <= CurrentEnemiesData[i].enemyPos.left + 60 &&
                    blasterBulletContainer.position().left >= CurrentEnemiesData[i].enemyPos.left - 60){
-                    if(blasterBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top + 350 &&
+                    if(blasterBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top + 50 &&
                        blasterBulletContainer.position().top >= CurrentEnemiesData[i].enemyPos.top){
                         if(CurrentEnemiesData[i].isEnemyAlive === true){
                             let newHealth = CurrentEnemiesData[i].enemyHealth.current - blasterDamage;
@@ -348,7 +347,7 @@ class mainShipBlaster {
                                 
                                 blasterExplosion.css({
                                     "animation": "explosionAnimation 2s ease-in-out both",
-                                    "top": (CurrentEnemiesData[i].enemyPos.top * -1) - 60,
+                                    "top": (CurrentEnemiesData[i].enemyPos.top) + 20,
                                     // the top value that i give is negative and i should make in positive
                                     "left": CurrentEnemiesData[i].enemyPos.left
                                 });
@@ -374,7 +373,6 @@ class mainShipBlaster {
     }
 }
 
-goToTutorial()
 function goToTutorial() {
     let groupOneTexts = [
         ".tutorial__prag__num9",
@@ -384,8 +382,7 @@ function goToTutorial() {
         ".tutorial__prag__num5",
         ".tutorial__prag__num4",
         ".tutorial__prag__num3",
-        ".tutorial__prag__num2",
-        ".tutorial__prag__num1"
+        ".tutorial__prag__num2"
     ];
 
     let groupTwoTexts = [
@@ -397,17 +394,32 @@ function goToTutorial() {
         ".tutorial__headers",
     ];
 
-    // TutorialAnime.restart();
+    $.each(groupOneTexts, function(index, element) {
+        $(`${element}`).removeClass("d-none");
+    }) 
 
+    resetBasicData();
+    createAnimation(groupOneTexts, groupTwoTexts);
+}
+
+function resetBasicData() {
+    blasterNum.text("20");
+    blasterCountingSituation = false;
+    isFuelEndless = true;
+    isCountingActive = false;
+    isShipDamageActive = false;
+    currentHeartNumber = 4;
+    blaster__num = 0;
+    rifle__num = 0;
+}
+
+function createAnimation(groupOneTexts, groupTwoTexts) {
+    TutorialAnime.restart();
     TutorialAnime
     .bringThePage(pageTutorial, 0)
     .showText(".tutorial__headers", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num1", {duration: .5}, "+=2")
-    .to(".tutorial__prag__num1", {
-        x: -50,
-        duration: 1,
-        opacity: 0
-    }, "+=2")
+    .hidePrevTexts(".tutorial__prag__num1", {stagger: 1}, "+=2")
     // i want to hide my wish
     .showText(".tutorial__prag__num2", {duration: .5}, "+=1")
     .showText(".tutorial__prag__num3", {duration: .5}, "+=2.5")
@@ -438,9 +450,9 @@ function goToTutorial() {
         pauseTutorialAnime();
         gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
     }, onStart: function() {pauseOrderAnime(8)}}, "+=3")
-    .hidePrevTexts(groupOneTexts, {stagger: .5, onComplete: function() {
+    .hidePrevTexts(groupOneTexts, {stagger: .2, onComplete: function() {
         $.each(groupOneTexts, function(index, element) {
-            $(`${element}`).remove();
+            $(`${element}`).addClass("d-none");
         }) 
     }}, "+=3")
     .showText(".tutorial__prag__num10", {duration: .5, onStart: function(){pauseOrderAnime(9)}}, "+=3")
@@ -471,7 +483,20 @@ function goToTutorial() {
         gsap.effects.orderAnime(".tutorial__prag__num14 .order", {id: "prag__13__order"});
         enemyContainer.toggleClass("enemy__container--lower");
     }}, "+=5")
-    .hidePrevTexts(groupTwoTexts, {stagger: .2, onComplete: makeEnemyReady(["fighter__1", "fighter__1", "fighter__1", "fighter__1"])}, "+=3")
+    .hidePrevTexts(groupTwoTexts, {stagger: .2, onComplete: function(){
+        makeEnemyReady(["fighter__1", "fighter__1", "fighter__1", "fighter__1"]);
+    }}, "+=3")
+    .fromTo(enemyContainer, {
+        scale: 0,
+        opacity: .7,
+        rotateX: 80
+    }, {
+        scale: 1,
+        opacity: 1,
+        duration: 2,
+        ease: "expo.out",
+        rotateX: 0,
+    })
     .fromTo(".enemy__container > div", 
     {
         y: -300,
@@ -482,12 +507,11 @@ function goToTutorial() {
         onComplete: pauseTutorialAnime
     }, "+=1")
     .showText(".tutorial__over__message", {duration: .75, onComplete: clearEnemyContainer})
-    .showText(".tutorial__over__btn", {duration: .75, onComplete: pressToContinue})
-    .hidePrevTexts(".tutorial__over__message, .tutorial__over__btn", {stagger: .4, onComplete: function() {
+    .hidePrevTexts(".tutorial__over__message", {stagger: .4, onComplete: function() {
         controllersAnime();
         gameContainer.css("cursor", "default");
         playSituation("pause");
-    }})
+    }}, "+=2")
     .to(mainShip, {
         opacity: 0,
         duration: 2,
@@ -497,11 +521,7 @@ function goToTutorial() {
         }
     })
     .takeThePage(pageTutorial)
-    TutorialAnime.timeScale(15)
 }
-
-    // TutorialAnime.progress(.95)
-    // TutorialAnime.timeScale(8)
 
 function makeRifleReady() {
     $("body").on({
@@ -572,8 +592,8 @@ function shipMovement() {
             for(var i = 0; i < CurrentEnemiesData.length; i++){
                 if(mainShip.position().left <= CurrentEnemiesData[i].enemyPos.left + 50 &&
                    mainShip.position().left >= CurrentEnemiesData[i].enemyPos.left - 50){
-                    if(mainShip.position().top <= CurrentEnemiesData[i].enemyPos.top + 400 &&
-                       mainShip.position().top >= CurrentEnemiesData[i].enemyPos.top + 300){
+                    if(mainShip.position().top <= CurrentEnemiesData[i].enemyPos.top + 100 &&
+                       mainShip.position().top >= CurrentEnemiesData[i].enemyPos.top){
                         // plus 300 is for the line 432 in this line we have an animation for 
                         // putting element in the page with an animation
                         // and 75 is the size of element
@@ -635,21 +655,24 @@ function pressToContinue() {
 function makeEnemyReady(listOfEnemies) {
     let fighters = giveFightersCode(listOfEnemies);
     enemyContainer.html(fighters);
-    let activeEnemies = $(".enemy__container > div");
 
-    activeEnemies.each(function( idx, element){
-        let obj = {
-            "enemyPos": $(element).position(),
-            "enemyNum": idx + 1,
-            "isEnemyAlive": true,
-            "enemyHealth": {
-                "current": 9,
-                "first": 9
+    setTimeout(() => {
+        let activeEnemies = $(".enemy__container > div");
+
+        activeEnemies.each(function( idx, element){
+            let obj = {
+                "enemyPos": $(element).position(),
+                "enemyNum": idx + 1,
+                "isEnemyAlive": true,
+                "enemyHealth": {
+                    "current": 9,
+                    "first": 9
+                }
             }
-        }
-
-        CurrentEnemiesData.push(obj);
-    });
+    
+            CurrentEnemiesData.push(obj);
+        });
+    }, 2500);
 };
 
 function giveFightersCode(listOfEnemies) {
@@ -658,7 +681,7 @@ function giveFightersCode(listOfEnemies) {
     for(var i = 0; i <= listOfEnemies.length; i++){
         if(listOfEnemies[i] === "fighter__1"){
             allFighterContainer += `
-            <div class="fighter__1">
+            <div class="fighter__1 enemy__num__${i + 1}">
                 <div class="health__container">
                     <div class="current__health"></div>
                 </div>
@@ -676,7 +699,7 @@ function giveFightersCode(listOfEnemies) {
             </div>`;
         }else if(listOfEnemies[i] === "fighter__2"){
             allFighterContainer += `            
-            <div class="fighter__2">
+            <div class="fighter__2 enemy__num__${i + 1}">
                 <div class="health__container">
                     <div class="current__health"></div>
                 </div>
@@ -692,7 +715,7 @@ function giveFightersCode(listOfEnemies) {
             </div>`;
         }else if(listOfEnemies[i] === "fighter__3"){
             allFighterContainer += `
-            <div class="fighter__3">
+            <div class="fighter__3 enemy__num__${i + 1}">
                 <div class="health__container">
                     <div class="current__health"></div>
                 </div>
@@ -706,7 +729,7 @@ function giveFightersCode(listOfEnemies) {
             </div>`;
         }else if(listOfEnemies[i] === "boss__fight"){
             allFighterContainer += `
-            <div class="boss__fight">
+            <div class="boss__fight enemy__num__${i + 1}">
                 <div class="boss__fight--blaster--1"></div>
                 <div class="boss__fight--blaster--2"></div>
                 <div class="boss__fight--blaster--3"></div>
@@ -774,3 +797,5 @@ function controllersAnime() {
 function clearEnemyContainer() {
     enemyContainer.empty();
 }
+
+console.log(CurrentEnemiesData)

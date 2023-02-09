@@ -192,7 +192,7 @@ table {
 #main__ship__blasterData .blaster__icon {
   font-size: 40px;
 }
-#main__ship__blasterData .blaster__num {
+#main__ship__blasterData #blaster__num {
   font-size: 35px;
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
@@ -807,7 +807,7 @@ div[class*=boss__fight--laser--] {
 }
 
 .page__menu {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background-image: url(../images/background-images/page-game-bg.jpg);
   background-size: cover;
@@ -956,7 +956,7 @@ div[class*=boss__fight--laser--] {
   user-select: none;
   overflow: hidden;
   top: 0;
-  right: 100%;
+  left: 100%;
 }
 .page__tutorial .main__ship {
   width: 100px;
@@ -975,7 +975,6 @@ div[class*=boss__fight--laser--] {
   margin: 0.8rem 0;
   max-width: 500px;
   text-align: justify;
-  transition: 2s;
 }
 
 .meteorite__image__container {
@@ -1009,23 +1008,6 @@ div[class*=boss__fight--laser--] {
   width: 100%;
   max-width: 100%;
   position: absolute;
-}
-
-.tutorial__over__btn {
-  width: 30%;
-  margin-bottom: 0.5rem;
-  background: transparent;
-  border: 0;
-  background: hsla(223deg, 92%, 10%, 0.5);
-  font-size: 2rem;
-  border-radius: 50px;
-  font-family: "Ubuntu Condensed", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
-  color: #ffffff;
-  border: 3px solid #404F87;
-  padding: 0.3rem 0;
-  cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
-  position: absolute;
-  left: 35%;
 }
 
 @keyframes rockAnimation {
