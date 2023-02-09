@@ -1041,3 +1041,58 @@ div[class*=boss__fight--laser--] {
     rotate: 360deg;
   }
 }
+.page__levels {
+  width: 100%;
+  height: 100vh;
+  background-image: url(../images/background-images/page-level-bg.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  flex-wrap: wrap;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0 5vw;
+}
+.page__levels .level {
+  width: 30%;
+  height: 40vh;
+  min-width: 200px;
+  border-radius: 3rem;
+  background: green;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  gap: 1rem;
+}
+.page__levels .level .locked__level {
+  opacity: 0;
+}
+.page__levels .level .level__header {
+  font-size: 1.5rem;
+  font-family: "Bebas Neue", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+}
+.page__levels .lock__is__active {
+  opacity: 1 !important;
+}
+.page__levels .lock__is__active .lockIcon {
+  color: rgba(255, 255, 255, 0.4);
+  width: 10rem;
+  height: 10rem;
+  scale: 1.1 1;
+}
+.page__levels .level__num--1 {
+  background-image: url("../images/background-images/levels__bg/first__level__bg.jpeg");
+}
+.page__levels .level__num--2 {
+  background-image: url("../images/background-images/levels__bg/second__level__bg.jpg");
+}
+.page__levels .level__num--3 {
+  background-image: url("../images/background-images/levels__bg/third__level__bg.webp");
+}
