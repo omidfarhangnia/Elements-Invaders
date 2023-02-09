@@ -834,6 +834,9 @@ div[class*=boss__fight--laser--] {
   padding: 0.3rem 0;
   cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
 }
+.page__menu button:active {
+  background: rgba(32, 8, 129, 0.5843137255);
+}
 
 .locked__button {
   opacity: 0.5;
@@ -916,16 +919,29 @@ div[class*=boss__fight--laser--] {
 
 #lock__message {
   cursor: url("../images/mouse-cursor/fork.png"), pointer !important;
+  --bs-modal-bg: transparent;
+  border-style: dotted !important;
+  --bs-modal-width: 50%;
+  --bs-modal-border-color: #ffffff;
+  --bs-modal-border-width: 2px;
+}
+#lock__message .modal-content {
+  background: rgba(227, 221, 221, 0.13);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6.2px);
+  -webkit-backdrop-filter: blur(6.2px);
 }
 #lock__message .modal-title {
   font-size: 2rem;
   font-family: "Ubuntu Condensed", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   text-transform: capitalize;
+  color: #ffffff;
 }
 #lock__message .modal-body p {
   text-transform: capitalize;
   font-family: "Ubuntu Condensed", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   line-height: 1.6rem;
+  color: #ffffff;
 }
 #lock__message .modal-footer button[data-bs-dismiss=modal], #lock__message .modal-footer #go__tutorial {
   text-transform: uppercase;
@@ -933,12 +949,19 @@ div[class*=boss__fight--laser--] {
   font-family: "Ubuntu Condensed", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   padding: 0.4rem 1rem;
   cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
+  border: 1px solid #ffffff;
+  border-radius: 0 !important;
+  transition: 1s;
 }
-#lock__message .modal-footer button[data-bs-dismiss=modal] {
+#lock__message .modal-footer button[data-bs-dismiss=modal]:hover, #lock__message .modal-footer #go__tutorial:hover {
+  border-radius: 40px !important;
+  border: 1px solid transparent;
+}
+#lock__message .modal-footer button[data-bs-dismiss=modal]:hover {
   background: #a5222b;
 }
-#lock__message .modal-footer #go__tutorial {
-  background: #28074f;
+#lock__message .modal-footer #go__tutorial:hover {
+  background: #6f26c3;
 }
 
 #game__container {

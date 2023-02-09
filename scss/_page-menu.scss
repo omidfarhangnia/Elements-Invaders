@@ -35,6 +35,9 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
  
     button{
         @include gameBtn();
+        &:active{
+            background: #20088195;
+        }
     }
 }
 
@@ -132,16 +135,30 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
 // modal style
 #lock__message{
     cursor: url("../images/mouse-cursor/fork.png"), pointer !important;
+    --bs-modal-bg: transparent;
+    border-style: dotted !important;
+    --bs-modal-width: 50%;
+    --bs-modal-border-color: #ffffff;
+    --bs-modal-border-width: 2px;
+
+    .modal-content{
+        background: rgba(227, 221, 221, 0.13);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(6.2px);
+        -webkit-backdrop-filter: blur(6.2px);
+    }
     .modal-title{
         font-size: 2rem;
         font-family: $font-roboto-mono;
         text-transform: capitalize;
+        color: #ffffff;
     }
     .modal-body{
         p{
             text-transform: capitalize;
             font-family: $font-roboto-mono;
             line-height: 1.6rem;
+            color: #ffffff;
         }
     }
     .modal-footer{
@@ -151,12 +168,23 @@ $font-roboto-mono: "Ubuntu Condensed", 'Lucida Sans Unicode', Geneva, Verdana, s
             font-family: $font-roboto-mono;
             padding: .4rem 1rem;
             cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
+            border: 1px solid #ffffff;
+            border-radius: 0 !important;
+            transition: 1s;
+            &:hover{
+                border-radius: 40px !important;
+                border: 1px solid transparent;
+            }
         }
         button[data-bs-dismiss = "modal"]{
-            background: #a5222b;
+            &:hover{
+                background: #a5222b;
+            }
         }
         #go__tutorial{
-            background: #28074f;
+            &:hover{
+                background: #6f26c3;
+            }
         }
     }
 }

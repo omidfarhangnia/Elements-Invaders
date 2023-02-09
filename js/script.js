@@ -22,7 +22,7 @@ gsap.registerEffect({
 })
 gsap.registerEffect({
     name: "takeThePage",
-    effect: (targets) => {
+    effect: (targets, config) => {
         return gsap.timeline()
         .set(targets, {left: "0"})
         .set(".meteorite__image__container", {rotate: 180})
@@ -37,6 +37,7 @@ gsap.registerEffect({
             left: "100%",
             duration: 2,
             ease: "linear",
+            onComplete: config.onComplete
         }, "-=3.5")
     },
     extendTimeline: true
@@ -95,6 +96,7 @@ const fuelContainer = $("#main__ship__fuelData div.current__fuel__level");
 const pageTutorial = $(".page__tutorial");
 const enemyContainer = $(".enemy__container");
 const blasterNum = $("#blaster__num .num");
+const playBtn = $("#play__button");
 
 var isGamePlaying = false,
     blaster__num = 0,
@@ -112,7 +114,7 @@ var isGamePlaying = false,
     currentHeartNumber = 4,
     isShipInImmortalMode = false;
 
-$('#go__tutorial, #tutorial').click(goToTutorial)
+$('#go__tutorial, #tutorial__button').click(goToTutorial)
 
 const mainShipSize = {
     width: 100, 
@@ -409,15 +411,13 @@ function resetBasicData() {
     isCountingActive = false;
     isShipDamageActive = false;
     currentHeartNumber = 4;
-    blaster__num = 0;
-    rifle__num = 0;
 }
 
 function createAnimation(groupOneTexts, groupTwoTexts) {
     TutorialAnime.restart();
     TutorialAnime
     .bringThePage(pageTutorial, 0)
-    .showText(".tutorial__headers", {duration: .5}, "+=1")
+    .showText(".tutorial__headers", {duration: .5})
     .showText(".tutorial__prag__num1", {duration: .5}, "+=2")
     .hidePrevTexts(".tutorial__prag__num1", {stagger: 1}, "+=2")
     // i want to hide my wish
@@ -454,7 +454,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         $.each(groupOneTexts, function(index, element) {
             $(`${element}`).addClass("d-none");
         }) 
-    }}, "+=3")
+    }}, "+=.5")
     .showText(".tutorial__prag__num10", {duration: .5, onStart: function(){pauseOrderAnime(9)}}, "+=3")
     .showText(".tutorial__prag__num11", {duration: .5}, "fuelContainerAnime+=3")
     .to("#main__ship__blasterData", {
@@ -485,7 +485,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     }}, "+=5")
     .hidePrevTexts(groupTwoTexts, {stagger: .2, onComplete: function(){
         makeEnemyReady(["fighter__1", "fighter__1", "fighter__1", "fighter__1"]);
-    }}, "+=3")
+    }}, "+=.5")
     .fromTo(enemyContainer, {
         scale: 0,
         opacity: .7,
@@ -493,7 +493,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     }, {
         scale: 1,
         opacity: 1,
-        duration: 2,
+        duration: 3,
         ease: "expo.out",
         rotateX: 0,
     })
@@ -520,9 +520,21 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
             enemyContainer.toggleClass("enemy__container--lower");
         }
     })
-    .takeThePage(pageTutorial)
+    .takeThePage(pageTutorial, {onComplete: function(){
+        playBtn.removeClass("locked__button");
+        playBtn.on("click", goToLevelList);
+        playBtn.html("play");
+        playBtn.removeAttr("data-bs-toggle");
+        playBtn.removeAttr("data-bs-target");
+    }})
 }
 
+// playBtn.removeClass("locked__button");
+// playBtn.on("click", goToLevelList);
+// playBtn.html("play");
+// playBtn.removeAttr("data-bs-toggle");
+// playBtn.removeAttr("data-bs-target");
+ 
 function makeRifleReady() {
     $("body").on({
         "click": function() {
@@ -672,7 +684,7 @@ function makeEnemyReady(listOfEnemies) {
     
             CurrentEnemiesData.push(obj);
         });
-    }, 2500);
+    }, 3500);
 };
 
 function giveFightersCode(listOfEnemies) {
@@ -798,4 +810,6 @@ function clearEnemyContainer() {
     enemyContainer.empty();
 }
 
-console.log(CurrentEnemiesData)
+function goToLevelList() {
+    console.log("level list is here")
+}
