@@ -1,7 +1,7 @@
 // register change page effect
 gsap.registerEffect({
     name: "bringThePage",
-    effect: (targets) => {
+    effect: (targets, config) => {
         return gsap.timeline()
         .set(".meteorite__image__container", {rotate: 0})
         .set(targets, {left: "100%"})
@@ -16,6 +16,7 @@ gsap.registerEffect({
             left: "0",
             duration: 2,
             ease: "linear",
+            onComplete: config.onComplete
         }, "-=3.5")
     },
     extendTimeline: true
@@ -136,12 +137,12 @@ let xPos = gsap.quickTo(mainShip, "x", {duration: .3, ease: "power4.out"}),
     yPos = gsap.quickTo(mainShip, "y", {duration: .3, ease: "power4.out"});
 
 let TutorialAnime = gsap.timeline();
-const pauseTutorialAnime = () => {
-    TutorialAnime.pause();
+const pauseTutorialAnime = (timeLineName) => {
+    timeLineName.pause();
 }
 
-const resumeTutorialAnime = () => {
-    TutorialAnime.resume();
+const resumeTutorialAnime = (timeLineName) => {
+    timeLineName.resume();
 }
 
 const playSituation = (situation) => {
@@ -436,18 +437,18 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
         playSituation("play");
         shipMovement()
-        pauseTutorialAnime();
+        pauseTutorialAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num7", {duration: .5, onStart: function() {pauseOrderAnime(6)}}, "+=2")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
         makeRifleReady();
-        pauseTutorialAnime();
+        pauseTutorialAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num8 .order", {id: "prag__8__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num9", {duration: .5, onComplete: function() {
         makeBlasterReady();
-        pauseTutorialAnime();
+        pauseTutorialAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
     }, onStart: function() {pauseOrderAnime(8)}}, "+=3")
     .hidePrevTexts(groupOneTexts, {stagger: .2, onComplete: function() {
@@ -455,7 +456,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
             $(`${element}`).addClass("d-none");
         }) 
     }}, "+=.5")
-    .showText(".tutorial__prag__num10", {duration: .5, onStart: function(){pauseOrderAnime(9)}}, "+=3")
+    .showText(".tutorial__prag__num10", {duration: .5, onStart: function(){pauseOrderAnime(9)}}, "+=1")
     .showText(".tutorial__prag__num11", {duration: .5}, "fuelContainerAnime+=3")
     .to("#main__ship__blasterData", {
         left: "0",
@@ -479,33 +480,26 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     }, "healthContainerAnime+=3")
     .showText(".tutorial__prag__num14", {duration: .5, onComplete: function(){
         pressToContinue()
-        pauseTutorialAnime();
+        pauseTutorialAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num14 .order", {id: "prag__13__order"});
         enemyContainer.toggleClass("enemy__container--lower");
     }}, "+=5")
     .hidePrevTexts(groupTwoTexts, {stagger: .2, onComplete: function(){
-        makeEnemyReady(["fighter__1", "fighter__1", "fighter__1", "fighter__1"]);
+        let enemyArr = fillListOfEnemies({name: "fighter__1", num: 4});
+        makeEnemyReady(enemyArr);
     }}, "+=.5")
     .fromTo(enemyContainer, {
         scale: 0,
         opacity: .7,
-        rotateX: 80
     }, {
         scale: 1,
         opacity: 1,
         duration: 3,
-        ease: "expo.out",
-        rotateX: 0,
+        ease: "expo.in",
+        onComplete: function(){
+            pauseTutorialAnime(TutorialAnime)
+        }
     })
-    .fromTo(".enemy__container > div", 
-    {
-        y: -300,
-    },{
-        y: 0,
-        duration: .5,
-        stagger: .2,
-        onComplete: pauseTutorialAnime
-    }, "+=1")
     .showText(".tutorial__over__message", {duration: .75, onComplete: clearEnemyContainer})
     .hidePrevTexts(".tutorial__over__message", {stagger: .4, onComplete: function() {
         controllersAnime();
@@ -529,11 +523,11 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     }})
 }
 
-// playBtn.removeClass("locked__button");
-// playBtn.on("click", goToLevelList);
-// playBtn.html("play");
-// playBtn.removeAttr("data-bs-toggle");
-// playBtn.removeAttr("data-bs-target");
+playBtn.removeClass("locked__button");
+playBtn.on("click", goToLevelList);
+playBtn.html("play");
+playBtn.removeAttr("data-bs-toggle");
+playBtn.removeAttr("data-bs-target");
  
 function makeRifleReady() {
     $("body").on({
@@ -541,7 +535,7 @@ function makeRifleReady() {
             if(isGamePlaying === false) return;
             // for controlling functions and their behavior
 
-            rifle = new mainShipRifle(3, isFuelEndless, resumeTutorialAnime);
+            rifle = new mainShipRifle(3, isFuelEndless, resumeTutorialAnime());
             rifle.fireRifle();
             rifle.calcDamage();
         },
@@ -810,6 +804,74 @@ function clearEnemyContainer() {
     enemyContainer.empty();
 }
 
+function fillListOfEnemies(...Objects) {
+    let arr = [];
+
+    for(var i = 0; i < Objects.length; i++){
+        for(var j = 0; j < Objects[i].num; j++){
+            arr.push(Objects[i].name)
+        }
+    }
+
+    return arr;
+}
+
+const PageLevels = $(".page__levels");
+
+const GameLevel1 = $(".game__level__1");
+const cardLevel1 = $("#card__level__1");
+
+const GameLevel2 = $(".game__level__2");
+const cardLevel2 = $("#card__level__2");
+
+const GameLevel3 = $(".game__level__3");
+const cardLevel3 = $("#card__level__3");
+
+
 function goToLevelList() {
-    console.log("level list is here")
+    let listOfEnemies = fillListOfEnemies(
+        {name: "fighter__2", num: 6},
+        {name: "fighter__1", num: 24},
+        {name: "fighter__2", num: 6});
+
+    let goToLevelTl = gsap.timeline();
+    goToLevelTl
+    .bringThePage(PageLevels, {onComplete: function(){
+        cardLevel1.on("click", goToLevelOne);
+        makeEnemyReady(listOfEnemies);
+    }})
+    .fromTo(enemyContainer, {
+        scale: 0,
+        opacity: .7,
+    }, {
+        scale: 1,
+        opacity: 1,
+        duration: 3,
+        ease: "expo.in",
+        onComplete: function(){
+            pauseTutorialAnime(TutorialAnime)
+        }
+    })
+
+    goToLevelTl.progress(1);
+}
+// goToLevelList();
+
+function goToLevelOne(){
+    let LevelOneTl = gsap.timeline();
+    LevelOneTl
+    .bringThePage(GameLevel1)
+    LevelOneTl.progress(1);
+}
+
+function goToLevelTwo(){
+    let LevelTwoTl = gsap.timeline();
+    LevelTwoTl
+    .bringThePage(GameLevel2)
+}
+
+function goToLevelThree(){
+    let LevelThreeTl = gsap.timeline();
+    LevelThreeTl
+    .bringThePage(GameLevel3)
 }

@@ -90,15 +90,15 @@
             </div>
         </div>
         <div class="page__levels d-flex justify-content-around align-items-center">
-            <div class="level level__num--1">
-                <span class="locked__level lock__is__active">
+            <div class="level level__num--1" id="card__level__1">
+                <span class="locked__level">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock lockIcon" viewBox="0 0 16 16">
                         <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
                     </svg>
                 </span>
                 <h2 class="level__header">level 1</h2>
             </div>
-            <div class="level level__num--2">
+            <div class="level level__num--2" id="card__level__2">
                 <span class="locked__level lock__is__active">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock lockIcon" viewBox="0 0 16 16">
                         <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
@@ -106,7 +106,7 @@
                 </span>
                 <h2 class="level__header">level 2</h2>
             </div>
-            <div class="level level__num--3">
+            <div class="level level__num--3" id="card__level__3">
                 <span class="locked__level lock__is__active">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock lockIcon" viewBox="0 0 16 16">
                         <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
@@ -114,10 +114,6 @@
                 </span>
                 <h2 class="level__header">level 3</h2>
             </div>
-        </div>
-        <div class="meteorite__image__container">
-            <div class="meteorite__image"></div>
-            <img src="./images/background-images/meteorite.png" alt="">
         </div>
         <div class="modal fade" id="lock__message" tabindex="-1" aria-labelledby="lock__message__label" aria-hidden="true">
             <div class="modal-dialog">
@@ -155,7 +151,14 @@
             <span class="heart__num__3"><i class='fas fa-heart heart__icon'></i></span>
             <span class="heart__num__4"><i class='fas fa-heart heart__icon'></i></span>
         </div>
+        <div class="game__level__1"></div>
+        <div class="game__level__2"></div>
+        <div class="game__level__3"></div>
         <div class="enemy__container enemy__container--lower"></div>
+        <div class="meteorite__image__container">
+            <div class="meteorite__image"></div>
+            <img src="./images/background-images/meteorite.png" alt="">
+        </div>
     </div>
     <!-- <div class="page__container">
         <div title="main ship">
@@ -230,7 +233,7 @@
             </div>
         </div>
         <div title="boss fight">
-            <div class="boss__fight">
+            <div class="fighter__4 boss__fight">
                 <div class="boss__fight--blaster--1"></div>
                 <div class="boss__fight--blaster--2"></div>
                 <div class="boss__fight--blaster--3"></div>

@@ -1051,15 +1051,15 @@ div[class*=boss__fight--laser--] {
   flex-wrap: wrap;
   position: absolute;
   top: 0;
-  left: 0;
+  left: 100%;
   padding: 0 5vw;
 }
 .page__levels .level {
+  user-select: none;
   width: 30%;
   height: 40vh;
   min-width: 200px;
   border-radius: 3rem;
-  background: green;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1094,5 +1094,28 @@ div[class*=boss__fight--laser--] {
   background-image: url("../images/background-images/levels__bg/second__level__bg.jpg");
 }
 .page__levels .level__num--3 {
+  background-image: url("../images/background-images/levels__bg/third__level__bg.webp");
+}
+
+div[class*=game__level] {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  left: 100%;
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+}
+
+.game__level__1 {
+  background-image: url("../images/background-images/levels__bg/first__level__bg.jpeg");
+}
+
+.game__level__2 {
+  background-image: url("../images/background-images/levels__bg/second__level__bg.jpg");
+}
+
+.game__level__3 {
   background-image: url("../images/background-images/levels__bg/third__level__bg.webp");
 }
