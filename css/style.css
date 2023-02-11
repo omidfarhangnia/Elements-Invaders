@@ -50,6 +50,10 @@ table {
   border-spacing: 0;
 }
 
+div[class*=fighter__] {
+  scale: 0.8;
+}
+
 .main__ship {
   width: 100px;
   height: 100px;
@@ -322,8 +326,11 @@ div[class*=main__ship--motor] .main__ship--guns {
   left: 0;
   position: absolute;
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px 100px;
   padding: 15vh 20vw 0 20vw;
-  justify-content: space-between;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .enemy__container--lower {
@@ -1053,6 +1060,7 @@ div[class*=boss__fight--laser--] {
   top: 0;
   left: 100%;
   padding: 0 5vw;
+  cursor: url("../images/mouse-cursor/fork.png"), pointer;
 }
 .page__levels .level {
   user-select: none;
@@ -1064,6 +1072,7 @@ div[class*=boss__fight--laser--] {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;

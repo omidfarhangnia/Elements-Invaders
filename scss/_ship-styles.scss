@@ -2,6 +2,10 @@
 
 @use "sass:color";
 
+div[class *= "fighter__"]{
+    scale: .8;
+}
+
 .main__ship{
     width: 100px;
     height: 100px;
@@ -292,8 +296,11 @@ div[class *= "main__ship--motor"]{
     left: 0;
     position: absolute;
     display: flex;
+    flex-wrap: wrap;
+    gap: 10px 100px;
     padding: 15vh 20vw 0 20vw;
-    justify-content: space-between;
+    align-items: flex-start;
+    justify-content: center;
 }
 
 .enemy__container--lower{

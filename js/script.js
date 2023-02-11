@@ -137,11 +137,11 @@ let xPos = gsap.quickTo(mainShip, "x", {duration: .3, ease: "power4.out"}),
     yPos = gsap.quickTo(mainShip, "y", {duration: .3, ease: "power4.out"});
 
 let TutorialAnime = gsap.timeline();
-const pauseTutorialAnime = (timeLineName) => {
+const pauseAnime = (timeLineName) => {
     timeLineName.pause();
 }
 
-const resumeTutorialAnime = (timeLineName) => {
+const resumeAnime = (timeLineName) => {
     timeLineName.resume();
 }
 
@@ -158,10 +158,10 @@ const pauseOrderAnime = (id) => {
 }
 
 class mainShipRifle {
-    constructor (level, isFuelEndless, endFunction) {
+    constructor (level, isFuelEndless, animeName) {
         this.level = level;
         this.isFuelEndless = isFuelEndless;
-        this.endFunction = endFunction;
+        this.animeName = animeName;
     }
     fireRifle() {
         let fuelContainerHeight = 262.5;
@@ -247,7 +247,8 @@ class mainShipRifle {
                             let mainFirstHealth = CurrentEnemiesData[i].enemyHealth.first;
 
                             $(`.enemy__num__${CurrentEnemiesData[i].enemyNum} .current__health`).css(
-                                "height", `${(newHealth * 100 / mainFirstHealth)}%`)
+                                "height", `${(newHealth * 100 / mainFirstHealth)}%`
+                                );
                             
                             CurrentEnemiesData[i].enemyHealth.current = newHealth;
                             rifleBulletContainer.remove();
@@ -256,7 +257,8 @@ class mainShipRifle {
                                 $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).addClass("destroyed__ship");
                                 CurrentEnemiesData[i].isEnemyAlive = false;
                             }
-                            isGameEnded(this.endFunction);
+                            
+                            isGameEnded(this.animeName);
                             clearInterval(checkRiflePosStepByStep);
                         }
                     }
@@ -274,12 +276,12 @@ class mainShipRifle {
 }
 
 class mainShipBlaster {
-    constructor(isBlasterReady, blastersId, isCountingActive, allowableBlasterNumber, endFunction) {
+    constructor(isBlasterReady, blastersId, isCountingActive, allowableBlasterNumber, animeName) {
         this.isBlasterReady = isBlasterReady;
         this.blastersId = blastersId;
         this.isCountingActive = isCountingActive;
         this.allowableBlasterNumber = allowableBlasterNumber;
-        this.endFunction = endFunction;
+        this.animeName = animeName;
     }
     fireBlaster() {
         if(this.isBlasterReady !== true) return;
@@ -371,7 +373,7 @@ class mainShipBlaster {
             blasterBulletContainer.remove();
         }, 750);
         setTimeout(() => {
-            isGameEnded(this.endFunction); 
+            isGameEnded(this.animeName);
         }, 2000);
     }
 }
@@ -437,18 +439,18 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
         playSituation("play");
         shipMovement()
-        pauseTutorialAnime(TutorialAnime);
+        pauseAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num7", {duration: .5, onStart: function() {pauseOrderAnime(6)}}, "+=2")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
         makeRifleReady();
-        pauseTutorialAnime(TutorialAnime);
+        pauseAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num8 .order", {id: "prag__8__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num9", {duration: .5, onComplete: function() {
         makeBlasterReady();
-        pauseTutorialAnime(TutorialAnime);
+        pauseAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
     }, onStart: function() {pauseOrderAnime(8)}}, "+=3")
     .hidePrevTexts(groupOneTexts, {stagger: .2, onComplete: function() {
@@ -480,7 +482,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     }, "healthContainerAnime+=3")
     .showText(".tutorial__prag__num14", {duration: .5, onComplete: function(){
         pressToContinue()
-        pauseTutorialAnime(TutorialAnime);
+        pauseAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num14 .order", {id: "prag__13__order"});
         enemyContainer.toggleClass("enemy__container--lower");
     }}, "+=5")
@@ -497,7 +499,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         duration: 3,
         ease: "expo.in",
         onComplete: function(){
-            pauseTutorialAnime(TutorialAnime)
+            pauseAnime(TutorialAnime)
         }
     })
     .showText(".tutorial__over__message", {duration: .75, onComplete: clearEnemyContainer})
@@ -535,7 +537,7 @@ function makeRifleReady() {
             if(isGamePlaying === false) return;
             // for controlling functions and their behavior
 
-            rifle = new mainShipRifle(3, isFuelEndless, resumeTutorialAnime());
+            rifle = new mainShipRifle(3, isFuelEndless, TutorialAnime);
             rifle.fireRifle();
             rifle.calcDamage();
         },
@@ -545,7 +547,7 @@ function makeRifleReady() {
                     if(isGamePlaying === false) return;
                     // for controlling functions and their behavior
 
-                    let rifle = new mainShipRifle(3, isFuelEndless, resumeTutorialAnime);
+                    let rifle = new mainShipRifle(3, isFuelEndless, TutorialAnime);
                     rifle.fireRifle();
                     rifle.calcDamage();
                 }, 250);
@@ -557,13 +559,15 @@ function makeRifleReady() {
         }
     })
 
-    gameContainer.one("click", resumeTutorialAnime)
+    gameContainer.one("click", function(){
+        resumeAnime(TutorialAnime)
+    })
 }
 
 function makeBlasterReady() {
     $("body").one("keydown", function(event) {
         if(event.originalEvent.code === "Space"){
-            resumeTutorialAnime()
+            resumeAnime(TutorialAnime)
         }
     }) 
 
@@ -572,7 +576,7 @@ function makeBlasterReady() {
             if(isGamePlaying === false) return;
             // for controlling functions and their behavior
 
-            let blaster = new mainShipBlaster(true, blaster__num, isCountingActive, 20 , resumeTutorialAnime);
+            let blaster = new mainShipBlaster(true, blaster__num, isCountingActive, 20 , TutorialAnime);
             blaster.fireBlaster();
             blaster.calcDamage();
         }
@@ -643,7 +647,9 @@ function shipMovement() {
         }
     })
 
-    gameContainer.one("mousemove", resumeTutorialAnime)
+    gameContainer.one("mousemove", function() {
+        resumeAnime(TutorialAnime)
+    })
 }
 
 function blasterCounterIsReady() {
@@ -655,7 +661,9 @@ function fuelContainerIsReady() {
 }
 
 function pressToContinue() {
-    $("body").one("keydown", resumeTutorialAnime)
+    $("body").one("keydown", function(){
+        resumeAnime(TutorialAnime)
+    })
 }
 
 function makeEnemyReady(listOfEnemies) {
@@ -766,7 +774,7 @@ function giveFightersCode(listOfEnemies) {
     return allFighterContainer;
 }
 
-function isGameEnded(callback) {
+function isGameEnded(animeName) {
     let isAnyAlive;
 
     $.each(CurrentEnemiesData, function(index, value){
@@ -779,7 +787,7 @@ function isGameEnded(callback) {
     })
 
     if(isAnyAlive === false){
-        callback();
+        resumeAnime(animeName);
     }
 }
 
@@ -829,16 +837,27 @@ const cardLevel3 = $("#card__level__3");
 
 
 function goToLevelList() {
-    let listOfEnemies = fillListOfEnemies(
-        {name: "fighter__2", num: 6},
-        {name: "fighter__1", num: 24},
-        {name: "fighter__2", num: 6});
-
     let goToLevelTl = gsap.timeline();
     goToLevelTl
     .bringThePage(PageLevels, {onComplete: function(){
         cardLevel1.on("click", goToLevelOne);
-        makeEnemyReady(listOfEnemies);
+    }})
+    goToLevelTl.progress(1);
+}
+goToLevelList();
+
+function goToLevelOne(){
+    let listOfEnemies = fillListOfEnemies(
+        {name: "fighter__2", num: 6},
+        {name: "fighter__1", num: 18},
+        {name: "fighter__2", num: 6});
+    
+    makeEnemyReady(listOfEnemies);
+
+    let LevelOneTl = gsap.timeline();
+    LevelOneTl
+    .bringThePage(GameLevel1, {onComplete: function(){
+        enemyContainer.removeClass("enemy__container--lower");
     }})
     .fromTo(enemyContainer, {
         scale: 0,
@@ -849,20 +868,13 @@ function goToLevelList() {
         duration: 3,
         ease: "expo.in",
         onComplete: function(){
-            pauseTutorialAnime(TutorialAnime)
+            pauseAnime(TutorialAnime)
         }
     })
 
-    goToLevelTl.progress(1);
-}
-// goToLevelList();
-
-function goToLevelOne(){
-    let LevelOneTl = gsap.timeline();
-    LevelOneTl
-    .bringThePage(GameLevel1)
     LevelOneTl.progress(1);
 }
+goToLevelOne();
 
 function goToLevelTwo(){
     let LevelTwoTl = gsap.timeline();

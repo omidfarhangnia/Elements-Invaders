@@ -16,6 +16,7 @@
     top: 0;
     left: 100%;
     padding: 0 5vw;
+    cursor: url("../images/mouse-cursor/fork.png"), pointer;
     .level{
         user-select: none;
         width: 30%;
@@ -26,6 +27,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        cursor: url("../images/mouse-cursor/fork-hovered.png"), pointer !important;
         @include backgroundNoRepeatCoverCenter();
         gap: 1rem;
         .locked__level{
