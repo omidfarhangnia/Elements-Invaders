@@ -136,6 +136,13 @@ function idMaker(num) {
 let xPos = gsap.quickTo(mainShip, "x", {duration: .3, ease: "power4.out"}),
     yPos = gsap.quickTo(mainShip, "y", {duration: .3, ease: "power4.out"});
 
+let fighterHealth = {
+    "fighter1": 9,
+    "fighter2": 15,
+    "fighter3": 20,
+    "fighter4": 100,
+}
+
 let TutorialAnime = gsap.timeline();
 const pauseAnime = (timeLineName) => {
     timeLineName.pause();
@@ -222,9 +229,11 @@ class mainShipRifle {
 
         gsap.set(mainShipBulletContainerClone, {
             top: mainShip.position().top,
-            left: mainShip.position().left,
+            left: mainShip.position().left - 10,
+            // i had an scale on my main ship scale: .8 and we have .2 this will be for to side and left should be
+            // -.1 that it means -10
             zIndex: 1,
-            rotate: -90
+            rotate: -90,
         })
 
         gsap.to(mainShipBulletContainerClone, {
@@ -247,10 +256,10 @@ class mainShipRifle {
                             let mainFirstHealth = CurrentEnemiesData[i].enemyHealth.first;
 
                             $(`.enemy__num__${CurrentEnemiesData[i].enemyNum} .current__health`).css(
-                                "height", `${(newHealth * 100 / mainFirstHealth)}%`
-                                );
+                                "height", `${(newHealth * 100 / mainFirstHealth)}%`);
                             
                             CurrentEnemiesData[i].enemyHealth.current = newHealth;
+                            
                             rifleBulletContainer.remove();
 
                             if(CurrentEnemiesData[i].enemyHealth.current <= 0){
@@ -312,9 +321,12 @@ class mainShipBlaster {
 
         gsap.set(mainShipBlasterContainerClone, {
             top: mainShip.position().top,
-            left: mainShip.position().left,
+            left: mainShip.position().left - 10,
+            // i had an scale on my main ship scale: .8 and we have .2 this will be for to side and left should be
+            // -.1 that it means -10
             zIndex: 1,
-            rotate: -90
+            rotate: -90,
+            scale: .8
         })
 
         gsap.to(mainShipBlasterContainerClone, {
@@ -354,7 +366,7 @@ class mainShipBlaster {
                                     "animation": "explosionAnimation 2s ease-in-out both",
                                     "top": (CurrentEnemiesData[i].enemyPos.top) + 20,
                                     // the top value that i give is negative and i should make in positive
-                                    "left": CurrentEnemiesData[i].enemyPos.left
+                                    "left": CurrentEnemiesData[i].enemyPos.left - 10
                                 });
 
                                 setTimeout(() => {
@@ -487,7 +499,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         enemyContainer.toggleClass("enemy__container--lower");
     }}, "+=5")
     .hidePrevTexts(groupTwoTexts, {stagger: .2, onComplete: function(){
-        let enemyArr = fillListOfEnemies({name: "fighter__1", num: 4});
+        let enemyArr = fillListOfEnemies({name: "fighter__1", num: 6});
         makeEnemyReady(enemyArr);
     }}, "+=.5")
     .fromTo(enemyContainer, {
@@ -504,7 +516,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     })
     .showText(".tutorial__over__message", {duration: .75, onComplete: clearEnemyContainer})
     .hidePrevTexts(".tutorial__over__message", {stagger: .4, onComplete: function() {
-        controllersAnime();
+        controllersAnime("hide");
         gameContainer.css("cursor", "default");
         playSituation("pause");
     }}, "+=2")
@@ -523,13 +535,14 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         playBtn.removeAttr("data-bs-toggle");
         playBtn.removeAttr("data-bs-target");
     }})
+    TutorialAnime.timeScale(15); 
 }
 
-playBtn.removeClass("locked__button");
-playBtn.on("click", goToLevelList);
-playBtn.html("play");
-playBtn.removeAttr("data-bs-toggle");
-playBtn.removeAttr("data-bs-target");
+// playBtn.removeClass("locked__button");
+// playBtn.on("click", goToLevelList);
+// playBtn.html("play");
+// playBtn.removeAttr("data-bs-toggle");
+// playBtn.removeAttr("data-bs-target");
  
 function makeRifleReady() {
     $("body").on({
@@ -667,20 +680,33 @@ function pressToContinue() {
 }
 
 function makeEnemyReady(listOfEnemies) {
+    CurrentEnemiesData = [];
     let fighters = giveFightersCode(listOfEnemies);
     enemyContainer.html(fighters);
 
     setTimeout(() => {
-        let activeEnemies = $(".enemy__container > div");
+        let activeEnemies = $(".enemy__container > div > div[class *= 'fighter']");
+        activeEnemies.each(function(idx, element){
+            let health;
+            let currentElement = $(element);
 
-        activeEnemies.each(function( idx, element){
+            if(currentElement.hasClass("fighter__1")){
+                health = fighterHealth.fighter1;
+            }else if(currentElement.hasClass("fighter__2")){
+                health = fighterHealth.fighter2;
+            }else if(currentElement.hasClass("fighter__3")){
+                health = fighterHealth.fighter3;
+            }else if(currentElement.hasClass("fighter__4")){
+                health = fighterHealth.fighter4;
+            }
+
             let obj = {
-                "enemyPos": $(element).position(),
+                "enemyPos": currentElement.position(),
                 "enemyNum": idx + 1,
                 "isEnemyAlive": true,
                 "enemyHealth": {
-                    "current": 9,
-                    "first": 9
+                    "current": health,
+                    "first": health
                 }
             }
     
@@ -692,7 +718,11 @@ function makeEnemyReady(listOfEnemies) {
 function giveFightersCode(listOfEnemies) {
     let allFighterContainer = "";
 
-    for(var i = 0; i <= listOfEnemies.length; i++){
+    for(var i = 0; i < listOfEnemies.length; i++){
+        if((i + 1) % 6 === 1){
+            allFighterContainer += "<div class='enemies__group'>"
+        }
+
         if(listOfEnemies[i] === "fighter__1"){
             allFighterContainer += `
             <div class="fighter__1 enemy__num__${i + 1}">
@@ -769,7 +799,14 @@ function giveFightersCode(listOfEnemies) {
                 </div>
             </div>`;
         }
+
+        if((i + 1) % 6 === 0){
+            allFighterContainer += "</div>"
+        }
     }
+
+    // i dont know why but i have one more extra enemies__group
+    // i have no idea for fixing this now i will fix it later 
 
     return allFighterContainer;
 }
@@ -795,17 +832,30 @@ function healthContainerIsReady() {
     isShipDamageActive = true;
 }
 
-function controllersAnime() {
+function controllersAnime(situation) {
     let tl = gsap.timeline();
-    tl
-    .to("#main__ship__fuelData, #main__ship__healthData", {
-        right: "-80",
-        duration: 1,
-        ease: "power4.out"
-    }, "controllersLabel")
-    .to("#main__ship__blasterData", {
-        left: "-150"
-    }, "controllersLabel");
+
+    if(situation === "hide"){
+        tl
+        .to("#main__ship__fuelData, #main__ship__healthData", {
+            right: "-80",
+            duration: 1,
+            ease: "power4.out"
+        }, "controllersLabel")
+        .to("#main__ship__blasterData", {
+            left: "-150"
+        }, "controllersLabel");
+    }else if(situation === "show"){
+        tl
+        .to("#main__ship__fuelData, #main__ship__healthData", {
+            right: "0",
+            duration: 1,
+            ease: "power4.out"
+        }, "controllersLabel")
+        .to("#main__ship__blasterData", {
+            left: "0"
+        }, "controllersLabel");
+    }
 }
 
 function clearEnemyContainer() {
@@ -844,7 +894,7 @@ function goToLevelList() {
     }})
     goToLevelTl.progress(1);
 }
-goToLevelList();
+// goToLevelList();
 
 function goToLevelOne(){
     let listOfEnemies = fillListOfEnemies(
@@ -856,25 +906,46 @@ function goToLevelOne(){
 
     let LevelOneTl = gsap.timeline();
     LevelOneTl
+    .set(".enemy__container", {"padding": "5vh 20vw 0 20vw"})
     .bringThePage(GameLevel1, {onComplete: function(){
         enemyContainer.removeClass("enemy__container--lower");
     }})
-    .fromTo(enemyContainer, {
+    .fromTo(mainShip, {
+        y: window.innerHeight,
+        x: (window.innerWidth / 2) - mainShipSize.halfOfWidth
+    },{
+        duration: 1.3,
+        y: "-=150",
+        ease: "back.out(.6)",
+        onComplete: function(){
+            controllersAnime("show");
+        }
+    })
+    .fromTo(`.enemy__container > div`, {
         scale: 0,
         opacity: .7,
     }, {
         scale: 1,
         opacity: 1,
-        duration: 3,
+        stagger: .3,
         ease: "expo.in",
         onComplete: function(){
-            pauseAnime(TutorialAnime)
+            blasterCountingSituation = true;
+            isFuelEndless = false;
+            isCountingActive = true;
+            isShipDamageActive = true;
+            playSituation("play");
+            shipMovement();
+            // makeRifleReady(1);
+            // makeBlasterReady(20);
+            pauseAnime(TutorialAnime);
         }
-    })
+    }, "+=1.5")    
 
     LevelOneTl.progress(1);
 }
-goToLevelOne();
+// goToLevelOne();
+
 
 function goToLevelTwo(){
     let LevelTwoTl = gsap.timeline();

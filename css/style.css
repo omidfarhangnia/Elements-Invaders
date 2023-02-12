@@ -51,7 +51,7 @@ table {
 }
 
 div[class*=fighter__] {
-  scale: 0.8;
+  scale: 0.8 !important;
 }
 
 .main__ship {
@@ -59,6 +59,7 @@ div[class*=fighter__] {
   height: 100px;
   position: relative;
   rotate: -90deg;
+  scale: 0.8;
 }
 .main__ship > * {
   position: absolute;
@@ -95,7 +96,6 @@ div[class*=fighter__] {
   height: 100px;
   position: absolute;
   z-index: -1;
-  scale: 0.8;
 }
 .main__ship--blaster__container .mainShip__blaster {
   width: 50%;
@@ -325,12 +325,17 @@ div[class*=main__ship--motor] .main__ship--guns {
   top: 0;
   left: 0;
   position: absolute;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 100px;
   padding: 15vh 20vw 0 20vw;
   align-items: flex-start;
   justify-content: center;
+}
+.enemy__container .enemies__group {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+.enemy__container .enemies__group > div {
+  display: inline-block;
 }
 
 .enemy__container--lower {
