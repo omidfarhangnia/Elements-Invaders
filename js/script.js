@@ -145,11 +145,11 @@ let xPos = gsap.quickTo(mainShip, "x", {duration: .3, ease: "power4.out"}),
 
 let TutorialAnime = gsap.timeline();
 
-const pauseTutorialAnime = (timeLineName) => {
+const pauseAnime = (timeLineName) => {
     timeLineName.pause();
 }
 
-const resumeTutorialAnime = (timeLineName) => {
+const resumeAnime = (timeLineName) => {
     timeLineName.resume();
 }
 
@@ -449,18 +449,18 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
         playSituation("play");
         shipMovement()
-        pauseTutorialAnime(TutorialAnime);
+        pauseAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num7", {duration: .5, onStart: function() {pauseOrderAnime(6)}}, "+=2")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
         makeRifleReady();
-        pauseTutorialAnime(TutorialAnime);
+        pauseAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num8 .order", {id: "prag__8__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num9", {duration: .5, onComplete: function() {
         makeBlasterReady();
-        pauseTutorialAnime(TutorialAnime);
+        pauseAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
     }, onStart: function() {pauseOrderAnime(8)}}, "+=3")
     .hidePrevTexts(groupOneTexts, {stagger: .2, onComplete: function() {
@@ -492,12 +492,12 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     }, "healthContainerAnime+=3")
     .showText(".tutorial__prag__num14", {duration: .5, onComplete: function(){
         pressToContinue()
-        pauseTutorialAnime(TutorialAnime);
+        pauseAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num14 .order", {id: "prag__13__order"});
         enemyContainer.toggleClass("enemy__container--lower");
     }}, "+=5")
     .hidePrevTexts(groupTwoTexts, {stagger: .2, onComplete: function(){
-        let enemyArr = fillListOfEnemies({name: "fighter__1", num: 4});
+        let enemyArr = fillListOfEnemies({name: "fighter__1", num: 2}, {name: "fighter__2", num: 2}, {name: "fighter__1", num: 2});
         makeEnemyReady(enemyArr);
     }}, "+=.5")
     .fromTo(enemyContainer, {
@@ -509,7 +509,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         duration: 3,
         ease: "expo.in",
         onComplete: function(){
-            pauseTutorialAnime(TutorialAnime)
+            pauseAnime(TutorialAnime)
         }
     })
     .showText(".tutorial__over__message", {duration: .75, onComplete: clearEnemyContainer})
@@ -524,6 +524,9 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         ease: "elastic.out(1.5, 0.3)",
         onStart: function() {
             enemyContainer.toggleClass("enemy__container--lower");
+        },
+        onComplete: function() {
+            mainShip.remove();
         }
     })
     .takeThePage(pageTutorial, {onComplete: function(){
@@ -537,11 +540,11 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     TutorialAnime.timeScale(10)
 }
 
-// playBtn.removeClass("locked__button");
-// playBtn.on("click", goToLevelList);
-// playBtn.html("play");
-// playBtn.removeAttr("data-bs-toggle");
-// playBtn.removeAttr("data-bs-target");
+playBtn.removeClass("locked__button");
+playBtn.on("click", goToLevelList);
+playBtn.html("play");
+playBtn.removeAttr("data-bs-toggle");
+playBtn.removeAttr("data-bs-target");
  
 function makeRifleReady() {
     $("body").on({
@@ -572,14 +575,14 @@ function makeRifleReady() {
     })
 
     gameContainer.one("click", function() {
-        resumeTutorialAnime(TutorialAnime)
+        resumeAnime(TutorialAnime)
     })
 }
 
 function makeBlasterReady() {
     $("body").one("keydown", function(event) {
         if(event.originalEvent.code === "Space"){
-            resumeTutorialAnime(TutorialAnime)
+            resumeAnime(TutorialAnime)
         }
     }) 
 
@@ -594,6 +597,11 @@ function makeBlasterReady() {
         }
     })
 };
+
+isGamePlaying = true;
+makeRifleReady();
+shipMovement();
+makeBlasterReady();
 
 function shipMovement() {
     gameContainer.css("cursor", "none")
@@ -660,7 +668,7 @@ function shipMovement() {
     })
 
     gameContainer.one("mousemove", function() {
-        resumeTutorialAnime(TutorialAnime)
+        resumeAnime(TutorialAnime)
     })
 }
 
@@ -674,7 +682,7 @@ function fuelContainerIsReady() {
 
 function pressToContinue() {
     $("body").one("keydown", function() {
-        resumeTutorialAnime(TutorialAnime)
+        resumeAnime(TutorialAnime)
     })
 }
 
@@ -823,7 +831,7 @@ function isGameEnded(callback) {
     })
 
     if(isAnyAlive === false){
-        resumeTutorialAnime(callback);
+        resumeAnime(callback);
     }
 }
 
@@ -935,9 +943,9 @@ function goToLevelOne(){
             isShipDamageActive = true;
             playSituation("play");
             shipMovement();
-            // makeRifleReady(1);
-            // makeBlasterReady(20);
-            pauseAnime(TutorialAnime);
+            makeRifleReady();
+            makeBlasterReady();
+            pauseAnime(LevelOneTl);
         }
     }, "+=1.5")    
 

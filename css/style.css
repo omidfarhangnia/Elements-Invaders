@@ -60,6 +60,9 @@ div[class*=fighter__] {
   position: relative;
   rotate: -90deg;
   scale: 0.8;
+  background: green;
+  position: absolute;
+  top: 0;
 }
 .main__ship > * {
   position: absolute;
