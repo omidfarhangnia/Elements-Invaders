@@ -60,7 +60,6 @@ div[class*=fighter__] {
   position: relative;
   rotate: -90deg;
   scale: 0.8;
-  background: green;
   position: absolute;
   top: 0;
 }
@@ -993,6 +992,7 @@ div[class*=boss__fight--laser--] {
   position: absolute;
   user-select: none;
   overflow: hidden;
+  padding: 10vh 0 0 0;
   top: 0;
   left: 100%;
 }

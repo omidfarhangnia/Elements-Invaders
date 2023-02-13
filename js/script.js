@@ -164,6 +164,19 @@ const playSituation = (situation) => {
 const pauseOrderAnime = (id) => {
     gsap.getById(`prag__${id}__order`).seek(0).kill();
 }
+ 
+function makeMainShipReady(situation) {
+    if(situation === "hide"){
+        gsap.set(mainShip, {
+            opacity: 0
+        })
+    }else if(situation === "show"){
+        gsap.set(mainShip, {
+            opacity: 1
+        })
+    }
+}
+makeMainShipReady("hide");
 
 class mainShipRifle {
     constructor (level, isFuelEndless, endFunction) {
@@ -414,6 +427,7 @@ function goToTutorial() {
     }) 
 
     resetBasicData();
+    makeMainShipReady("show");
     createAnimation(groupOneTexts, groupTwoTexts);
 }
 
@@ -545,7 +559,7 @@ playBtn.on("click", goToLevelList);
 playBtn.html("play");
 playBtn.removeAttr("data-bs-toggle");
 playBtn.removeAttr("data-bs-target");
- 
+
 function makeRifleReady() {
     $("body").on({
         "click": function() {
@@ -570,7 +584,7 @@ function makeRifleReady() {
         },
         "mouseup" : function() {
             clearTimeout(timeOutId);
-            clearTimeout(RightClickSetInterval);
+            clearInterval(RightClickSetInterval);
         }
     })
 
@@ -597,11 +611,6 @@ function makeBlasterReady() {
         }
     })
 };
-
-isGamePlaying = true;
-makeRifleReady();
-shipMovement();
-makeBlasterReady();
 
 function shipMovement() {
     gameContainer.css("cursor", "none")
