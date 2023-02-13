@@ -99,6 +99,15 @@ const enemyContainer = $(".enemy__container");
 const blasterNum = $("#blaster__num .num");
 const playBtn = $("#play__button");
 
+// levels
+const PageLevels = $(".page__levels");
+const GameLevel1 = $(".game__level__1");
+const cardLevel1 = $("#card__level__1");
+const GameLevel2 = $(".game__level__2");
+const cardLevel2 = $("#card__level__2");
+const GameLevel3 = $(".game__level__3");
+const cardLevel3 = $("#card__level__3");
+
 var isGamePlaying = false,
     blaster__num = 0,
     rifle__num = 0,  
@@ -805,9 +814,6 @@ function giveFightersCode(listOfEnemies) {
         }
     }
 
-    // i dont know why but i have one more extra enemies__group
-    // i have no idea for fixing this now i will fix it later 
-
     return allFighterContainer;
 }
 
@@ -874,18 +880,6 @@ function fillListOfEnemies(...Objects) {
     return arr;
 }
 
-const PageLevels = $(".page__levels");
-
-const GameLevel1 = $(".game__level__1");
-const cardLevel1 = $("#card__level__1");
-
-const GameLevel2 = $(".game__level__2");
-const cardLevel2 = $("#card__level__2");
-
-const GameLevel3 = $(".game__level__3");
-const cardLevel3 = $("#card__level__3");
-
-
 function goToLevelList() {
     let goToLevelTl = gsap.timeline();
     goToLevelTl
@@ -894,7 +888,6 @@ function goToLevelList() {
     }})
     goToLevelTl.progress(1);
 }
-// goToLevelList();
 
 function goToLevelOne(){
     let listOfEnemies = fillListOfEnemies(
@@ -944,7 +937,6 @@ function goToLevelOne(){
 
     LevelOneTl.progress(1);
 }
-// goToLevelOne();
 
 
 function goToLevelTwo(){
