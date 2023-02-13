@@ -60,6 +60,14 @@
     }
 }
 
+.ball{
+    width: 20px;
+    height: 20px;
+    background: red;
+    position: absolute;
+    z-index: 10;
+    border-radius: 50%;
+}
 
 div[class *= "game__level"]{
     @include backgroundNoRepeatCoverCenter();

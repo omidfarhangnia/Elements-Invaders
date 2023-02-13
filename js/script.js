@@ -510,22 +510,23 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         gsap.effects.orderAnime(".tutorial__prag__num14 .order", {id: "prag__13__order"});
         enemyContainer.toggleClass("enemy__container--lower");
     }}, "+=5")
-    .hidePrevTexts(groupTwoTexts, {stagger: .2, onComplete: function(){
-        let enemyArr = fillListOfEnemies({name: "fighter__1", num: 2}, {name: "fighter__2", num: 2}, {name: "fighter__1", num: 2});
-        makeEnemyReady(enemyArr);
-    }}, "+=.5")
-    .fromTo(enemyContainer, {
+    .hidePrevTexts(groupTwoTexts, {stagger: .2}, "+=.5")
+    .fromTo(`.enemy__container > div`, {
         scale: 0,
         opacity: .7,
     }, {
         scale: 1,
         opacity: 1,
-        duration: 3,
+        stagger: .3,
         ease: "expo.in",
         onComplete: function(){
-            pauseAnime(TutorialAnime)
+            pauseAnime(TutorialAnime);
+        },
+        onStart: function(){
+            let enemyArr = fillListOfEnemies({name: "fighter__1", num: 2}, {name: "fighter__2", num: 2}, {name: "fighter__1", num: 2});
+            makeEnemyReady(enemyArr);
         }
-    })
+    }, "+=1.5")  
     .showText(".tutorial__over__message", {duration: .75, onComplete: clearEnemyContainer})
     .hidePrevTexts(".tutorial__over__message", {stagger: .4, onComplete: function() {
         controllersAnime("hide");
@@ -538,9 +539,6 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         ease: "elastic.out(1.5, 0.3)",
         onStart: function() {
             enemyContainer.toggleClass("enemy__container--lower");
-        },
-        onComplete: function() {
-            mainShip.remove();
         }
     })
     .takeThePage(pageTutorial, {onComplete: function(){
@@ -628,6 +626,8 @@ function shipMovement() {
         // this condition my ship will gone out of VIEW PORT 
 
         if(isShipDamageActive === true){
+            console.log(mainShip.position().top)
+            console.log(CurrentEnemiesData[0].enemyPos.top)
             for(var i = 0; i < CurrentEnemiesData.length; i++){
                 if(mainShip.position().left <= CurrentEnemiesData[i].enemyPos.left + 50 &&
                    mainShip.position().left >= CurrentEnemiesData[i].enemyPos.left - 50){
@@ -696,11 +696,10 @@ function pressToContinue() {
 }
 
 function makeEnemyReady(listOfEnemies) {
-    CurrentEnemiesData = [];
-    let fighters = giveFightersCode(listOfEnemies);
-    enemyContainer.html(fighters);
+    let fightersCode = giveFightersCode(listOfEnemies);
+    enemyContainer.html(fightersCode);
 
-    setTimeout(() => {
+    // setTimeout(() => {
         let activeEnemies = $(".enemy__container > div > div[class *= 'fighter']");
         activeEnemies.each(function(idx, element){
             let health;
@@ -725,10 +724,22 @@ function makeEnemyReady(listOfEnemies) {
                     "first": health
                 }
             }
-    
+
             CurrentEnemiesData.push(obj);
         });
-    }, 3500);
+        
+        for(var i = 0; i < CurrentEnemiesData.length; i++){
+            let ball = $("<div class='ball'></div>");
+        
+            ball.css({
+                "left": CurrentEnemiesData[i].enemyPos.top,
+                "top": CurrentEnemiesData[i].enemyPos.left
+            })
+        
+            ball.appendTo(gameContainer);
+        }
+    // }, 3500);
+    
 };
 
 function giveFightersCode(listOfEnemies) {
@@ -821,10 +832,19 @@ function giveFightersCode(listOfEnemies) {
         }
     }
 
-    // i dont know why but i have one more extra enemies__group
-    // i have no idea for fixing this now i will fix it later 
-
     return allFighterContainer;
+}
+
+function fillListOfEnemies(...Objects) {
+    let arr = [];
+
+    for(var i = 0; i < Objects.length; i++){
+        for(var j = 0; j < Objects[i].num; j++){
+            arr.push(Objects[i].name)
+        }
+    }
+
+    return arr;
 }
 
 function isGameEnded(callback) {
@@ -878,18 +898,6 @@ function clearEnemyContainer() {
     enemyContainer.empty();
 }
 
-function fillListOfEnemies(...Objects) {
-    let arr = [];
-
-    for(var i = 0; i < Objects.length; i++){
-        for(var j = 0; j < Objects[i].num; j++){
-            arr.push(Objects[i].name)
-        }
-    }
-
-    return arr;
-}
-
 const PageLevels = $(".page__levels");
 
 const GameLevel1 = $(".game__level__1");
@@ -935,6 +943,9 @@ function goToLevelOne(){
         ease: "back.out(.6)",
         onComplete: function(){
             controllersAnime("show");
+        },
+        onStart: function(){
+            makeMainShipReady("show");
         }
     })
     .fromTo(`.enemy__container > div`, {
@@ -961,7 +972,6 @@ function goToLevelOne(){
     LevelOneTl.progress(1);
 }
 // goToLevelOne();
-
 
 function goToLevelTwo(){
     let LevelTwoTl = gsap.timeline();

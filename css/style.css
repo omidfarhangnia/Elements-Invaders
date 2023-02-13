@@ -1114,6 +1114,15 @@ div[class*=boss__fight--laser--] {
   background-image: url("../images/background-images/levels__bg/third__level__bg.webp");
 }
 
+.ball {
+  width: 20px;
+  height: 20px;
+  background: red;
+  position: absolute;
+  z-index: 10;
+  border-radius: 50%;
+}
+
 div[class*=game__level] {
   background-repeat: no-repeat;
   background-size: cover;
