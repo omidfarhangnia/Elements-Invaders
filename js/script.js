@@ -99,15 +99,6 @@ const enemyContainer = $(".enemy__container");
 const blasterNum = $("#blaster__num .num");
 const playBtn = $("#play__button");
 
-// levels
-const PageLevels = $(".page__levels");
-const GameLevel1 = $(".game__level__1");
-const cardLevel1 = $("#card__level__1");
-const GameLevel2 = $(".game__level__2");
-const cardLevel2 = $("#card__level__2");
-const GameLevel3 = $(".game__level__3");
-const cardLevel3 = $("#card__level__3");
-
 var isGamePlaying = false,
     blaster__num = 0,
     rifle__num = 0,  
@@ -125,6 +116,13 @@ var isGamePlaying = false,
     isShipInImmortalMode = false;
 
 $('#go__tutorial, #tutorial__button').click(goToTutorial)
+
+let fighterHealth = {
+    "fighter1": 9,
+    "fighter2": 15,
+    "fighter3": 20,
+    "fighter4": 100,
+}
 
 const mainShipSize = {
     width: 100, 
@@ -145,19 +143,13 @@ function idMaker(num) {
 let xPos = gsap.quickTo(mainShip, "x", {duration: .3, ease: "power4.out"}),
     yPos = gsap.quickTo(mainShip, "y", {duration: .3, ease: "power4.out"});
 
-let fighterHealth = {
-    "fighter1": 9,
-    "fighter2": 15,
-    "fighter3": 20,
-    "fighter4": 100,
-}
-
 let TutorialAnime = gsap.timeline();
-const pauseAnime = (timeLineName) => {
+
+const pauseTutorialAnime = (timeLineName) => {
     timeLineName.pause();
 }
 
-const resumeAnime = (timeLineName) => {
+const resumeTutorialAnime = (timeLineName) => {
     timeLineName.resume();
 }
 
@@ -174,10 +166,10 @@ const pauseOrderAnime = (id) => {
 }
 
 class mainShipRifle {
-    constructor (level, isFuelEndless, animeName) {
+    constructor (level, isFuelEndless, endFunction) {
         this.level = level;
         this.isFuelEndless = isFuelEndless;
-        this.animeName = animeName;
+        this.endFunction = endFunction;
     }
     fireRifle() {
         let fuelContainerHeight = 262.5;
@@ -265,18 +257,16 @@ class mainShipRifle {
                             let mainFirstHealth = CurrentEnemiesData[i].enemyHealth.first;
 
                             $(`.enemy__num__${CurrentEnemiesData[i].enemyNum} .current__health`).css(
-                                "height", `${(newHealth * 100 / mainFirstHealth)}%`);
+                                "height", `${(newHealth * 100 / mainFirstHealth)}%`)
                             
                             CurrentEnemiesData[i].enemyHealth.current = newHealth;
-                            
                             rifleBulletContainer.remove();
 
                             if(CurrentEnemiesData[i].enemyHealth.current <= 0){
                                 $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).addClass("destroyed__ship");
                                 CurrentEnemiesData[i].isEnemyAlive = false;
                             }
-                            
-                            isGameEnded(this.animeName);
+                            isGameEnded(this.endFunction);
                             clearInterval(checkRiflePosStepByStep);
                         }
                     }
@@ -294,12 +284,12 @@ class mainShipRifle {
 }
 
 class mainShipBlaster {
-    constructor(isBlasterReady, blastersId, isCountingActive, allowableBlasterNumber, animeName) {
+    constructor(isBlasterReady, blastersId, isCountingActive, allowableBlasterNumber, endFunction) {
         this.isBlasterReady = isBlasterReady;
         this.blastersId = blastersId;
         this.isCountingActive = isCountingActive;
         this.allowableBlasterNumber = allowableBlasterNumber;
-        this.animeName = animeName;
+        this.endFunction = endFunction;
     }
     fireBlaster() {
         if(this.isBlasterReady !== true) return;
@@ -326,7 +316,6 @@ class mainShipBlaster {
         mainShipBlasterContainerClone.attr("id", `${currentBlastersId}-blasterBullet`)
 
         mainShipBlasterContainerClone.appendTo(gameContainer);
-
 
         gsap.set(mainShipBlasterContainerClone, {
             top: mainShip.position().top,
@@ -394,7 +383,7 @@ class mainShipBlaster {
             blasterBulletContainer.remove();
         }, 750);
         setTimeout(() => {
-            isGameEnded(this.animeName);
+            isGameEnded(this.endFunction); 
         }, 2000);
     }
 }
@@ -460,18 +449,18 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     .showText(".tutorial__prag__num6", {duration: .5, onComplete: function() {
         playSituation("play");
         shipMovement()
-        pauseAnime(TutorialAnime);
+        pauseTutorialAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num6 .order", {id: "prag__6__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num7", {duration: .5, onStart: function() {pauseOrderAnime(6)}}, "+=2")
     .showText(".tutorial__prag__num8", {duration: .5, onComplete: function() {
         makeRifleReady();
-        pauseAnime(TutorialAnime);
+        pauseTutorialAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num8 .order", {id: "prag__8__order"})
     }}, "+=2.5")
     .showText(".tutorial__prag__num9", {duration: .5, onComplete: function() {
         makeBlasterReady();
-        pauseAnime(TutorialAnime);
+        pauseTutorialAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num9 .order", {id: "prag__9__order"})
     }, onStart: function() {pauseOrderAnime(8)}}, "+=3")
     .hidePrevTexts(groupOneTexts, {stagger: .2, onComplete: function() {
@@ -503,12 +492,12 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     }, "healthContainerAnime+=3")
     .showText(".tutorial__prag__num14", {duration: .5, onComplete: function(){
         pressToContinue()
-        pauseAnime(TutorialAnime);
+        pauseTutorialAnime(TutorialAnime);
         gsap.effects.orderAnime(".tutorial__prag__num14 .order", {id: "prag__13__order"});
         enemyContainer.toggleClass("enemy__container--lower");
     }}, "+=5")
     .hidePrevTexts(groupTwoTexts, {stagger: .2, onComplete: function(){
-        let enemyArr = fillListOfEnemies({name: "fighter__1", num: 6});
+        let enemyArr = fillListOfEnemies({name: "fighter__1", num: 4});
         makeEnemyReady(enemyArr);
     }}, "+=.5")
     .fromTo(enemyContainer, {
@@ -520,7 +509,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         duration: 3,
         ease: "expo.in",
         onComplete: function(){
-            pauseAnime(TutorialAnime)
+            pauseTutorialAnime(TutorialAnime)
         }
     })
     .showText(".tutorial__over__message", {duration: .75, onComplete: clearEnemyContainer})
@@ -544,7 +533,8 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         playBtn.removeAttr("data-bs-toggle");
         playBtn.removeAttr("data-bs-target");
     }})
-    TutorialAnime.timeScale(15); 
+
+    TutorialAnime.timeScale(10)
 }
 
 // playBtn.removeClass("locked__button");
@@ -581,15 +571,15 @@ function makeRifleReady() {
         }
     })
 
-    gameContainer.one("click", function(){
-        resumeAnime(TutorialAnime)
+    gameContainer.one("click", function() {
+        resumeTutorialAnime(TutorialAnime)
     })
 }
 
 function makeBlasterReady() {
     $("body").one("keydown", function(event) {
         if(event.originalEvent.code === "Space"){
-            resumeAnime(TutorialAnime)
+            resumeTutorialAnime(TutorialAnime)
         }
     }) 
 
@@ -670,7 +660,7 @@ function shipMovement() {
     })
 
     gameContainer.one("mousemove", function() {
-        resumeAnime(TutorialAnime)
+        resumeTutorialAnime(TutorialAnime)
     })
 }
 
@@ -683,8 +673,8 @@ function fuelContainerIsReady() {
 }
 
 function pressToContinue() {
-    $("body").one("keydown", function(){
-        resumeAnime(TutorialAnime)
+    $("body").one("keydown", function() {
+        resumeTutorialAnime(TutorialAnime)
     })
 }
 
@@ -814,10 +804,13 @@ function giveFightersCode(listOfEnemies) {
         }
     }
 
+    // i dont know why but i have one more extra enemies__group
+    // i have no idea for fixing this now i will fix it later 
+
     return allFighterContainer;
 }
 
-function isGameEnded(animeName) {
+function isGameEnded(callback) {
     let isAnyAlive;
 
     $.each(CurrentEnemiesData, function(index, value){
@@ -830,7 +823,7 @@ function isGameEnded(animeName) {
     })
 
     if(isAnyAlive === false){
-        resumeAnime(animeName);
+        resumeTutorialAnime(callback);
     }
 }
 
@@ -880,6 +873,18 @@ function fillListOfEnemies(...Objects) {
     return arr;
 }
 
+const PageLevels = $(".page__levels");
+
+const GameLevel1 = $(".game__level__1");
+const cardLevel1 = $("#card__level__1");
+
+const GameLevel2 = $(".game__level__2");
+const cardLevel2 = $("#card__level__2");
+
+const GameLevel3 = $(".game__level__3");
+const cardLevel3 = $("#card__level__3");
+
+
 function goToLevelList() {
     let goToLevelTl = gsap.timeline();
     goToLevelTl
@@ -888,6 +893,7 @@ function goToLevelList() {
     }})
     goToLevelTl.progress(1);
 }
+// goToLevelList();
 
 function goToLevelOne(){
     let listOfEnemies = fillListOfEnemies(
@@ -937,6 +943,7 @@ function goToLevelOne(){
 
     LevelOneTl.progress(1);
 }
+// goToLevelOne();
 
 
 function goToLevelTwo(){
