@@ -626,17 +626,18 @@ function shipMovement() {
         // this condition my ship will gone out of VIEW PORT 
 
         if(isShipDamageActive === true){
-            console.log(mainShip.position().top)
-            console.log(CurrentEnemiesData[0].enemyPos.top)
+            console.log(mainShip.position().left)
+            console.log(CurrentEnemiesData[6].enemyPos.left)
             for(var i = 0; i < CurrentEnemiesData.length; i++){
                 if(mainShip.position().left <= CurrentEnemiesData[i].enemyPos.left + 50 &&
                    mainShip.position().left >= CurrentEnemiesData[i].enemyPos.left - 50){
-                    if(mainShip.position().top <= CurrentEnemiesData[i].enemyPos.top + 100 &&
-                       mainShip.position().top >= CurrentEnemiesData[i].enemyPos.top){
+                    if(mainShip.position().top <= CurrentEnemiesData[i].enemyPos.top &&
+                       mainShip.position().top >= CurrentEnemiesData[i].enemyPos.top - 90){
                         // plus 300 is for the line 432 in this line we have an animation for 
                         // putting element in the page with an animation
                         // and 75 is the size of element
                         if(CurrentEnemiesData[i].isEnemyAlive === true){
+                            // console.log("you crashed")
                             if(isShipInImmortalMode === false){
                                 let currentHealth = $(`.heart__num__${currentHeartNumber}`);
                                 currentHeartNumber--;
@@ -727,17 +728,6 @@ function makeEnemyReady(listOfEnemies) {
 
             CurrentEnemiesData.push(obj);
         });
-        
-        for(var i = 0; i < CurrentEnemiesData.length; i++){
-            let ball = $("<div class='ball'></div>");
-        
-            ball.css({
-                "left": CurrentEnemiesData[i].enemyPos.top,
-                "top": CurrentEnemiesData[i].enemyPos.left
-            })
-        
-            ball.appendTo(gameContainer);
-        }
     // }, 3500);
     
 };
@@ -918,7 +908,7 @@ function goToLevelList() {
     }})
     goToLevelTl.progress(1);
 }
-// goToLevelList();
+goToLevelList();
 
 function goToLevelOne(){
     let listOfEnemies = fillListOfEnemies(
@@ -971,7 +961,7 @@ function goToLevelOne(){
 
     LevelOneTl.progress(1);
 }
-// goToLevelOne();
+goToLevelOne();
 
 function goToLevelTwo(){
     let LevelTwoTl = gsap.timeline();
