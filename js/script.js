@@ -263,8 +263,10 @@ class mainShipRifle {
             for(var i = 0; i < CurrentEnemiesData.length; i++){
                 if(rifleBulletContainer.position().left <= CurrentEnemiesData[i].enemyPos.left + 60 &&
                    rifleBulletContainer.position().left >= CurrentEnemiesData[i].enemyPos.left - 60){
-                    if(rifleBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top + 60 &&
-                       rifleBulletContainer.position().top >= CurrentEnemiesData[i].enemyPos.top){    
+                    if(rifleBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top - 50 &&
+                       rifleBulletContainer.position().top >= CurrentEnemiesData[i].enemyPos.top - 90){   
+                        // -50 and -90 : I am using this two number for having an animation that the bullet
+                        // is in the ship 
                         if(CurrentEnemiesData[i].isEnemyAlive === true){
                             let newHealth = CurrentEnemiesData[i].enemyHealth.current - this.level;
                             let mainFirstHealth = CurrentEnemiesData[i].enemyHealth.first;
@@ -343,6 +345,7 @@ class mainShipBlaster {
         gsap.to(mainShipBlasterContainerClone, {
             top: "-=1000",
             duration: 1.2 ,
+            scale: .7
         }) 
     }
     calcDamage() {
@@ -354,8 +357,8 @@ class mainShipBlaster {
             for(var i = 0; i < CurrentEnemiesData.length; i++){
                 if(blasterBulletContainer.position().left <= CurrentEnemiesData[i].enemyPos.left + 60 &&
                    blasterBulletContainer.position().left >= CurrentEnemiesData[i].enemyPos.left - 60){
-                    if(blasterBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top + 50 &&
-                       blasterBulletContainer.position().top >= CurrentEnemiesData[i].enemyPos.top){
+                    if(blasterBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top - 50 &&
+                       blasterBulletContainer.position().top >= CurrentEnemiesData[i].enemyPos.top - 90){
                         if(CurrentEnemiesData[i].isEnemyAlive === true){
                             let newHealth = CurrentEnemiesData[i].enemyHealth.current - blasterDamage;
                             let mainFirstHealth = CurrentEnemiesData[i].enemyHealth.first;
@@ -375,7 +378,7 @@ class mainShipBlaster {
                                 
                                 blasterExplosion.css({
                                     "animation": "explosionAnimation 2s ease-in-out both",
-                                    "top": (CurrentEnemiesData[i].enemyPos.top) + 20,
+                                    "top": (CurrentEnemiesData[i].enemyPos.top) - 90,
                                     // the top value that i give is negative and i should make in positive
                                     "left": CurrentEnemiesData[i].enemyPos.left - 10
                                 });
