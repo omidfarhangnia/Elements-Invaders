@@ -113,7 +113,11 @@ var isGamePlaying = false,
     CurrentEnemiesData = [],
     isShipDamageActive,
     currentHeartNumber = 4,
-    isShipInImmortalMode = false;
+    isShipInImmortalMode = false,
+    fighter1Interval,
+    fighter2Interval,
+    fighter3Interval,
+    bossFightInterval;
 
 $('#go__tutorial, #tutorial__button').click(goToTutorial)
 
@@ -281,6 +285,9 @@ class mainShipRifle {
                                 $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).addClass("destroyed__ship");
                                 CurrentEnemiesData[i].isEnemyAlive = false;
                             }
+
+
+                            checkEnemiesChange();
                             isGameEnded(this.endFunction);
                             clearInterval(checkRiflePosStepByStep);
                         }
@@ -387,6 +394,9 @@ class mainShipBlaster {
                                     blasterExplosion.remove();
                                 }, 2000);
                             }
+
+
+                            checkEnemiesChange();
                             clearInterval(checkBlasterPosStepByStep);
                         }
                     }
@@ -629,8 +639,6 @@ function shipMovement() {
         // this condition my ship will gone out of VIEW PORT 
 
         if(isShipDamageActive === true){
-            console.log(mainShip.position().left)
-            console.log(CurrentEnemiesData[6].enemyPos.left)
             for(var i = 0; i < CurrentEnemiesData.length; i++){
                 if(mainShip.position().left <= CurrentEnemiesData[i].enemyPos.left + 50 &&
                    mainShip.position().left >= CurrentEnemiesData[i].enemyPos.left - 50){
@@ -702,38 +710,140 @@ function pressToContinue() {
 function makeEnemyReady(listOfEnemies) {
     let fightersCode = giveFightersCode(listOfEnemies);
     enemyContainer.html(fightersCode);
-
-    // setTimeout(() => {
-        let activeEnemies = $(".enemy__container > div > div[class *= 'fighter']");
-        activeEnemies.each(function(idx, element){
-            let health;
-            let currentElement = $(element);
-
-            if(currentElement.hasClass("fighter__1")){
-                health = fighterHealth.fighter1;
-            }else if(currentElement.hasClass("fighter__2")){
-                health = fighterHealth.fighter2;
-            }else if(currentElement.hasClass("fighter__3")){
-                health = fighterHealth.fighter3;
-            }else if(currentElement.hasClass("fighter__4")){
-                health = fighterHealth.fighter4;
+    let activeEnemies = $(".enemy__container > div > div[class *= 'fighter']");
+    activeEnemies.each(function(idx, element){
+        let health;
+        let currentElement = $(element);
+        let currentElementModel = currentElement.attr("fighter-model");
+        let currentEnemyNumFromItsKind;
+        if(currentElementModel === "fighter__1"){
+            health = fighterHealth.fighter1;
+        }else if(currentElementModel === "fighter__2"){
+            health = fighterHealth.fighter2;
+        }else if(currentElementModel === "fighter__3"){
+            health = fighterHealth.fighter3;
+        }else if(currentElementModel === "fighter__4"){
+            health = fighterHealth.fighter4;
+        }
+        let obj = {
+            "enemyPos": currentElement.position(),
+            "enemyNum": idx + 1,
+            "isEnemyAlive": true,
+            "fighterModel": currentElementModel,
+            "enemyHealth": {
+                "current": health,
+                "first": health
             }
+        }
+        CurrentEnemiesData.push(obj);
+    });
 
-            let obj = {
-                "enemyPos": currentElement.position(),
-                "enemyNum": idx + 1,
-                "isEnemyAlive": true,
-                "enemyHealth": {
-                    "current": health,
-                    "first": health
-                }
-            }
-
-            CurrentEnemiesData.push(obj);
-        });
-    // }, 3500);
-    
+    let fightersGroup = makeEnemiesGunReady();
+    makeRandomShoot(fightersGroup);
 };
+
+function makeEnemiesGunReady() {    
+    let fightersGroup = {
+        fighters1: [],
+        fighters2: [],
+        fighters3: [],
+        fighters4: [],
+    }
+
+    for(var i = 0; i < CurrentEnemiesData.length; i++){
+        if(CurrentEnemiesData[i].isEnemyAlive === false) continue;
+
+        if(CurrentEnemiesData[i].fighterModel === "fighter__1"){
+            fightersGroup.fighters1.push(CurrentEnemiesData[i]);
+        }else if(CurrentEnemiesData[i].fighterModel === "fighter__2"){
+            fightersGroup.fighters2.push(CurrentEnemiesData[i]);
+        }else if(CurrentEnemiesData[i].fighterModel === "fighter__3"){
+            fightersGroup.fighters3.push(CurrentEnemiesData[i]);
+        }else if(CurrentEnemiesData[i].fighterModel === "fighter__4"){
+            fightersGroup.fighters4.push(CurrentEnemiesData[i]);
+        }
+    };
+
+    return fightersGroup;
+}
+
+function makeRandomShoot(fightersGroup){
+    if(fightersGroup.fighters1.length){
+        let fightersOneLength = fightersGroup.fighters1.length;
+        fighter1Interval = setInterval(() => {
+            let randomFighters = giveRandomNumbers(0, (fightersOneLength - 1), 6);
+            let randomFightersToArr = Array.from(randomFighters);
+            shootWithFighter1(randomFightersToArr);
+            console.log(fightersGroup.fighters1)
+        }, 3000);
+    }
+    if(fightersGroup.fighters2.length){
+        let fightersTwoLength = fightersGroup.fighters2.length
+        fighter2Interval = setInterval(() => {
+            let randomFighters = giveRandomNumbers(0, (fightersTwoLength - 1), 3);
+            let randomFightersToArr = Array.from(randomFighters);
+            shootWithFighter2(randomFightersToArr);
+        }, 5000);
+    }
+    if(fightersGroup.fighters3.length){
+        let fightersThreeLength = fightersGroup.fighters3.length;
+        fighter3Interval = setInterval(() => {
+            let randomFighters = giveRandomNumbers(0, (fightersThreeLength - 1), 5);
+            let randomFightersToArr = Array.from(randomFighters);
+            shootWithFighter3(randomFightersToArr);
+        }, 10000);
+    }
+    if(fightersGroup.fighters4.length){
+        let fightersFourLength = fightersGroup.fighters4.length;
+        bossFightInterval = setInterval(() => {
+            let randomFighters = giveRandomNumbers(0, (fightersFourLength - 1), 5);
+            let randomFightersToArr = Array.from(randomFighters);
+            shootWithBossFight(randomFightersToArr);
+        }, 10000);
+    }
+}
+
+function checkEnemiesChange(){
+    clearInterval(fighter1Interval);
+    clearInterval(fighter2Interval);
+    clearInterval(fighter3Interval);
+    clearInterval(bossFightInterval);
+
+    let fightersGroup = makeEnemiesGunReady();
+    makeRandomShoot(fightersGroup);
+}
+
+function giveRandomNumbers(min, max, count) {
+    let numberContainer = new Set();
+    let prevSize = numberContainer.size, currentSize, counter = 0;
+    while(counter < count){
+      numberContainer.add(Math.floor(Math.random() * (max - min + 1)) + min)
+      currentSize = numberContainer.size;
+      if(currentSize === prevSize){
+        counter--;
+        prevSize--;
+      }
+            
+      prevSize++;
+      counter++;
+    }
+
+    return numberContainer;
+}
+
+function shootWithFighter1(randomListOfEnemies){
+    console.log(randomListOfEnemies)
+}
+
+function shootWithFighter2(randomListOfEnemies){
+    // console.log(randomListOfEnemies)
+}
+
+function shootWithFighter3(randomListOfEnemies){
+}
+
+function shootWithBossFight(randomListOfEnemies){
+}
 
 function giveFightersCode(listOfEnemies) {
     let allFighterContainer = "";
@@ -745,7 +855,7 @@ function giveFightersCode(listOfEnemies) {
 
         if(listOfEnemies[i] === "fighter__1"){
             allFighterContainer += `
-            <div class="fighter__1 enemy__num__${i + 1}">
+            <div class="fighter__1 enemy__num__${i + 1}" fighter-model="fighter__1">
                 <div class="health__container">
                     <div class="current__health"></div>
                 </div>
@@ -763,7 +873,7 @@ function giveFightersCode(listOfEnemies) {
             </div>`;
         }else if(listOfEnemies[i] === "fighter__2"){
             allFighterContainer += `            
-            <div class="fighter__2 enemy__num__${i + 1}">
+            <div class="fighter__2 enemy__num__${i + 1}" fighter-model="fighter__2">
                 <div class="health__container">
                     <div class="current__health"></div>
                 </div>
@@ -779,7 +889,7 @@ function giveFightersCode(listOfEnemies) {
             </div>`;
         }else if(listOfEnemies[i] === "fighter__3"){
             allFighterContainer += `
-            <div class="fighter__3 enemy__num__${i + 1}">
+            <div class="fighter__3 enemy__num__${i + 1}" fighter-model="fighter__3">
                 <div class="health__container">
                     <div class="current__health"></div>
                 </div>
@@ -793,7 +903,7 @@ function giveFightersCode(listOfEnemies) {
             </div>`;
         }else if(listOfEnemies[i] === "boss__fight"){
             allFighterContainer += `
-            <div class="boss__fight enemy__num__${i + 1}">
+            <div class="boss__fight enemy__num__${i + 1}" fighter-model="fighter__4">
                 <div class="boss__fight--blaster--1"></div>
                 <div class="boss__fight--blaster--2"></div>
                 <div class="boss__fight--blaster--3"></div>
