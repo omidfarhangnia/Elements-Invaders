@@ -787,23 +787,23 @@ function makeRandomShoot(){
 
     if(fightersGroup.fighters1.length){
         let fightersOneLength = fightersGroup.fighters1.length;
-        orderForShooting(0, fightersOneLength, (2 <= fightersOneLength ? 2 : fightersOneLength), shootWithFighter1);
+        orderForShooting(0, fightersOneLength, (3 <= fightersOneLength ? 3 : fightersOneLength), shootWithFighter1);
         // i should have a condition for the time witch play killed most of the enemies
         // and i need to have a condition for this situation i should send the current number of
         // enemies for this situation
 
         // i want to have a shoot for the second that i called this function
         fighter1Interval = setInterval(() => {
-            orderForShooting(0, fightersOneLength, (2 <= fightersOneLength ? 2 : fightersOneLength), shootWithFighter1);
+            orderForShooting(0, fightersOneLength, (3 <= fightersOneLength ? 3 : fightersOneLength), shootWithFighter1);
             // and i need to have repeated orders for calling this function
         }, 3000);
     }
     if(fightersGroup.fighters2.length){
         let fightersTwoLength = fightersGroup.fighters2.length;
-        orderForShooting(0, fightersTwoLength, (3 <= fightersTwoLength ? 3 : fightersTwoLength), shootWithFighter2);
+        orderForShooting(0, fightersTwoLength, (2 <= fightersTwoLength ? 2 : fightersTwoLength), shootWithFighter2);
         fighter2Interval = setInterval(() => {
-            orderForShooting(0, fightersTwoLength, (3 <= fightersTwoLength ? 3 : fightersTwoLength), shootWithFighter2);
-        }, 5000);
+            orderForShooting(0, fightersTwoLength, (2 <= fightersTwoLength ? 2 : fightersTwoLength), shootWithFighter2);
+        }, 4000);
     }
     if(fightersGroup.fighters3.length){
         let fightersThreeLength = fightersGroup.fighters3.length;
@@ -861,12 +861,57 @@ class enemyGun {
     }
     shootWithRifle(){
         let targetElement = this.target;
-        // let bulletContainer = 
+        let enemyId = targetElement.attr("enemyId");
+        let targetBulletContainer = targetElement.children(".bullet__container");
+        let targetBulletContainerClone = targetBulletContainer.clone();
+        
+        targetBulletContainerClone.appendTo(gameContainer);
 
-        console.log(targetElement[0])
+        gsap.set(targetBulletContainerClone, {
+            top: CurrentEnemiesData[enemyId].enemyPos.top - 70,
+            left: CurrentEnemiesData[enemyId].enemyPos.left - 7.5,
+            // i used this specific number for fixing them with the element 70 is the height of fighters
+            zIndex: 1,
+            rotate: -90
+        })
+
+        // console.log(targetElement.position().top)        
+        
+        gsap.to(targetBulletContainerClone, {
+            top: "+=1000",
+            duration: 3,
+        })
+
+        setTimeout(() => {
+            targetBulletContainerClone.remove();
+        }, 3000);
     }
     blastWithBlaster(){
+        let targetElement = this.target;
+        let enemyId = targetElement.attr("enemyId");
+        let targetBlasterContainer = targetElement.children(".blaster__container");
+        let targetBlasterContainerClone = targetBlasterContainer.clone();
 
+        targetBlasterContainerClone.appendTo(gameContainer);
+
+        gsap.set(targetBlasterContainerClone, {
+            top: CurrentEnemiesData[enemyId].enemyPos.top - 70,
+            left: CurrentEnemiesData[enemyId].enemyPos.left - 7.5,
+            // i used this specific number for fixing them with the element 70 is the height of fighters
+            zIndex: 1,
+            rotate: 90
+        })
+
+        // console.log(targetElement.position().top)        
+        
+        gsap.to(targetBlasterContainerClone, {
+            top: "+=1000",
+            duration: 3,
+        })
+
+        // setTimeout(() => {
+        //     targetBlasterContainerClone.remove();
+        // }, 3000);
     }
 }
 
@@ -880,19 +925,27 @@ function shootWithFighter1(randomListOfEnemies){
 
         let enemy = new enemyGun(currentFighter);
         enemy.shootWithRifle();
-
-        // gsap.set(`${element}`)
     })
 }
 
 function shootWithFighter2(randomListOfEnemies){
+    $.each(randomListOfEnemies, function(idx, element){
+        if(isGamePlaying === false) return;
+        let currentFighterNumb = fightersGroup.fighters2[element].enemyNum;
+        // i need to translate my random number of element from array to real element
+        let currentFighter = $(`.enemy__num__${currentFighterNumb}`);
+        
+
+        let enemy = new enemyGun(currentFighter);
+        enemy.blastWithBlaster();
+    })
 }
 
-function shootWithFighter3(randomListOfEnemies){
-}
+// function shootWithFighter3(randomListOfEnemies){
+// }
 
-function shootWithBossFight(randomListOfEnemies){
-}
+// function shootWithBossFight(randomListOfEnemies){
+// }
 
 function giveFightersCode(listOfEnemies) {
     let allFighterContainer = "";
@@ -904,9 +957,12 @@ function giveFightersCode(listOfEnemies) {
 
         if(listOfEnemies[i] === "fighter__1"){
             allFighterContainer += `
-            <div class="fighter__1 enemy__num__${i + 1}" fighter-model="fighter__1">
+            <div class="fighter__1 enemy__num__${i + 1}" fighter-model="fighter__1" enemyId="${i}">
                 <div class="health__container">
                     <div class="current__health"></div>
+                </div>
+                <div class="fighter__1--bullet__container bullet__container">
+                    <div class="fighter__1--bullet"></div>
                 </div>
                 <div class="fighter__1--gun--1"></div>
                 <div class="fighter__1--gun--2"></div>
@@ -919,15 +975,16 @@ function giveFightersCode(listOfEnemies) {
                 </div>
                 <div class="fighter__1--motor--2"></div>
                 <div class="fighter__1--motor--cover--2"></div>
-                <div class="fighter__1--bullet__container">
-                    <div class="fighter__1--bullet"></div>
-                </div>
             </div>`;
         }else if(listOfEnemies[i] === "fighter__2"){
             allFighterContainer += `            
-            <div class="fighter__2 enemy__num__${i + 1}" fighter-model="fighter__2">
+            <div class="fighter__2 enemy__num__${i + 1}" fighter-model="fighter__2" enemyId="${i}">
                 <div class="health__container">
                     <div class="current__health"></div>
+                </div>
+                <div class="fighter__1--blaster__container blaster__container">
+                    <div class="fighter__1--blaster--1"></div>
+                    <div class="fighter__1--blaster--2"></div>
                 </div>
                 <div class="fighter__2--bullet__container"></div>
                 <div class="fighter__2--blasters--1"></div>
@@ -942,7 +999,7 @@ function giveFightersCode(listOfEnemies) {
             </div>`;
         }else if(listOfEnemies[i] === "fighter__3"){
             allFighterContainer += `
-            <div class="fighter__3 enemy__num__${i + 1}" fighter-model="fighter__3">
+            <div class="fighter__3 enemy__num__${i + 1}" fighter-model="fighter__3" enemyId="${i}">
                 <div class="health__container">
                     <div class="current__health"></div>
                 </div>
@@ -957,7 +1014,7 @@ function giveFightersCode(listOfEnemies) {
             </div>`;
         }else if(listOfEnemies[i] === "boss__fight"){
             allFighterContainer += `
-            <div class="boss__fight enemy__num__${i + 1}" fighter-model="fighter__4">
+            <div class="boss__fight enemy__num__${i + 1}" fighter-model="fighter__4" enemyId="${i}">
                 <div class="boss__fight--bullet__container"></div>
                 <div class="boss__fight--blaster--1"></div>
                 <div class="boss__fight--blaster--2"></div>
@@ -1089,7 +1146,7 @@ function goToLevelOne(){
 
     let LevelOneTl = gsap.timeline();
     LevelOneTl
-    .set(".enemy__container", {"padding": "5vh 20vw 0 20vw"})
+    .set(".enemy__container", {"padding": "50px 150px 0 150px"})
     .bringThePage(GameLevel1, {onComplete: function(){
         enemyContainer.removeClass("enemy__container--lower");
     }})
