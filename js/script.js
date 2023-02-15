@@ -118,7 +118,8 @@ var isGamePlaying = false,
     fighter2Interval,
     fighter3Interval,
     bossFightInterval,
-    fightersGroup;
+    fightersGroup,
+    EnemiesShootInterval;
 
 $('#go__tutorial, #tutorial__button').click(goToTutorial)
 
@@ -662,49 +663,72 @@ function shipMovement() {
                         // putting element in the page with an animation
                         // and 75 is the size of element
                         if(CurrentEnemiesData[i].isEnemyAlive === true){
-                            // console.log("you crashed")
-                            if(isShipInImmortalMode === false){
-                                let currentHealth = $(`.heart__num__${currentHeartNumber}`);
-                                currentHeartNumber--;
-
-                                if(currentHeartNumber >= 0){
-                                    gsap.to(currentHealth, {
-                                        opacity: 0,
-                                        duration: .3,
-                                        ease: "power4.out",
-                                        repeat: 1,
-                                        yoyo: true,
-                                    });
-                                    currentHealth.html("<i class='far fa-heart'></i>");
-                                    isShipInImmortalMode = true;
-                                    gsap.to(mainShip, {
-                                        opacity: 0,
-                                        duration: .2,
-                                        ease: "linear",
-                                        repeat: 5,
-                                        onComplete: function(){
-                                            gsap.set(mainShip, {opacity: 1});
-                                        }
-                                    })
-                                    setTimeout(() => {
-                                        isShipInImmortalMode = false;
-                                    }, 2000);
-                                }
-                                else{
-                                    currentHeartNumber = 0;
-                                    // looseMessage()
-                                }
-                            }
+                            calcTheDamage();
                         }
                     }
                 }
             }
+
+            EnemiesShootInterval = setInterval(() => {
+                if($(`.enemies__shoot`).length){
+                    let currentAvailableShoot = $(`.enemies__shoot`);
+
+                    $.each(currentAvailableShoot, function(idx, element){
+                        let target = $(element);
+                        let currentElementPosition = target.position();
+                        if(mainShip.position().left <= currentElementPosition.left + 50 &&
+                        mainShip.position().left >= currentElementPosition.left - 50){
+                            if(mainShip.position().top <= currentElementPosition.top &&
+                            mainShip.position().top >= currentElementPosition.top - 90){
+                                target.remove();
+                                calcTheDamage();
+                            }   
+                        }
+                    })
+                }
+            }, 1000);
+        
         }
     })
 
     gameContainer.one("mousemove", function() {
         resumeAnime(TutorialAnime)
     })
+}
+
+function calcTheDamage() {
+    if(isShipInImmortalMode === false){
+        let currentHealth = $(`.heart__num__${currentHeartNumber}`);
+        currentHeartNumber--;
+
+        if(currentHeartNumber >= 0){
+            gsap.to(currentHealth, {
+                opacity: 0,
+                duration: .3,
+                ease: "power4.out",
+                repeat: 1,
+                yoyo: true,
+            });
+            currentHealth.html("<i class='far fa-heart'></i>");
+            isShipInImmortalMode = true;
+            gsap.to(mainShip, {
+                opacity: 0,
+                duration: .2,
+                ease: "linear",
+                repeat: 5,
+                onComplete: function(){
+                    gsap.set(mainShip, {opacity: 1});
+                }
+            })
+            setTimeout(() => {
+                isShipInImmortalMode = false;
+            }, 2000);
+        }
+        else{
+            currentHeartNumber = 0;
+            // looseMessage();
+        }
+    }
 }
 
 function blasterCounterIsReady() {
@@ -865,6 +889,7 @@ class enemyGun {
         let targetBulletContainer = targetElement.children(".bullet__container");
         let targetBulletContainerClone = targetBulletContainer.clone();
         
+        targetBulletContainerClone.addClass("enemies__shoot");
         targetBulletContainerClone.appendTo(gameContainer);
 
         gsap.set(targetBulletContainerClone, {
@@ -874,8 +899,6 @@ class enemyGun {
             zIndex: 1,
             rotate: -90
         })
-
-        // console.log(targetElement.position().top)        
         
         gsap.to(targetBulletContainerClone, {
             top: "+=1000",
@@ -892,6 +915,7 @@ class enemyGun {
         let targetBlasterContainer = targetElement.children(".blaster__container");
         let targetBlasterContainerClone = targetBlasterContainer.clone();
 
+        targetBlasterContainerClone.addClass("enemies__shoot");
         targetBlasterContainerClone.appendTo(gameContainer);
 
         gsap.set(targetBlasterContainerClone, {
@@ -901,17 +925,24 @@ class enemyGun {
             zIndex: 1,
             rotate: 90
         })
-
-        // console.log(targetElement.position().top)        
+        
+        gsap.fromTo(targetBlasterContainer, {
+            opacity: 0,
+        },{
+            opacity: 1,
+            delay: 2,
+            duration: 1,
+            ease: "steps(6)"
+        })
         
         gsap.to(targetBlasterContainerClone, {
             top: "+=1000",
             duration: 3,
         })
 
-        // setTimeout(() => {
-        //     targetBlasterContainerClone.remove();
-        // }, 3000);
+        setTimeout(() => {
+            targetBlasterContainerClone.remove();
+        }, 3000);
     }
 }
 
