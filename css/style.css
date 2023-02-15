@@ -357,6 +357,19 @@ div[class*=main__ship--motor] .main__ship--guns {
 .fighter__1 > * {
   position: absolute;
 }
+.fighter__1--bullet__container {
+  width: 100%;
+  height: 100%;
+}
+.fighter__1--bullet__container .fighter__1--bullet {
+  width: 80%;
+  height: 10%;
+  background: linear-gradient(to right, #FF1F08, #5D0900);
+  position: absolute;
+  left: 20%;
+  top: 45%;
+  border-radius: 25%;
+}
 
 .health__container {
   width: 10%;
@@ -374,6 +387,7 @@ div[class*=main__ship--motor] .main__ship--guns {
   height: 100%;
   width: 100%;
   background: red;
+  transition: 0.2s;
 }
 
 div[class*=fighter__1--motor--] {

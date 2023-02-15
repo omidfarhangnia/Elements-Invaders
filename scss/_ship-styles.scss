@@ -332,6 +332,19 @@ div[class *= "main__ship--motor"]{
     > *{
         position: absolute;
     }
+    &--bullet__container{
+        width: 100%;
+        height: 100%;
+        .fighter__1--bullet{
+            width: 80%;
+            height: 10%;
+            background: linear-gradient(to right, #FF1F08, #5D0900);
+            position: absolute;
+            left: 20%;
+            top: 45%;
+            border-radius: 25%;
+        }
+    }
 }
 
 .health__container{
@@ -349,6 +362,7 @@ div[class *= "main__ship--motor"]{
         height: 100%;
         width: 100%;
         background: red;
+        transition: .2s;
     }
 }
 
