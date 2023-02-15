@@ -274,6 +274,7 @@ class mainShipRifle {
                         if(CurrentEnemiesData[i].isEnemyAlive === true){
                             let newHealth = CurrentEnemiesData[i].enemyHealth.current - this.level;
                             let mainFirstHealth = CurrentEnemiesData[i].enemyHealth.first;
+                            let enemyClass = `.enemy__num__${CurrentEnemiesData[i].enemyNum}`;
 
                             $(`.enemy__num__${CurrentEnemiesData[i].enemyNum} .current__health`).css(
                                 "height", `${(newHealth * 100 / mainFirstHealth)}%`)
@@ -282,12 +283,23 @@ class mainShipRifle {
                             rifleBulletContainer.remove();
 
                             if(CurrentEnemiesData[i].enemyHealth.current <= 0){
-                                $(`.enemy__num__${CurrentEnemiesData[i].enemyNum}`).addClass("destroyed__ship");
+                                gsap.to(enemyClass, {
+                                    scale: 0,
+                                    opacity: 0,
+                                    duration: .4,
+                                    rotate: -600,
+                                    ease: "expo.in",
+                                    onStart: function() {
+                                        $(`${enemyClass} .health__container`).css("display", "none");
+                                    },
+                                    onComplete: function() {
+                                        $(enemyClass).addClass("destroyed__ship");
+                                    }
+                                })
                                 CurrentEnemiesData[i].isEnemyAlive = false;
+                                checkEnemiesChange();
                             }
 
-
-                            checkEnemiesChange();
                             isGameEnded(this.endFunction);
                             clearInterval(checkRiflePosStepByStep);
                         }
@@ -390,13 +402,14 @@ class mainShipBlaster {
                                     "left": CurrentEnemiesData[i].enemyPos.left - 10
                                 });
 
+                                checkEnemiesChange();
+
                                 setTimeout(() => {
                                     blasterExplosion.remove();
                                 }, 2000);
                             }
 
 
-                            checkEnemiesChange();
                             clearInterval(checkBlasterPosStepByStep);
                         }
                     }
@@ -774,7 +787,6 @@ function makeRandomShoot(fightersGroup){
             let randomFighters = giveRandomNumbers(0, (fightersOneLength - 1), 6);
             let randomFightersToArr = Array.from(randomFighters);
             shootWithFighter1(randomFightersToArr);
-            console.log(fightersGroup.fighters1)
         }, 3000);
     }
     if(fightersGroup.fighters2.length){
@@ -832,11 +844,9 @@ function giveRandomNumbers(min, max, count) {
 }
 
 function shootWithFighter1(randomListOfEnemies){
-    console.log(randomListOfEnemies)
 }
 
 function shootWithFighter2(randomListOfEnemies){
-    // console.log(randomListOfEnemies)
 }
 
 function shootWithFighter3(randomListOfEnemies){
