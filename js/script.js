@@ -100,6 +100,7 @@ const blasterNum = $("#blaster__num .num");
 const playBtn = $("#play__button");
 
 var isGamePlaying = false,
+    canEnemyShoot = false,
     blaster__num = 0,
     rifle__num = 0,  
     RightClickTimeOut = 0,
@@ -119,7 +120,9 @@ var isGamePlaying = false,
     fighter3Interval,
     bossFightInterval,
     fightersGroup,
-    EnemiesShootInterval;
+    EnemiesShootInterval,
+    errorValue = 0,
+    rifleShootingSituation, blasterShootingSituation;
 
 $('#go__tutorial, #tutorial__button').click(goToTutorial)
 
@@ -193,13 +196,14 @@ class mainShipRifle {
     fireRifle() {
         let fuelContainerHeight = 262.5;
         let currentBulletsId = idMaker(rifle__num);
+        rifleShootingSituation = "active";
 
         if(this.isFuelEndless === false){
             let currentFuelLevel = fuelContainer.height();
             let newFuelLevel = currentFuelLevel + (fuelContainerHeight / 100 * 4);
             let newPercent = currentFuelLevel / fuelContainerHeight * 100;
+            clearInterval(reloading)
             clearTimeout(recoverFuelContainer)
-            clearTimeout(reloading)
             recoverFuelContainer = setTimeout(() => {
                 reloading = setInterval(() => {
                     if(newFuelLevel <= 0) {
@@ -217,6 +221,7 @@ class mainShipRifle {
                         fuelContainer.css("background", `#ff4c12`);
                         if(newPercent >= 100){
                             fuelContainer.css({"background": `#FF0000`});
+                            rifleShootingSituation = "inactive";
                             return;
                         }
                     }
@@ -265,6 +270,8 @@ class mainShipRifle {
         let currentBulletsId = idMaker(rifle__num);
         let rifleBulletContainer = $(`#${currentBulletsId}-rifleBullet`);
 
+        if(rifleShootingSituation === "inactive") return;
+
         checkRiflePosStepByStep = setInterval(() => {
             for(var i = 0; i < CurrentEnemiesData.length; i++){
                 if(rifleBulletContainer.position().left <= CurrentEnemiesData[i].enemyPos.left + 60 &&
@@ -308,7 +315,7 @@ class mainShipRifle {
                     }
                 }
             }
-        }, 10);
+        }, 30);
         
         setTimeout(() => {
             rifleBulletContainer.remove();
@@ -328,12 +335,14 @@ class mainShipBlaster {
         this.endFunction = endFunction;
     }
     fireBlaster() {
+        blasterShootingSituation = "active";
         if(this.isBlasterReady !== true) return;
 
         if(this.isCountingActive === true){
             blaster__num++;
             if(this.allowableBlasterNumber <= this.blastersId){
-                $("#main__ship__blasterData").addClass("blasterAlarm")
+                $("#main__ship__blasterData").addClass("blasterAlarm");
+                blasterShootingSituation = "inactive";
                 return;
             }else{
                 blasterNum.text(`${this.allowableBlasterNumber - 1 - this.blastersId}`);
@@ -374,6 +383,8 @@ class mainShipBlaster {
         let blasterDamage = 10;
         let blasterBulletContainer = $(`#${currentBlastersId}-blasterBullet`);
 
+        if(blasterShootingSituation === "inactive") return;
+
         checkBlasterPosStepByStep = setInterval(() => {
             for(var i = 0; i < CurrentEnemiesData.length; i++){
                 if(blasterBulletContainer.position().left <= CurrentEnemiesData[i].enemyPos.left + 60 &&
@@ -399,8 +410,9 @@ class mainShipBlaster {
                                 
                                 blasterExplosion.css({
                                     "animation": "explosionAnimation 2s ease-in-out both",
-                                    "top": (CurrentEnemiesData[i].enemyPos.top) - 90,
-                                    // the top value that i give is negative and i should make in positive
+                                    "top": (CurrentEnemiesData[i].enemyPos.top) - errorValue,
+                                    // when i have explosion in levels and in tutorial i have a little errorValue
+                                    // i used this value for put effect in the right place
                                     "left": CurrentEnemiesData[i].enemyPos.left - 10
                                 });
 
@@ -461,6 +473,7 @@ function goToTutorial() {
 
 function resetBasicData() {
     blasterNum.text("20");
+    canEnemyShoot = false;
     blasterCountingSituation = false;
     isFuelEndless = true;
     isCountingActive = false;
@@ -545,7 +558,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
     }, {
         scale: 1,
         opacity: 1,
-        stagger: .3,
+        duration: 1,
         ease: "expo.in",
         onComplete: function(){
             pauseAnime(TutorialAnime);
@@ -553,6 +566,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         onStart: function(){
             let enemyArr = fillListOfEnemies({name: "fighter__1", num: 2}, {name: "fighter__2", num: 2}, {name: "fighter__1", num: 2});
             makeEnemyReady(enemyArr);
+            enemyCanShoot();
         }
     }, "+=1.5")  
     .showText(".tutorial__over__message", {duration: .75, onComplete: clearEnemyContainer})
@@ -577,7 +591,7 @@ function createAnimation(groupOneTexts, groupTwoTexts) {
         playBtn.removeAttr("data-bs-target");
     }})
 
-    TutorialAnime.timeScale(10)
+    TutorialAnime.progress(1)
 }
 
 playBtn.removeClass("locked__button");
@@ -807,8 +821,6 @@ function makeEnemiesGunReady() {
 }
 
 function makeRandomShoot(){
-    if(isGamePlaying === false) return;
-
     if(fightersGroup.fighters1.length){
         let fightersOneLength = fightersGroup.fighters1.length;
         orderForShooting(0, fightersOneLength, (3 <= fightersOneLength ? 3 : fightersOneLength), shootWithFighter1);
@@ -845,6 +857,14 @@ function makeRandomShoot(){
     }
 }
 
+// i need a function for have a delay between coming enemy and
+// shooting this function with its timeout give me 2 second time
+function enemyCanShoot(){
+    setTimeout(() => {
+        canEnemyShoot = true;
+    }, 2000);
+}
+
 function refreshEnemiesData(){
     clearInterval(fighter1Interval);
     clearInterval(fighter2Interval);
@@ -874,6 +894,8 @@ function giveRandomNumbers(min, max, count) {
 }
 
 function orderForShooting(min, max, count, callback){
+    if(canEnemyShoot === false) return;
+
     let randomFighters = giveRandomNumbers(min, (max - 1), count);
     let randomFightersToArr = Array.from(randomFighters);
     callback(randomFightersToArr);
@@ -888,7 +910,9 @@ class enemyGun {
         let enemyId = targetElement.attr("enemyId");
         let targetBulletContainer = targetElement.children(".bullet__container");
         let targetBulletContainerClone = targetBulletContainer.clone();
-        
+        // i need a clone of my rifle container for shooting the bullet is not main bullet
+        // this is a clone of my main bullet
+
         targetBulletContainerClone.addClass("enemies__shoot");
         targetBulletContainerClone.appendTo(gameContainer);
 
@@ -914,6 +938,8 @@ class enemyGun {
         let enemyId = targetElement.attr("enemyId");
         let targetBlasterContainer = targetElement.children(".blaster__container");
         let targetBlasterContainerClone = targetBlasterContainer.clone();
+        // i need a clone of my blaster container for shooting the bullet is not main bullet
+        // this is a clone of my main bullet
 
         targetBlasterContainerClone.addClass("enemies__shoot");
         targetBlasterContainerClone.appendTo(gameContainer);
@@ -948,7 +974,6 @@ class enemyGun {
 
 function shootWithFighter1(randomListOfEnemies){
     $.each(randomListOfEnemies, function(idx, element){
-        if(isGamePlaying === false) return;
         let currentFighterNumb = fightersGroup.fighters1[element].enemyNum;
         // i need to translate my random number of element from array to real element
         let currentFighter = $(`.enemy__num__${currentFighterNumb}`);
@@ -961,7 +986,6 @@ function shootWithFighter1(randomListOfEnemies){
 
 function shootWithFighter2(randomListOfEnemies){
     $.each(randomListOfEnemies, function(idx, element){
-        if(isGamePlaying === false) return;
         let currentFighterNumb = fightersGroup.fighters2[element].enemyNum;
         // i need to translate my random number of element from array to real element
         let currentFighter = $(`.enemy__num__${currentFighterNumb}`);
@@ -973,9 +997,11 @@ function shootWithFighter2(randomListOfEnemies){
 }
 
 // function shootWithFighter3(randomListOfEnemies){
+//        if(canEnemyShoot === false) return;
 // }
 
 // function shootWithBossFight(randomListOfEnemies){
+//        if(canEnemyShoot === false) return;
 // }
 
 function giveFightersCode(listOfEnemies) {
@@ -1094,18 +1120,19 @@ function fillListOfEnemies(...Objects) {
 }
 
 function isGameEnded(callback) {
-    let isAnyAlive;
+    let isAnyOneAlive;
 
     $.each(CurrentEnemiesData, function(index, value){
         if(value.isEnemyAlive === false){
-            isAnyAlive = false;
+            isAnyOneAlive = false;
         }else{
-            isAnyAlive = true;
+            isAnyOneAlive = true;
             return false;  
         }
     })
 
-    if(isAnyAlive === false){
+    if(isAnyOneAlive === false){
+        canEnemyShoot = false;
         resumeAnime(callback);
     }
 }
@@ -1164,7 +1191,7 @@ function goToLevelList() {
     }})
     goToLevelTl.progress(1);
 }
-goToLevelList();
+// goToLevelList();
 
 function goToLevelOne(){
     let listOfEnemies = fillListOfEnemies(
@@ -1172,14 +1199,14 @@ function goToLevelOne(){
         {name: "fighter__1", num: 18},
         {name: "fighter__2", num: 6});
     
-    isGamePlaying = true;
+    errorValue = 90;
     makeEnemyReady(listOfEnemies);
 
     let LevelOneTl = gsap.timeline();
     LevelOneTl
     .set(".enemy__container", {"padding": "50px 150px 0 150px"})
     .bringThePage(GameLevel1, {onComplete: function(){
-        enemyContainer.removeClass("enemy__container--lower");
+        enemyContainer.toggleClass("enemy__container--lower");
     }})
     .fromTo(mainShip, {
         y: window.innerHeight,
@@ -1208,17 +1235,19 @@ function goToLevelOne(){
             isFuelEndless = false;
             isCountingActive = true;
             isShipDamageActive = true;
+            isGamePlaying = true;
             playSituation("play");
             shipMovement();
             makeRifleReady();
             makeBlasterReady();
             pauseAnime(LevelOneTl);
+            enemyCanShoot();
         }
     }, "+=1.5")    
 
-    LevelOneTl.progress(1);
+    // LevelOneTl.progress(1);
 }
-goToLevelOne();
+// goToLevelOne();
 
 function goToLevelTwo(){
     let LevelTwoTl = gsap.timeline();
@@ -1231,3 +1260,7 @@ function goToLevelThree(){
     LevelThreeTl
     .bringThePage(GameLevel3)
 }
+
+
+
+// i should have a condition for starting fighting
