@@ -210,8 +210,10 @@ class mainShipRifle {
                         clearInterval(reloading)
                     }
                     newFuelLevel = newFuelLevel - (fuelContainerHeight / 100 * 1);
-                    fuelContainer.css("height", `${newFuelLevel}px`);
-                }, 50);
+                    gsap.set(fuelContainer, {
+                        "height": `${newFuelLevel}px`
+                    });
+                }, 10);
             }, 1000);
             if(newPercent >= 25){
                 fuelContainer.css("background", `#ffe436`);
@@ -229,7 +231,9 @@ class mainShipRifle {
             }else{
                 fuelContainer.css("background", `#23FF00`);
             }
-            fuelContainer.css("height", `${newFuelLevel}px`);
+            gsap.set(fuelContainer, {
+                "height": `${newFuelLevel}px`
+            });
         }
 
         if(this.level >= 1){
@@ -263,7 +267,8 @@ class mainShipRifle {
 
         gsap.to(mainShipBulletContainerClone, {
             top: "-=1000",
-            duration: .75,
+            duration: 1.5,
+            rotate: "+=0.01",
         })
     }
     calcDamage() {
@@ -274,8 +279,8 @@ class mainShipRifle {
 
         checkRiflePosStepByStep = setInterval(() => {
             for(var i = 0; i < CurrentEnemiesData.length; i++){
-                if(rifleBulletContainer.position().left <= CurrentEnemiesData[i].enemyPos.left + 60 &&
-                   rifleBulletContainer.position().left >= CurrentEnemiesData[i].enemyPos.left - 60){
+                if(rifleBulletContainer.position().left <= CurrentEnemiesData[i].enemyPos.left + 80 &&
+                   rifleBulletContainer.position().left >= CurrentEnemiesData[i].enemyPos.left - 80){
                     if(rifleBulletContainer.position().top <= CurrentEnemiesData[i].enemyPos.top - 50 &&
                        rifleBulletContainer.position().top >= CurrentEnemiesData[i].enemyPos.top - 90){   
                         // -50 and -90 : I am using this two number for having an animation that the bullet
@@ -375,7 +380,8 @@ class mainShipBlaster {
         gsap.to(mainShipBlasterContainerClone, {
             top: "-=1000",
             duration: 1.2 ,
-            scale: .7
+            scale: .7,
+            rotate: "+=0.01",
         }) 
     }
     calcDamage() {
@@ -684,10 +690,13 @@ function shipMovement() {
             }
 
             EnemiesShootInterval = setInterval(() => {
-                if($(`.enemies__shoot`).length){
-                    let currentAvailableShoot = $(`.enemies__shoot`);
-
-                    $.each(currentAvailableShoot, function(idx, element){
+                //  i tried to fix the lagging problem and i change enemies__shoot class to id
+                // now i cant selecting anything fuuuuuuuuuuuuuuuuuuu.......
+                // omid waram ke farda betoni dorstesh koni
+                // yadet bashe shekast khordan mohem nist toye meydon bodan moheme
+                console.log(enemiesShoot);
+                if(enemiesShoot.length){
+                    $.each(enemiesShoot, function(idx, element){
                         let target = $(element);
                         let currentElementPosition = target.position();
                         if(mainShip.position().left <= currentElementPosition.left + 50 &&
@@ -823,38 +832,40 @@ function makeEnemiesGunReady() {
 function makeRandomShoot(){
     if(fightersGroup.fighters1.length){
         let fightersOneLength = fightersGroup.fighters1.length;
-        orderForShooting(0, fightersOneLength, (3 <= fightersOneLength ? 3 : fightersOneLength), shootWithFighter1);
+        let randomEnemies = orderForShooting(0, fightersOneLength, (2 <= fightersOneLength ? 2 : fightersOneLength));
+        shootWithFighter1(randomEnemies)
         // i should have a condition for the time witch play killed most of the enemies
         // and i need to have a condition for this situation i should send the current number of
         // enemies for this situation
 
         // i want to have a shoot for the second that i called this function
         fighter1Interval = setInterval(() => {
-            orderForShooting(0, fightersOneLength, (3 <= fightersOneLength ? 3 : fightersOneLength), shootWithFighter1);
+            let randomEnemies = orderForShooting(0, fightersOneLength, (2 <= fightersOneLength ? 2 : fightersOneLength));
+            shootWithFighter1(randomEnemies)
             // and i need to have repeated orders for calling this function
         }, 3000);
     }
     if(fightersGroup.fighters2.length){
         let fightersTwoLength = fightersGroup.fighters2.length;
-        orderForShooting(0, fightersTwoLength, (2 <= fightersTwoLength ? 2 : fightersTwoLength), shootWithFighter2);
+        orderForShooting(0, fightersTwoLength, (1 <= fightersTwoLength ? 1 : fightersTwoLength), shootWithFighter2);
         fighter2Interval = setInterval(() => {
-            orderForShooting(0, fightersTwoLength, (2 <= fightersTwoLength ? 2 : fightersTwoLength), shootWithFighter2);
+            orderForShooting(0, fightersTwoLength, (1 <= fightersTwoLength ? 1 : fightersTwoLength), shootWithFighter2);
         }, 4000);
     }
-    if(fightersGroup.fighters3.length){
-        let fightersThreeLength = fightersGroup.fighters3.length;
-        orderForShooting(0, fightersThreeLength, (2 <= fightersThreeLength ? 2 : fightersThreeLength), shootWithFighter3);
-        fighter3Interval = setInterval(() => {
-            orderForShooting(0, fightersThreeLength, (2 <= fightersThreeLength ? 2 : fightersThreeLength), shootWithFighter3);
-        }, 10000);
-    }
-    if(fightersGroup.fighters4.length){
-        let fightersFourLength = fightersGroup.fighters4.length;
-        bossFightInterval = setInterval(() => {
-            shootWithBossFight();
-            // i have only one boss fight and i don't need to choose random
-        }, 10000);
-    }
+    // if(fightersGroup.fighters3.length){
+    //     let fightersThreeLength = fightersGroup.fighters3.length;
+    //     orderForShooting(0, fightersThreeLength, (2 <= fightersThreeLength ? 2 : fightersThreeLength), shootWithFighter3);
+    //     fighter3Interval = setInterval(() => {
+    //         orderForShooting(0, fightersThreeLength, (2 <= fightersThreeLength ? 2 : fightersThreeLength), shootWithFighter3);
+    //     }, 10000);
+    // }
+    // if(fightersGroup.fighters4.length){
+    //     let fightersFourLength = fightersGroup.fighters4.length;
+    //     bossFightInterval = setInterval(() => {
+    //         shootWithBossFight();
+    //         // i have only one boss fight and i don't need to choose random
+    //     }, 10000);
+    // }
 }
 
 // i need a function for have a delay between coming enemy and
@@ -893,12 +904,12 @@ function giveRandomNumbers(min, max, count) {
     return numberContainer;
 }
 
-function orderForShooting(min, max, count, callback){
+function orderForShooting(min, max, count){
     if(canEnemyShoot === false) return;
 
     let randomFighters = giveRandomNumbers(min, (max - 1), count);
     let randomFightersToArr = Array.from(randomFighters);
-    callback(randomFightersToArr);
+    return randomFightersToArr
 }
 
 class enemyGun {
@@ -913,7 +924,7 @@ class enemyGun {
         // i need a clone of my rifle container for shooting the bullet is not main bullet
         // this is a clone of my main bullet
 
-        targetBulletContainerClone.addClass("enemies__shoot");
+        targetBulletContainerClone.attr("id", "enemy__shoot");
         targetBulletContainerClone.appendTo(gameContainer);
 
         gsap.set(targetBulletContainerClone, {
@@ -927,12 +938,13 @@ class enemyGun {
         gsap.to(targetBulletContainerClone, {
             top: "+=1000",
             duration: 3,
+            rotate: "+=0.01",
         })
 
         setTimeout(() => {
             targetBulletContainerClone.remove();
         }, 3000);
-    }
+        }
     blastWithBlaster(){
         let targetElement = this.target;
         let enemyId = targetElement.attr("enemyId");
@@ -941,7 +953,7 @@ class enemyGun {
         // i need a clone of my blaster container for shooting the bullet is not main bullet
         // this is a clone of my main bullet
 
-        targetBlasterContainerClone.addClass("enemies__shoot");
+        targetBulletContainerClone.attr("id", "enemy__shoot");
         targetBlasterContainerClone.appendTo(gameContainer);
 
         gsap.set(targetBlasterContainerClone, {
@@ -958,7 +970,8 @@ class enemyGun {
             opacity: 1,
             delay: 2,
             duration: 1,
-            ease: "steps(6)"
+            rotate: "+=0.01",
+            ease: "steps(6)",
         })
         
         gsap.to(targetBlasterContainerClone, {

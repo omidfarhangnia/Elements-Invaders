@@ -181,7 +181,7 @@ div[class*=fighter__] {
 #main__ship__fuelData .fuel__level .current__fuel__level {
   width: 100%;
   height: 0%;
-  transition: height 0.2s, background-color 0.3s;
+  transition: background-color 0.3s;
   background: #ffe436;
 }
 
