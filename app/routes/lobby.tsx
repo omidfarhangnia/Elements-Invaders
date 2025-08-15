@@ -1,27 +1,38 @@
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useRef, useState } from "react";
+import {
+  Canvas,
+  useFrame,
+  useThree,
+  type ThreeEvent,
+} from "@react-three/fiber";
+import { forwardRef, useRef } from "react";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import { type Ref } from "react";
 
-function Box({ shipPosition }) {
+type BoxProps = {
+  ref: Ref<THREE.Mesh>;
+  handleClickBox: (event: ThreeEvent<MouseEvent>) => void;
+};
+
+function Box({ handleClickBox, ref }: BoxProps) {
   return (
-    <mesh
-      onClick={() => console.log("you clicked")}
-      scale={1}
-      position={shipPosition}
-    >
-      <boxGeometry args={[1, 1, 1]} />
+    <mesh ref={ref} onClick={handleClickBox} position={[0, 0, 1]} scale={1}>
+      <boxGeometry args={[5, 5, 1]} />
       <meshStandardMaterial color={"blue"} />
     </mesh>
   );
 }
 
-export function Surface({ handleMouseMove }) {
+type SurfaceProps = {
+  handlePointerMove: (event: ThreeEvent<PointerEvent>) => void;
+};
+
+export function Surface({ handlePointerMove }: SurfaceProps) {
   const { viewport } = useThree();
 
   return (
     <mesh
-      onPointerMove={handleMouseMove}
+      onPointerMove={handlePointerMove}
       position={[0, 0, 0]}
       scale={[viewport.width, viewport.height, 1]}
     >
@@ -32,18 +43,31 @@ export function Surface({ handleMouseMove }) {
 }
 
 function Scene() {
-  const [shipPosition, setShipPosition] = useState([0, 0, 1]);
+  const boxRef = useRef<THREE.Mesh>(null!);
+  const mousePos = useRef({ x: 0, y: 0 });
 
-  function handleMouseMove(event) {
+  function handlePointerMove(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
-    setShipPosition([event.point.x, event.point.y, 1]);
+    mousePos.current = { x: event.point.x, y: event.point.y };
   }
+
+  function handleClickBox(event: ThreeEvent<MouseEvent>) {
+    console.log("hello there");
+  }
+
+  useFrame(() => {
+    if (boxRef.current) {
+      boxRef.current.position.x = mousePos.current.x;
+      boxRef.current.position.y = mousePos.current.y;
+    }
+  });
+
   return (
     <>
       <OrbitControls />
       <ambientLight intensity={Math.PI / 2} />
-      <Box shipPosition={shipPosition} />
-      <Surface handleMouseMove={handleMouseMove} />
+      <Box ref={boxRef} handleClickBox={handleClickBox} />
+      <Surface handlePointerMove={handlePointerMove} />
     </>
   );
 }
