@@ -47,6 +47,7 @@ export default function Bullet({
   return (
     <RigidBody
       ref={rigidBodyRef}
+      name="bullet"
       type="dynamic"
       gravityScale={0}
       position={bullet.position}

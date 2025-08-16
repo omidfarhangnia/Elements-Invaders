@@ -20,9 +20,14 @@ export default function Enemy({ enemy }: EnemyProps) {
   const enemyHeight = enemy.args[1];
   const enemyWidth = enemy.args[0];
 
+  const healthFraction = enemy.health / 100;
+  const healthPositionX = -(enemyWidth * (1 - healthFraction)) / 2;
+
   return (
     <RigidBody
-      type="fixed"
+      type="dynamic"
+      lockTranslations
+      lockRotations
       name="enemy"
       userData={{ id: enemy.id }}
       position={enemy.position}
@@ -40,9 +45,11 @@ export default function Enemy({ enemy }: EnemyProps) {
             <planeGeometry args={[enemyWidth + 1, 1]} />
             <meshStandardMaterial color="black" />
           </mesh>
-          <mesh position={[0, 0, 0.2]}>
+          <mesh scale-x={healthFraction} position={[healthPositionX, 0, 0.3]}>
             <planeGeometry args={[enemyWidth, 0.5]} />
-            <meshStandardMaterial color="green" />
+            <meshStandardMaterial
+              color={enemy.health > 50 ? "green" : "orange"}
+            />
           </mesh>
         </group>
       </group>
