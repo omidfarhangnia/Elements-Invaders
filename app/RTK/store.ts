@@ -1,7 +1,15 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, createSlice } from "@reduxjs/toolkit";
+
+const randomSlice = createSlice({
+  name: "random",
+  initialState: { value: "" },
+  reducers: {},
+});
 
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    randomReducer: randomSlice.reducer,
+  },
 });
 
 export type AppDispatch = typeof store.dispatch;

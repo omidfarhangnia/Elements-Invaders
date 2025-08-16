@@ -11,7 +11,6 @@ import { Surface } from "./surface";
 import Bullet from "../game/bullet";
 import Enemy from "../game/enemy";
 import type { EnemyArrangements } from "~/routes/lobby";
-import { build } from "vite";
 
 export default function Scene({
   enemyArrangements,
@@ -61,7 +60,7 @@ export default function Scene({
   });
 
   function handleCollision(bulletId: string, enemyId: string) {
-    // if (!bullets.find((member) => member.id === bulletId)) return;
+    if (!bullets.find((member) => member.id === bulletId)) return;
   }
 
   return (
