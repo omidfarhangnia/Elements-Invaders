@@ -4,13 +4,15 @@ import type { EnemyType } from "../game/enemy";
 import { v4 as uuidv4 } from "uuid";
 import * as THREE from "three";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { Physics } from "@react-three/rapier";
+import { Physics, RapierRigidBody } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
-import Ship from "../game/ship";
+import Ship, { ShipHealth } from "../game/ship";
 import { Surface } from "./surface";
 import Bullet from "../game/bullet";
 import Enemy from "../game/enemy";
 import type { EnemyArrangements } from "~/routes/lobby";
+
+type GameStatus = "playing" | "ended";
 
 export default function Scene({
   enemyArrangements,
@@ -21,9 +23,15 @@ export default function Scene({
   const [enemies, setEnemies] = useState<EnemyType[]>(
     enemyArrangements[0].enemyArrangments
   );
+  const [shipHealth, setShipHealth] = useState(100); // 0 < health < 100
+  const [isShipInvisible, setIsShipInvisible] = useState(false);
+  //
+  const [gameStatus, setGameStatus] = useState<GameStatus>("playing");
 
-  const boxRef = useRef<THREE.Mesh>(null!);
+  const shipRef = useRef<RapierRigidBody>(null!);
   const mousePos = useRef({ x: 0, y: 0 });
+  const processedBulletCollisionWithEnemyRef = useRef(new Set<string>());
+  const isShipCollisionWithEnemyRef = useRef(false);
 
   function handlePointerMove(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
@@ -53,21 +61,86 @@ export default function Scene({
   }
 
   useFrame(() => {
-    if (boxRef.current) {
-      boxRef.current.position.x = mousePos.current.x;
-      boxRef.current.position.y = mousePos.current.y;
+    if (shipRef.current) {
+      shipRef.current.setNextKinematicTranslation({
+        x: mousePos.current.x,
+        y: mousePos.current.y,
+        z: 1,
+      });
     }
   });
 
-  function handleCollision(bulletId: string, enemyId: string) {
-    if (!bullets.find((member) => member.id === bulletId)) return;
+  function handleCollisionBulletToEnemy(bulletId: string, enemyId: string) {
+    if (processedBulletCollisionWithEnemyRef.current.has(bulletId)) {
+      return;
+    }
+
+    processedBulletCollisionWithEnemyRef.current.add(bulletId);
+    handleDeleteBullet(bulletId);
+
+    const bulletDamage = 20;
+
+    setEnemies((currentEnemies) => {
+      const enemyToUpdate = currentEnemies.find(
+        (enemy) => enemy.id === enemyId
+      );
+
+      if (!enemyToUpdate) {
+        return currentEnemies;
+      }
+
+      if (enemyToUpdate.health > bulletDamage) {
+        return currentEnemies.map((enemy) =>
+          enemy.id === enemyId
+            ? { ...enemy, health: enemy.health - bulletDamage }
+            : enemy
+        );
+      } else {
+        return currentEnemies.filter((enemy) => enemy.id !== enemyId);
+      }
+    });
+  }
+
+  function handleMakeVisibleShip() {
+    setTimeout(() => {
+      setIsShipInvisible(false);
+      isShipCollisionWithEnemyRef.current = false;
+    }, 2000);
+  }
+
+  function handleCollisionShipToEnemy() {
+    if (isShipCollisionWithEnemyRef.current || isShipInvisible) return;
+
+    const damage = 20;
+
+    isShipCollisionWithEnemyRef.current = true;
+    setIsShipInvisible(true);
+
+    setShipHealth((currentHealth) => {
+      const newHealth = currentHealth - damage;
+      if (newHealth <= 0) {
+        console.log("game over");
+        setGameStatus("ended");
+        return 0;
+      }
+
+      return newHealth;
+    });
+
+    handleMakeVisibleShip();
   }
 
   return (
-    <Physics>
+    <Physics debug>
       <OrbitControls />
       <ambientLight intensity={Math.PI / 2} />
-      <Ship ref={boxRef} shootingTheBullet={handleClickBox} />
+      <ShipHealth shipHealth={shipHealth} />
+      <Ship
+        ref={shipRef}
+        shootingTheBullet={handleClickBox}
+        onCollision={handleCollisionShipToEnemy}
+        isShipInvisible={isShipInvisible}
+      />
       <Surface moveTheShip={handlePointerMove} />
       {bullets.map((bullet) => {
         return (
@@ -75,7 +148,7 @@ export default function Scene({
             key={bullet.id}
             bullet={bullet}
             removeOutOfRangeBullets={handleDeleteBullet}
-            onCollision={handleCollision}
+            onCollision={handleCollisionBulletToEnemy}
           />
         );
       })}
