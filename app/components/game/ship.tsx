@@ -1,52 +1,26 @@
-import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import {
   CuboidCollider,
   RapierRigidBody,
   RigidBody,
 } from "@react-three/rapier";
-import { useRef, type Ref } from "react";
-import * as THREE from "three";
+import { type Ref } from "react";
 
 type ShipProps = {
+  startTheGunfire: () => void;
+  stopTheGunefire: () => void;
   ref: Ref<RapierRigidBody>;
-  shootingTheBullet: (
-    event: ThreeEvent<MouseEvent>,
-    args: [number, number, number],
-    color: string
-  ) => void;
   onCollision: () => void;
   isShipInvisible: boolean;
 };
 
 export default function Ship({
-  shootingTheBullet,
+  startTheGunfire,
+  stopTheGunefire,
   ref,
   onCollision,
   isShipInvisible,
 }: ShipProps) {
-  const meshRef = useRef<THREE.Mesh>(null!);
-
-  // useFrame((state) => {
-  //   if (!meshRef.current) return;
-
-  //   const material = meshRef.current.material as THREE.MeshStandardMaterial;
-
-  //   if (isShipInvisible) {
-  //     material.transparent = true;
-  //     const time = state.clock.getElapsedTime();
-  //     const frequency = 10;
-  //     const minOpacity = 0.2;
-  //     const maxOpacity = 1;
-
-  //     material.opacity = (Math.sin(time * frequency) + 1) / 2 * (maxOpacity - minOpacity) + minOpacity;
-  //   } else {
-  //     if (material.transparent) {
-  //       material.transparent = false;
-  //       material.opacity = 1;
-  //     }
-  //   }
-  // });
-
   return (
     <RigidBody
       ref={ref}
@@ -60,13 +34,18 @@ export default function Ship({
       }}
     >
       <mesh
-        ref={meshRef}
-        onClick={(e) => shootingTheBullet(e, [1, 1, 1], "red")}
+        onPointerDown={startTheGunfire}
+        onPointerUp={stopTheGunefire}
+        onPointerLeave={stopTheGunefire}
         position={[0, 0, 1]}
         scale={1}
       >
         <boxGeometry args={[5, 5, 1]} />
-        <meshStandardMaterial color={"blue"} transparent />
+        <meshStandardMaterial
+          color="blue"
+          opacity={isShipInvisible ? 0.3 : 1.0}
+          transparent
+        />
       </mesh>
 
       <CuboidCollider args={[2.5, 2.5, 0.5]} sensor />
@@ -102,6 +81,44 @@ export function ShipHealth({ shipHealth }: ShipHealth) {
       <mesh scale-x={healthFraction} position={[healthPostionX, 0, 0.3]}>
         <planeGeometry args={[healthBarWidth - 5, healthBarHeight - 3]} />
         <meshBasicMaterial color="blue" />
+      </mesh>
+    </group>
+  );
+}
+
+interface ShipEngineProps {
+  shipEngine: number; // 0 < shipEngine < 100
+}
+
+export function ShipEngine({ shipEngine }: ShipEngineProps) {
+  const { viewport } = useThree();
+
+  const engineBarWidth = 10;
+  const engineBarHeight = 25;
+
+  const engineFraction = shipEngine / 100;
+  const enginePositionY = -(engineBarHeight * (1 - engineFraction)) / 2;
+
+  return (
+    <group
+      position={[
+        (viewport.width - engineBarWidth - 8) / 2,
+        (engineBarHeight - viewport.height + 12) / 2,
+        3,
+      ]}
+    >
+      <mesh>
+        <planeGeometry args={[engineBarWidth, engineBarHeight + 4]} />
+        <meshBasicMaterial color="hotpink" />
+      </mesh>
+      <mesh position={[0, enginePositionY, 0.2]} scale-y={engineFraction}>
+        <planeGeometry
+          scale={[0, 0]}
+          args={[engineBarWidth - 4, engineBarHeight]}
+        />
+        <meshBasicMaterial
+          color={shipEngine < 40 ? "lime" : shipEngine < 80 ? "orange" : "red"}
+        />
       </mesh>
     </group>
   );

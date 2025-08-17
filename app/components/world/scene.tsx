@@ -2,11 +2,10 @@ import { useRef, useState } from "react";
 import type { BulletType } from "../game/bullet";
 import type { EnemyType } from "../game/enemy";
 import { v4 as uuidv4 } from "uuid";
-import * as THREE from "three";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Physics, RapierRigidBody } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
-import Ship, { ShipHealth } from "../game/ship";
+import Ship, { ShipEngine, ShipHealth } from "../game/ship";
 import { Surface } from "./surface";
 import Bullet from "../game/bullet";
 import Enemy from "../game/enemy";
@@ -24,11 +23,14 @@ export default function Scene({
     enemyArrangements[0].enemyArrangments
   );
   const [shipHealth, setShipHealth] = useState(100); // 0 < health < 100
+  const [shipEngine, setShipEngine] = useState(0); // 0 < engine < 100
   const [isShipInvisible, setIsShipInvisible] = useState(false);
-  //
+
   const [gameStatus, setGameStatus] = useState<GameStatus>("playing");
 
   const shipRef = useRef<RapierRigidBody>(null!);
+  const gunfireInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const coolingInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const mousePos = useRef({ x: 0, y: 0 });
   const processedBulletCollisionWithEnemyRef = useRef(new Set<string>());
   const isShipCollisionWithEnemyRef = useRef(false);
@@ -38,20 +40,62 @@ export default function Scene({
     mousePos.current = { x: event.point.x, y: event.point.y };
   }
 
-  function handleClickBox(
-    event: ThreeEvent<MouseEvent>,
+  function handleCreateBullet(
+    position: { x: number; y: number },
     args: [number, number, number],
     color: string
   ) {
-    setBullets((bullets) => [
-      ...bullets,
-      {
-        position: [event.point.x, event.point.y, 1],
-        args,
-        color,
-        id: uuidv4(),
-      },
-    ]);
+    setShipEngine((currentEngine) => {
+      if (currentEngine >= 100) {
+        return currentEngine;
+      }
+
+      if (coolingInterval.current) clearInterval(coolingInterval.current);
+
+      setBullets((bullets) => [
+        ...bullets,
+        {
+          position: [position.x, position.y, 1],
+          args,
+          color,
+          id: uuidv4(),
+        },
+      ]);
+
+      coolingInterval.current = setInterval(() => {
+        setShipEngine((x) => {
+          if (x < 10) {
+            if (coolingInterval.current) {
+              clearInterval(coolingInterval.current);
+            }
+            return 0;
+          } else {
+            return x - 10;
+          }
+        });
+      }, 1000);
+
+      return currentEngine + 5;
+    });
+  }
+
+  function handlePointerDownInBox(
+    args: [number, number, number],
+    color: string
+  ) {
+    if (gunfireInterval.current) clearInterval(gunfireInterval.current);
+
+    handleCreateBullet(mousePos.current, args, color);
+
+    gunfireInterval.current = setInterval(() => {
+      handleCreateBullet(mousePos.current, args, color);
+    }, 200);
+  }
+
+  function handlePointerUpInBox() {
+    if (gunfireInterval.current) {
+      clearInterval(gunfireInterval.current);
+    }
   }
 
   function handleDeleteBullet(id: string) {
@@ -135,9 +179,11 @@ export default function Scene({
       <OrbitControls />
       <ambientLight intensity={Math.PI / 2} />
       <ShipHealth shipHealth={shipHealth} />
+      <ShipEngine shipEngine={shipEngine} />
       <Ship
+        startTheGunfire={() => handlePointerDownInBox([1, 1, 1], "red")}
+        stopTheGunefire={handlePointerUpInBox}
         ref={shipRef}
-        shootingTheBullet={handleClickBox}
         onCollision={handleCollisionShipToEnemy}
         isShipInvisible={isShipInvisible}
       />
