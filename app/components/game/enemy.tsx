@@ -33,7 +33,7 @@ export default function Enemy({ enemy }: EnemyProps) {
       position={enemy.position}
     >
       <group ref={enemyRef}>
-        {/* enemy ship */}
+        {/* enemy space ship */}
         <mesh>
           <boxGeometry args={enemy.args} />
           <meshStandardMaterial color={enemy.color} />

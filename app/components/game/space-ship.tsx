@@ -6,21 +6,21 @@ import {
 } from "@react-three/rapier";
 import { type Ref } from "react";
 
-type ShipProps = {
+type SpaceShipProps = {
   startTheGunfire: () => void;
-  stopTheGunefire: () => void;
+  stopTheGunfire: () => void;
   ref: Ref<RapierRigidBody>;
   onCollision: () => void;
-  isShipInvisible: boolean;
+  isSpaceShipInvisible: boolean;
 };
 
-export default function Ship({
+export default function SpaceShip({
   startTheGunfire,
-  stopTheGunefire,
+  stopTheGunfire,
   ref,
   onCollision,
-  isShipInvisible,
-}: ShipProps) {
+  isSpaceShipInvisible,
+}: SpaceShipProps) {
   return (
     <RigidBody
       ref={ref}
@@ -34,16 +34,27 @@ export default function Ship({
       }}
     >
       <mesh
-        onPointerDown={startTheGunfire}
-        onPointerUp={stopTheGunefire}
-        onPointerLeave={stopTheGunefire}
+        /* pointer event for firing */
+        onPointerDown={(e) => {
+          if (e.nativeEvent.button === 0) {
+            // left click
+            startTheGunfire();
+          }
+        }}
+        onPointerUp={(e) => {
+          if (e.nativeEvent.button === 0) {
+            // left click
+            stopTheGunfire();
+          }
+        }}
+        onPointerLeave={stopTheGunfire}
         position={[0, 0, 1]}
         scale={1}
       >
         <boxGeometry args={[5, 5, 1]} />
         <meshStandardMaterial
           color="blue"
-          opacity={isShipInvisible ? 0.3 : 1.0}
+          opacity={isSpaceShipInvisible ? 0.3 : 1.0}
           transparent
         />
       </mesh>
@@ -53,17 +64,17 @@ export default function Ship({
   );
 }
 
-interface ShipHealth {
-  shipHealth: number;
+interface SpaceShipHealthProps {
+  spaceShipHealth: number;
 }
 
-export function ShipHealth({ shipHealth }: ShipHealth) {
+export function SpaceShipHealth({ spaceShipHealth }: SpaceShipHealthProps) {
   const { viewport } = useThree();
 
   const healthBarWidth = 25;
   const healthBarHeight = 5;
 
-  const healthFraction = shipHealth / 100;
+  const healthFraction = spaceShipHealth / 100;
   const healthPostionX = -(healthBarWidth * (1 - healthFraction)) / 2;
 
   return (
@@ -86,17 +97,19 @@ export function ShipHealth({ shipHealth }: ShipHealth) {
   );
 }
 
-interface ShipEngineProps {
-  shipEngine: number; // 0 < shipEngine < 100
+interface SpaceShipOverheatProps {
+  spaceShipOverheat: number;
 }
 
-export function ShipEngine({ shipEngine }: ShipEngineProps) {
+export function SpaceShipOverheat({
+  spaceShipOverheat,
+}: SpaceShipOverheatProps) {
   const { viewport } = useThree();
 
   const engineBarWidth = 10;
   const engineBarHeight = 25;
 
-  const engineFraction = shipEngine / 100;
+  const engineFraction = spaceShipOverheat / 100;
   const enginePositionY = -(engineBarHeight * (1 - engineFraction)) / 2;
 
   return (
@@ -117,7 +130,13 @@ export function ShipEngine({ shipEngine }: ShipEngineProps) {
           args={[engineBarWidth - 4, engineBarHeight]}
         />
         <meshBasicMaterial
-          color={shipEngine < 40 ? "lime" : shipEngine < 80 ? "orange" : "red"}
+          color={
+            spaceShipOverheat < 40
+              ? "lime"
+              : spaceShipOverheat < 80
+                ? "orange"
+                : "red"
+          }
         />
       </mesh>
     </group>

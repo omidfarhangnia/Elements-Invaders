@@ -1,15 +1,15 @@
 import { useThree, type ThreeEvent } from "@react-three/fiber";
 
 type SurfaceProps = {
-  moveTheShip: (event: ThreeEvent<PointerEvent>) => void;
+  moveSpaceShip: (event: ThreeEvent<PointerEvent>) => void;
 };
 
-export function Surface({ moveTheShip }: SurfaceProps) {
+export function Surface({ moveSpaceShip }: SurfaceProps) {
   const { viewport } = useThree();
 
   return (
     <mesh
-      onPointerMove={moveTheShip}
+      onPointerMove={moveSpaceShip}
       position={[0, 0, 0]}
       scale={[viewport.width, viewport.height, 1]}
     >
