@@ -3,6 +3,7 @@ export const ENEMY_COLLISION_DAMAGE = 20;
 export const BULLET_DAMAGE_LEVEL_1 = 15;
 export const BULLET_DAMAGE_LEVEL_2 = 20;
 export const BULLET_DAMAGE_LEVEL_3 = 30;
+export const ENEMY_SHOOT_DURATION = 2000;
 
 // space ship constants
 export const COOLING_RATE = 10;

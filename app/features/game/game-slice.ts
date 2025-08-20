@@ -7,6 +7,7 @@ import { COOLING_RATE } from "~/constants";
 interface GameStatus {
   bullets: BulletType[];
   enemies: EnemyType[];
+  enemiesBullets: BulletType[];
   spaceShipHealth: number;
   spaceShipOverheat: number;
   isOverheated: boolean;
@@ -20,6 +21,8 @@ const initialState: GameStatus = {
   bullets: [],
   // all enemies are here (enemies will remove after death)
   enemies: [],
+  // all enemies bullets are here (bullets will remove after moving out of scene)
+  enemiesBullets: [],
   // space ship health is in percentage 0 <= health <= 100
   spaceShipHealth: 100,
   // space ship overheat is in percentage 0 <= overheat <= 100;
@@ -51,6 +54,12 @@ const gameSlice = createSlice({
         state.isOverheated = true;
       }
     },
+    addEnemiseBullet(state, action: PayloadAction<Omit<BulletType, "id">>) {
+      if (state.gameStatus !== "playing") return;
+
+      const newBullet = { ...action.payload, id: uuidv4() };
+      state.enemiesBullets.push(newBullet);
+    },
     coolingSystem(state) {
       if (state.spaceShipOverheat <= 50 && state.isOverheated) {
         state.isOverheated = false;
@@ -62,10 +71,22 @@ const gameSlice = createSlice({
         state.spaceShipOverheat -= COOLING_RATE;
       }
     },
-    removeBullet(state, action: PayloadAction<string>) {
-      state.bullets = state.bullets.filter(
-        (bullet) => bullet.id !== action.payload
-      );
+    removeBullet(
+      state,
+      action: PayloadAction<{
+        id: string;
+        bulletOwner: "spaceShip" | "enemy";
+      }>
+    ) {
+      if (action.payload.bulletOwner === "spaceShip") {
+        state.bullets = state.bullets.filter(
+          (bullet) => bullet.id !== action.payload.id
+        );
+      } else if (action.payload.bulletOwner === "enemy") {
+        state.enemiesBullets = state.enemiesBullets.filter(
+          (bullet) => bullet.id !== action.payload.id
+        );
+      }
     },
     damageSpaceShip(state, action: PayloadAction<number>) {
       const newHealth = state.spaceShipHealth - action.payload;
@@ -107,6 +128,7 @@ const gameSlice = createSlice({
 export const {
   initializeEnemies,
   addBullet,
+  addEnemiseBullet,
   coolingSystem,
   removeBullet,
   damageSpaceShip,

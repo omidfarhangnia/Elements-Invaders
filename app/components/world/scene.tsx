@@ -14,11 +14,13 @@ import {
   BULLET_DAMAGE_LEVEL_1,
   BULLET_DAMAGE_LEVEL_2,
   BULLET_DAMAGE_LEVEL_3,
+  ENEMY_SHOOT_DURATION,
   INVINCIBILITY_DURATION,
 } from "~/constants";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
 import {
   addBullet,
+  addEnemiseBullet,
   coolingSystem,
   damageEnemy,
   damageSpaceShip,
@@ -32,8 +34,15 @@ export default function Scene({
 }: {
   enemyArrangements: EnemyArrangements[];
 }) {
-  const { enemies, bullets, isOverheated, isSpaceShipInvisible, bulletLevel } =
-    useAppSelector((state) => state.game);
+  const {
+    enemies,
+    bullets,
+    enemiesBullets,
+    isOverheated,
+    isSpaceShipInvisible,
+    bulletLevel,
+    gameStatus,
+  } = useAppSelector((state) => state.game);
   const dispatch = useAppDispatch();
 
   /* useRef */
@@ -48,11 +57,16 @@ export default function Scene({
   const coolingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
     null
   );
+  const enemyBulletIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
   // prevent duplicate collisions from being recorded
   const collisionEventsRef = useRef({
-    bullets: new Set<string>(),
+    spaceShipBullet: new Set<string>(),
+    enemyBullet: new Set<string>(),
     spaceShip: false,
   });
+  const shotEnemiesRef = useRef(new Set<string>());
 
   // initial value for enemies
   useEffect(() => {
@@ -68,6 +82,9 @@ export default function Scene({
       if (gunfireIntervalRef.current) {
         clearInterval(gunfireIntervalRef.current);
       }
+      if (enemyBulletIntervalRef.current) {
+        clearInterval(enemyBulletIntervalRef.current);
+      }
     };
   }, []);
 
@@ -75,13 +92,28 @@ export default function Scene({
     handlePointerUpOnSpaceShip();
   }, [isOverheated]);
 
+  useEffect(() => {
+    if (gameStatus === "playing") {
+      enemyBulletIntervalRef.current = setInterval(
+        () => enemyShoot([1.5, 1.5, 1.5], "green"),
+        ENEMY_SHOOT_DURATION
+      );
+    }
+
+    return () => {
+      if (enemyBulletIntervalRef.current) {
+        clearInterval(enemyBulletIntervalRef.current);
+      }
+    };
+  }, [gameStatus, enemies.length]);
+
   /* functions */
   function handlePointerMove(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
     mousePosRef.current = { x: event.point.x, y: event.point.y };
   }
 
-  function handleCreateBullet(
+  function createBullet(
     position: { x: number; y: number },
     args: [number, number, number],
     color: string
@@ -102,10 +134,10 @@ export default function Scene({
   ) {
     if (gunfireIntervalRef.current) clearInterval(gunfireIntervalRef.current);
 
-    handleCreateBullet(mousePosRef.current, args, color);
+    createBullet(mousePosRef.current, args, color);
 
     gunfireIntervalRef.current = setInterval(() => {
-      handleCreateBullet(mousePosRef.current, args, color);
+      createBullet(mousePosRef.current, args, color);
     }, 200);
   }
 
@@ -115,8 +147,8 @@ export default function Scene({
     }
   }
 
-  function handleDeleteBullet(id: string) {
-    dispatch(removeBullet(id));
+  function deleteBullet(id: string, bulletOwner: "spaceShip" | "enemy") {
+    dispatch(removeBullet({ id, bulletOwner }));
   }
 
   useFrame(() => {
@@ -140,20 +172,40 @@ export default function Scene({
     }
   }
 
-  function handleCollisionBulletToEnemy(bulletId: string, enemyId: string) {
+  function collisionBulletToEnemy(bulletId: string, enemyId: string) {
     // prevent duplicate collisions from being recorded
-    if (collisionEventsRef.current.bullets.has(bulletId)) {
+    if (collisionEventsRef.current.spaceShipBullet.has(bulletId)) {
       return;
     }
-    collisionEventsRef.current.bullets.add(bulletId);
+    collisionEventsRef.current.spaceShipBullet.add(bulletId);
 
-    handleDeleteBullet(bulletId);
+    deleteBullet(bulletId, "spaceShip");
 
     const bulletDamage = calcBulletDamage();
     dispatch(damageEnemy({ enemyId, bulletDamage }));
   }
 
-  function handleMakeVisibleSpaceShip() {
+  function collisionBulletToSpaceShip(bulletId: string) {
+    if (
+      collisionEventsRef.current.enemyBullet.has(bulletId) ||
+      isSpaceShipInvisible
+    ) {
+      return;
+    }
+    collisionEventsRef.current.enemyBullet.add(bulletId);
+
+    const damage = 20;
+
+    deleteBullet(bulletId, "enemy");
+
+    // now is not visibile
+    dispatch(toggleSpaceShipVisibility());
+    dispatch(damageSpaceShip(damage));
+
+    makeVisibleSpaceShip();
+  }
+
+  function makeVisibleSpaceShip() {
     setTimeout(() => {
       // now is visible
       dispatch(toggleSpaceShipVisibility());
@@ -161,19 +213,45 @@ export default function Scene({
     }, INVINCIBILITY_DURATION);
   }
 
-  function handleCollisionSpaceShipToEnemy() {
+  function collisionSpaceShipToEnemy() {
     // prevent duplicate collisions from being recorded or calculating damage for invisible space ship
     if (collisionEventsRef.current.spaceShip || isSpaceShipInvisible) return;
 
     const damage = 20;
 
     collisionEventsRef.current.spaceShip = true;
-    // now is not visibile
 
+    // now is not visibile
     dispatch(toggleSpaceShipVisibility());
     dispatch(damageSpaceShip(damage));
 
-    handleMakeVisibleSpaceShip();
+    makeVisibleSpaceShip();
+  }
+
+  function enemyShoot(args: [number, number, number], color: string) {
+    let eligibleEnemies = enemies.filter(
+      (enemy) => !shotEnemiesRef.current.has(enemy.id)
+    );
+
+    if (eligibleEnemies.length === 0) {
+      shotEnemiesRef.current.clear();
+      eligibleEnemies = enemies;
+    }
+
+    const randomIndex = Math.floor(Math.random() * eligibleEnemies.length);
+    const shootingEnemy = eligibleEnemies[randomIndex];
+
+    if (!shootingEnemy) return;
+
+    shotEnemiesRef.current.add(shootingEnemy.id);
+
+    dispatch(
+      addEnemiseBullet({
+        position: [shootingEnemy.position[0], shootingEnemy.position[1] - 2, 1],
+        args,
+        color,
+      })
+    );
   }
 
   return (
@@ -186,7 +264,7 @@ export default function Scene({
         startTheGunfire={() => handlePointerDownOnSpaceShip([1, 1, 1], "red")}
         stopTheGunfire={handlePointerUpOnSpaceShip}
         ref={spaceShipRef}
-        onCollision={handleCollisionSpaceShipToEnemy}
+        onCollision={collisionSpaceShipToEnemy}
       />
       <Surface moveSpaceShip={handlePointerMove} />
       {bullets.map((bullet) => {
@@ -194,8 +272,20 @@ export default function Scene({
           <Bullet
             key={bullet.id}
             bullet={bullet}
-            removeOutOfRangeBullets={handleDeleteBullet}
-            onCollision={handleCollisionBulletToEnemy}
+            owner="spaceShip"
+            deleteBullet={deleteBullet}
+            onCollision={collisionBulletToEnemy}
+          />
+        );
+      })}
+      {enemiesBullets.map((bullet) => {
+        return (
+          <Bullet
+            key={bullet.id}
+            bullet={bullet}
+            owner="enemy"
+            deleteBullet={deleteBullet}
+            onCollision={collisionBulletToSpaceShip}
           />
         );
       })}

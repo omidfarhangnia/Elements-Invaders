@@ -15,22 +15,27 @@ export interface BulletType {
 
 type BulletProps = {
   bullet: BulletType;
-  removeOutOfRangeBullets: (id: string) => void;
+  owner: "spaceShip" | "enemy";
+  deleteBullet: (id: string, bulletOwner: "spaceShip" | "enemy") => void;
   onCollision: (id: string, otherOjb: string) => void;
 };
 
 export default function Bullet({
   bullet,
-  removeOutOfRangeBullets,
+  owner,
+  deleteBullet,
   onCollision,
 }: BulletProps) {
   const rigidBodyRef = useRef<RapierRigidBody>(null!);
   const { viewport } = useThree();
   const bulletHalfHeight = bullet.args[1] / 2;
+  const speed = owner === "spaceShip" ? 50 : -60;
+  const rigidBodyName = owner === "spaceShip" ? "bullet" : "enemyBullet";
+  const rigidBodyTarget = owner === "spaceShip" ? "enemy" : "spaceShip";
 
   useEffect(() => {
     if (rigidBodyRef.current) {
-      const impulse = { x: 0, y: 50, z: 0 };
+      const impulse = { x: 0, y: speed, z: 0 };
       rigidBodyRef.current.applyImpulse(impulse, true);
     }
   }, []);
@@ -38,8 +43,14 @@ export default function Bullet({
   useFrame(() => {
     if (rigidBodyRef.current) {
       const position = rigidBodyRef.current.translation();
-      if (position.y > viewport.height / 2 + bulletHalfHeight) {
-        removeOutOfRangeBullets(bullet.id);
+
+      const isOutOfRange =
+        owner === "spaceShip"
+          ? position.y > viewport.height / 2 + bulletHalfHeight
+          : position.y < -(viewport.height / 2 + bulletHalfHeight);
+
+      if (isOutOfRange) {
+        deleteBullet(bullet.id, owner);
       }
     }
   });
@@ -47,15 +58,30 @@ export default function Bullet({
   return (
     <RigidBody
       ref={rigidBodyRef}
-      name="bullet"
+      lockRotations
+      name={rigidBodyName}
       type="dynamic"
+      userData={{ id: bullet.id }}
       gravityScale={0}
       position={bullet.position}
-      onCollisionEnter={({ other }) => {
-        if (other.rigidBodyObject?.name === "enemy") {
-          onCollision(bullet.id, other.rigidBodyObject.userData.id);
-        }
-      }}
+      {...(owner === "enemy"
+        ? {
+            onIntersectionEnter: ({ other }) => {
+              if (other.rigidBodyObject?.name === rigidBodyTarget) {
+                onCollision(bullet.id, other.rigidBodyObject.userData.id);
+              }
+            },
+          }
+        : {
+            onCollisionEnter: ({ other }) => {
+              if (other.rigidBodyObject?.name === rigidBodyTarget) {
+                onCollision(bullet.id, other.rigidBodyObject.userData.id);
+              } else if (other.rigidBodyObject?.name === "enemyBullet") {
+                deleteBullet(bullet.id, "spaceShip");
+                deleteBullet(other.rigidBodyObject.userData.id, "enemy");
+              }
+            },
+          })}
     >
       <mesh>
         <boxGeometry args={bullet.args} />

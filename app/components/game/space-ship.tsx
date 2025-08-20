@@ -26,6 +26,7 @@ export default function SpaceShip({
 
   return (
     <RigidBody
+      name="spaceShip"
       ref={ref}
       type="kinematicPosition"
       gravityScale={0}
