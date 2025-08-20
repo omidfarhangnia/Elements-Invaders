@@ -5,13 +5,13 @@ import {
   RigidBody,
 } from "@react-three/rapier";
 import { type Ref } from "react";
+import { useAppSelector } from "~/RTK/hook";
 
 type SpaceShipProps = {
   startTheGunfire: () => void;
   stopTheGunfire: () => void;
   ref: Ref<RapierRigidBody>;
   onCollision: () => void;
-  isSpaceShipInvisible: boolean;
 };
 
 export default function SpaceShip({
@@ -19,8 +19,11 @@ export default function SpaceShip({
   stopTheGunfire,
   ref,
   onCollision,
-  isSpaceShipInvisible,
 }: SpaceShipProps) {
+  const isSpaceShipInvisible = useAppSelector(
+    (state) => state.game.isSpaceShipInvisible
+  );
+
   return (
     <RigidBody
       ref={ref}
@@ -64,12 +67,9 @@ export default function SpaceShip({
   );
 }
 
-interface SpaceShipHealthProps {
-  spaceShipHealth: number;
-}
-
-export function SpaceShipHealth({ spaceShipHealth }: SpaceShipHealthProps) {
+export function SpaceShipHealth() {
   const { viewport } = useThree();
+  const spaceShipHealth = useAppSelector((state) => state.game.spaceShipHealth);
 
   const healthBarWidth = 25;
   const healthBarHeight = 5;
@@ -97,14 +97,11 @@ export function SpaceShipHealth({ spaceShipHealth }: SpaceShipHealthProps) {
   );
 }
 
-interface SpaceShipOverheatProps {
-  spaceShipOverheat: number;
-}
-
-export function SpaceShipOverheat({
-  spaceShipOverheat,
-}: SpaceShipOverheatProps) {
+export function SpaceShipOverheat() {
   const { viewport } = useThree();
+  const spaceShipOverheat = useAppSelector(
+    (state) => state.game.spaceShipOverheat
+  );
 
   const engineBarWidth = 10;
   const engineBarHeight = 25;

@@ -1,14 +1,9 @@
-import { configureStore, createSlice } from "@reduxjs/toolkit";
-
-const randomSlice = createSlice({
-  name: "random",
-  initialState: { value: "" },
-  reducers: {},
-});
+import { configureStore } from "@reduxjs/toolkit";
+import gameReducer from "../features/game/game-slice";
 
 export const store = configureStore({
   reducer: {
-    randomReducer: randomSlice.reducer,
+    game: gameReducer,
   },
 });
 

@@ -1,7 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import type { BulletType } from "../game/bullet";
-import type { EnemyType } from "../game/enemy";
-import { v4 as uuidv4 } from "uuid";
+import { useEffect, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Physics, RapierRigidBody } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
@@ -17,35 +14,27 @@ import {
   BULLET_DAMAGE_LEVEL_1,
   BULLET_DAMAGE_LEVEL_2,
   BULLET_DAMAGE_LEVEL_3,
-  COOLING_RATE,
-  HEAT_PER_SHOOT,
   INVINCIBILITY_DURATION,
 } from "~/constants";
-
-type GameStatus = "playing" | "ended";
+import { useAppDispatch, useAppSelector } from "~/RTK/hook";
+import {
+  addBullet,
+  coolingSystem,
+  damageEnemy,
+  damageSpaceShip,
+  initializeEnemies,
+  removeBullet,
+  toggleSpaceShipVisibility,
+} from "~/features/game/game-slice";
 
 export default function Scene({
   enemyArrangements,
 }: {
   enemyArrangements: EnemyArrangements[];
 }) {
-  /* useState */
-  // all bullets are here (bullets will remove after moving out of scene)
-  const [bullets, setBullets] = useState<BulletType[]>([]);
-  // all enemies are here (enemies will remove after death)
-  const [enemies, setEnemies] = useState<EnemyType[]>(
-    enemyArrangements[0].enemyArrangments
-  );
-  // space ship health is in percentage 0 <= health <= 100
-  const [spaceShipHealth, setSpaceShipHealth] = useState(100);
-  // space ship overheat is in percentage 0 <= overheat <= 100;
-  const [spaceShipOverheat, setSpaceShipOverheat] = useState(0);
-  // space ship became invisible after collision with enemies
-  const [isSpaceShipInvisible, setIsSpaceShipInvisible] = useState(false);
-  // space ship selected bullet type
-  const [bulletLevel, setBulletLevel] = useState<1 | 2 | 3>(1);
-  // tracking game status (playing, ended)
-  const [gameStatus, setGameStatus] = useState<GameStatus>("playing");
+  const { enemies, bullets, isOverheated, isSpaceShipInvisible, bulletLevel } =
+    useAppSelector((state) => state.game);
+  const dispatch = useAppDispatch();
 
   /* useRef */
   // including the whole space ship
@@ -56,27 +45,35 @@ export default function Scene({
   const gunfireIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
     null
   );
-  const coolingRef = useRef<{
-    interval: ReturnType<typeof setInterval> | null;
-    isOverheated: boolean;
-  }>({ interval: null, isOverheated: false });
+  const coolingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
   // prevent duplicate collisions from being recorded
   const collisionEventsRef = useRef({
     bullets: new Set<string>(),
     spaceShip: false,
   });
 
+  // initial value for enemies
+  useEffect(() => {
+    dispatch(initializeEnemies(enemyArrangements[0].enemyArrangments));
+  }, [dispatch, enemyArrangements]);
+
   // interval lifecycle
   useEffect(() => {
     return () => {
-      if (coolingRef.current.interval) {
-        clearInterval(coolingRef.current.interval);
+      if (coolingIntervalRef.current) {
+        clearInterval(coolingIntervalRef.current);
       }
       if (gunfireIntervalRef.current) {
         clearInterval(gunfireIntervalRef.current);
       }
     };
   }, []);
+
+  useEffect(() => {
+    handlePointerUpOnSpaceShip();
+  }, [isOverheated]);
 
   /* functions */
   function handlePointerMove(event: ThreeEvent<PointerEvent>) {
@@ -89,44 +86,14 @@ export default function Scene({
     args: [number, number, number],
     color: string
   ) {
-    // in max heat we can't shoot until the engine cool completely
-    if (coolingRef.current.isOverheated) return;
+    if (isOverheated) return;
+    if (coolingIntervalRef.current) clearInterval(coolingIntervalRef.current);
 
-    setSpaceShipOverheat((currentHeat) => {
-      if (currentHeat >= 100) {
-        coolingRef.current.isOverheated = true;
-        return currentHeat;
-      }
+    coolingIntervalRef.current = setInterval(() => {
+      dispatch(coolingSystem());
+    }, 500);
 
-      if (coolingRef.current.interval)
-        clearInterval(coolingRef.current.interval);
-
-      coolingRef.current.interval = setInterval(() => {
-        setSpaceShipOverheat((x) => {
-          if (x <= 50 && coolingRef.current.isOverheated) {
-            coolingRef.current.isOverheated = false;
-          }
-
-          if (x < COOLING_RATE) {
-            return 0;
-          } else {
-            return x - COOLING_RATE;
-          }
-        });
-      }, 500);
-
-      setBullets((bullets) => [
-        ...bullets,
-        {
-          position: [position.x, position.y, 1],
-          args,
-          color,
-          id: uuidv4(),
-        },
-      ]);
-
-      return currentHeat + HEAT_PER_SHOOT;
-    });
+    dispatch(addBullet({ position: [position.x, position.y, 1], args, color }));
   }
 
   function handlePointerDownOnSpaceShip(
@@ -149,9 +116,7 @@ export default function Scene({
   }
 
   function handleDeleteBullet(id: string) {
-    setBullets((currentBullets) =>
-      currentBullets.filter((bullet) => bullet.id !== id)
-    );
+    dispatch(removeBullet(id));
   }
 
   useFrame(() => {
@@ -185,31 +150,13 @@ export default function Scene({
     handleDeleteBullet(bulletId);
 
     const bulletDamage = calcBulletDamage();
-
-    setEnemies((currentEnemies) => {
-      const enemyToUpdate = currentEnemies.find(
-        (enemy) => enemy.id === enemyId
-      );
-
-      if (!enemyToUpdate) {
-        return currentEnemies;
-      }
-
-      if (enemyToUpdate.health > bulletDamage) {
-        return currentEnemies.map((enemy) =>
-          enemy.id === enemyId
-            ? { ...enemy, health: enemy.health - bulletDamage }
-            : enemy
-        );
-      } else {
-        return currentEnemies.filter((enemy) => enemy.id !== enemyId);
-      }
-    });
+    dispatch(damageEnemy({ enemyId, bulletDamage }));
   }
 
   function handleMakeVisibleSpaceShip() {
     setTimeout(() => {
-      setIsSpaceShipInvisible(false);
+      // now is visible
+      dispatch(toggleSpaceShipVisibility());
       collisionEventsRef.current.spaceShip = false;
     }, INVINCIBILITY_DURATION);
   }
@@ -221,19 +168,10 @@ export default function Scene({
     const damage = 20;
 
     collisionEventsRef.current.spaceShip = true;
-    setIsSpaceShipInvisible(true);
+    // now is not visibile
 
-    setSpaceShipHealth((currentHealth) => {
-      const newHealth = currentHealth - damage;
-
-      // game over
-      if (newHealth <= 0) {
-        setGameStatus("ended");
-        return 0;
-      }
-
-      return newHealth;
-    });
+    dispatch(toggleSpaceShipVisibility());
+    dispatch(damageSpaceShip(damage));
 
     handleMakeVisibleSpaceShip();
   }
@@ -242,14 +180,13 @@ export default function Scene({
     <Physics debug>
       <OrbitControls />
       <ambientLight intensity={Math.PI / 2} />
-      <SpaceShipHealth spaceShipHealth={spaceShipHealth} />
-      <SpaceShipOverheat spaceShipOverheat={spaceShipOverheat} />
+      <SpaceShipHealth />
+      <SpaceShipOverheat />
       <SpaceShip
         startTheGunfire={() => handlePointerDownOnSpaceShip([1, 1, 1], "red")}
         stopTheGunfire={handlePointerUpOnSpaceShip}
         ref={spaceShipRef}
         onCollision={handleCollisionSpaceShipToEnemy}
-        isSpaceShipInvisible={isSpaceShipInvisible}
       />
       <Surface moveSpaceShip={handlePointerMove} />
       {bullets.map((bullet) => {
