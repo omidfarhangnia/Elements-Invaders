@@ -6,9 +6,11 @@ import {
 } from "@react-three/rapier";
 import { type Ref } from "react";
 import { useAppSelector } from "~/RTK/hook";
+import { Text } from "@react-three/drei";
 
 type SpaceShipProps = {
   startTheGunfire: () => void;
+  shootTheBlaster: () => void;
   stopTheGunfire: () => void;
   ref: Ref<RapierRigidBody>;
   onCollision: () => void;
@@ -16,6 +18,7 @@ type SpaceShipProps = {
 
 export default function SpaceShip({
   startTheGunfire,
+  shootTheBlaster,
   stopTheGunfire,
   ref,
   onCollision,
@@ -43,6 +46,9 @@ export default function SpaceShip({
           if (e.nativeEvent.button === 0) {
             // left click
             startTheGunfire();
+          } else if (e.nativeEvent.button === 2) {
+            // right click
+            shootTheBlaster();
           }
         }}
         onPointerUp={(e) => {
@@ -137,6 +143,33 @@ export function SpaceShipOverheat() {
           }
         />
       </mesh>
+    </group>
+  );
+}
+
+export function SpaceShipAmmo() {
+  const { viewport } = useThree();
+  const numberOfBlasters = useAppSelector(
+    (state) => state.game.numberOfBlasters
+  );
+
+  const ammoBarSideSize = 15;
+
+  return (
+    <group
+      position={[
+        (ammoBarSideSize - viewport.width + 10) / 2,
+        (ammoBarSideSize - viewport.height + 24) / 2,
+        3,
+      ]}
+    >
+      <mesh>
+        <planeGeometry args={[ammoBarSideSize, ammoBarSideSize]} />
+        <meshBasicMaterial color="green" />
+      </mesh>
+      <Text position={[0, 0, 0.3]} color="blue" fontSize={7}>
+        {numberOfBlasters}
+      </Text>
     </group>
   );
 }

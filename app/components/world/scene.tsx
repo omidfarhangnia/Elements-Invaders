@@ -3,29 +3,32 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Physics, RapierRigidBody } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
 import SpaceShip, {
+  SpaceShipAmmo,
   SpaceShipHealth,
   SpaceShipOverheat,
 } from "../game/space-ship";
 import { Surface } from "./surface";
-import Bullet from "../game/bullet";
+import Bullet, { Blaster } from "../game/bullet";
 import Enemy from "../game/enemy";
 import type { EnemyArrangements } from "~/routes/lobby";
 import {
+  BLASTER_DAMAGE,
   BULLET_DAMAGE_LEVEL_1,
   BULLET_DAMAGE_LEVEL_2,
   BULLET_DAMAGE_LEVEL_3,
+  ENEMY_COLLISION_DAMAGE,
   ENEMY_SHOOT_DURATION,
   INVINCIBILITY_DURATION,
 } from "~/constants";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
 import {
-  addBullet,
+  addAmmo,
   addEnemiseBullet,
   coolingSystem,
   damageEnemy,
   damageSpaceShip,
   initializeEnemies,
-  removeBullet,
+  removeAmmo,
   toggleSpaceShipVisibility,
 } from "~/features/game/game-slice";
 
@@ -37,6 +40,8 @@ export default function Scene({
   const {
     enemies,
     bullets,
+    blasters,
+    numberOfBlasters,
     enemiesBullets,
     isOverheated,
     isSpaceShipInvisible,
@@ -62,8 +67,8 @@ export default function Scene({
   );
   // prevent duplicate collisions from being recorded
   const collisionEventsRef = useRef({
-    spaceShipBullet: new Set<string>(),
-    enemyBullet: new Set<string>(),
+    spaceShipAmmo: new Set<string>(),
+    enemyAmmo: new Set<string>(),
     spaceShip: false,
   });
   const shotEnemiesRef = useRef(new Set<string>());
@@ -113,10 +118,10 @@ export default function Scene({
     mousePosRef.current = { x: event.point.x, y: event.point.y };
   }
 
-  function createBullet(
-    position: { x: number; y: number },
+  function createAmmo(
     args: [number, number, number],
-    color: string
+    color: string,
+    type: "bullet" | "blaster"
   ) {
     if (isOverheated) return;
     if (coolingIntervalRef.current) clearInterval(coolingIntervalRef.current);
@@ -125,19 +130,26 @@ export default function Scene({
       dispatch(coolingSystem());
     }, 500);
 
-    dispatch(addBullet({ position: [position.x, position.y, 1], args, color }));
+    dispatch(
+      addAmmo({
+        position: [mousePosRef.current.x, mousePosRef.current.y, 1],
+        args,
+        color,
+        type,
+      })
+    );
   }
 
-  function handlePointerDownOnSpaceShip(
+  function handlePointerDownLeftClick(
     args: [number, number, number],
     color: string
   ) {
     if (gunfireIntervalRef.current) clearInterval(gunfireIntervalRef.current);
 
-    createBullet(mousePosRef.current, args, color);
+    createAmmo(args, color, "bullet");
 
     gunfireIntervalRef.current = setInterval(() => {
-      createBullet(mousePosRef.current, args, color);
+      createAmmo(args, color, "bullet");
     }, 200);
   }
 
@@ -147,8 +159,11 @@ export default function Scene({
     }
   }
 
-  function deleteBullet(id: string, bulletOwner: "spaceShip" | "enemy") {
-    dispatch(removeBullet({ id, bulletOwner }));
+  function deleteAmmo(
+    id: string,
+    ammoType: "spaceShipBullet" | "enemyBullet" | "spaceShipBlaster"
+  ) {
+    dispatch(removeAmmo({ id, ammoType }));
   }
 
   useFrame(() => {
@@ -161,42 +176,51 @@ export default function Scene({
     }
   });
 
-  function calcBulletDamage() {
-    switch (bulletLevel) {
-      case 1:
-        return BULLET_DAMAGE_LEVEL_1;
-      case 2:
-        return BULLET_DAMAGE_LEVEL_2;
-      case 3:
-        return BULLET_DAMAGE_LEVEL_3;
+  function calcAmmoDamage(ammoType: "spaceShipBullet" | "spaceShipBlaster") {
+    if (ammoType === "spaceShipBullet") {
+      switch (bulletLevel) {
+        case 1:
+          return BULLET_DAMAGE_LEVEL_1;
+        case 2:
+          return BULLET_DAMAGE_LEVEL_2;
+        case 3:
+          return BULLET_DAMAGE_LEVEL_3;
+      }
+    } else {
+      return BLASTER_DAMAGE;
     }
   }
 
-  function collisionBulletToEnemy(bulletId: string, enemyId: string) {
+  function collisionAmmoToEnemy(
+    bulletId: string,
+    enemyId?: string,
+    ammoType?: "spaceShipBullet" | "spaceShipBlaster"
+  ) {
+    if (enemyId === undefined || ammoType === undefined) return;
     // prevent duplicate collisions from being recorded
-    if (collisionEventsRef.current.spaceShipBullet.has(bulletId)) {
+    if (collisionEventsRef.current.spaceShipAmmo.has(bulletId)) {
       return;
     }
-    collisionEventsRef.current.spaceShipBullet.add(bulletId);
+    collisionEventsRef.current.spaceShipAmmo.add(bulletId);
 
-    deleteBullet(bulletId, "spaceShip");
+    deleteAmmo(bulletId, ammoType);
 
-    const bulletDamage = calcBulletDamage();
+    const bulletDamage = calcAmmoDamage(ammoType);
     dispatch(damageEnemy({ enemyId, bulletDamage }));
   }
 
   function collisionBulletToSpaceShip(bulletId: string) {
     if (
-      collisionEventsRef.current.enemyBullet.has(bulletId) ||
+      collisionEventsRef.current.enemyAmmo.has(bulletId) ||
       isSpaceShipInvisible
     ) {
       return;
     }
-    collisionEventsRef.current.enemyBullet.add(bulletId);
+    collisionEventsRef.current.enemyAmmo.add(bulletId);
 
     const damage = 20;
 
-    deleteBullet(bulletId, "enemy");
+    deleteAmmo(bulletId, "enemyBullet");
 
     // now is not visibile
     dispatch(toggleSpaceShipVisibility());
@@ -217,13 +241,11 @@ export default function Scene({
     // prevent duplicate collisions from being recorded or calculating damage for invisible space ship
     if (collisionEventsRef.current.spaceShip || isSpaceShipInvisible) return;
 
-    const damage = 20;
-
     collisionEventsRef.current.spaceShip = true;
 
     // now is not visibile
     dispatch(toggleSpaceShipVisibility());
-    dispatch(damageSpaceShip(damage));
+    dispatch(damageSpaceShip(ENEMY_COLLISION_DAMAGE));
 
     makeVisibleSpaceShip();
   }
@@ -250,8 +272,15 @@ export default function Scene({
         position: [shootingEnemy.position[0], shootingEnemy.position[1] - 2, 1],
         args,
         color,
+        type: "bullet",
       })
     );
+  }
+
+  function handlePointerDownRightClick() {
+    if (numberOfBlasters === 0) return;
+
+    createAmmo([1, 10, 10], "lime", "blaster");
   }
 
   return (
@@ -260,8 +289,10 @@ export default function Scene({
       <ambientLight intensity={Math.PI / 2} />
       <SpaceShipHealth />
       <SpaceShipOverheat />
+      <SpaceShipAmmo />
       <SpaceShip
-        startTheGunfire={() => handlePointerDownOnSpaceShip([1, 1, 1], "red")}
+        startTheGunfire={() => handlePointerDownLeftClick([1, 1, 1], "red")}
+        shootTheBlaster={() => handlePointerDownRightClick()}
         stopTheGunfire={handlePointerUpOnSpaceShip}
         ref={spaceShipRef}
         onCollision={collisionSpaceShipToEnemy}
@@ -273,8 +304,18 @@ export default function Scene({
             key={bullet.id}
             bullet={bullet}
             owner="spaceShip"
-            deleteBullet={deleteBullet}
-            onCollision={collisionBulletToEnemy}
+            deleteAmmo={deleteAmmo}
+            onCollision={collisionAmmoToEnemy}
+          />
+        );
+      })}
+      {blasters.map((blaster) => {
+        return (
+          <Blaster
+            key={blaster.id}
+            blaster={blaster}
+            deleteAmmo={deleteAmmo}
+            onCollision={collisionAmmoToEnemy}
           />
         );
       })}
@@ -284,7 +325,7 @@ export default function Scene({
             key={bullet.id}
             bullet={bullet}
             owner="enemy"
-            deleteBullet={deleteBullet}
+            deleteAmmo={deleteAmmo}
             onCollision={collisionBulletToSpaceShip}
           />
         );
