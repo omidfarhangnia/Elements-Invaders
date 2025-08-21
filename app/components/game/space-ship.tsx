@@ -7,7 +7,6 @@ import {
 } from "@react-three/rapier";
 import { type Ref } from "react";
 import { useAppSelector } from "~/RTK/hook";
-import { Text } from "@react-three/drei";
 import { COLLISION_GROUPS, COLLISION_MASKS } from "~/constants";
 
 type SpaceShipProps = {
@@ -173,9 +172,18 @@ export function SpaceShipAmmo() {
         <planeGeometry args={[ammoBarSideSize, ammoBarSideSize]} />
         <meshBasicMaterial color="green" />
       </mesh>
-      <Text position={[0, 0, 0.3]} color="blue" fontSize={7}>
-        {numberOfBlasters}
-      </Text>
+      {Array.from({ length: numberOfBlasters }).map((_, index) => {
+        return (
+          <mesh
+            position={[index * 3 - 3, 0, 0]}
+            rotation-x={Math.PI / 2}
+            key={index}
+          >
+            <cylinderGeometry args={[1, 1, 2, 16]} />
+            <meshBasicMaterial color="red" />
+          </mesh>
+        );
+      })}
     </group>
   );
 }

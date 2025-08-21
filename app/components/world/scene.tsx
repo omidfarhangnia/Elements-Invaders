@@ -12,7 +12,6 @@ import Bullet, { Blaster } from "../game/bullet";
 import Enemy from "../game/enemy";
 import type { EnemyArrangements } from "~/routes/lobby";
 import {
-  ATTACK_WAVE_LEVEL_1,
   BLASTER_DAMAGE,
   BULLET_DAMAGE_LEVEL_1,
   BULLET_DAMAGE_LEVEL_2,
@@ -86,7 +85,6 @@ export default function Scene({
 
   // interval lifecycle
   useEffect(() => {
-    console.log(ATTACK_WAVE_LEVEL_1.length);
     return () => {
       if (coolingIntervalRef.current) {
         clearInterval(coolingIntervalRef.current);
@@ -295,7 +293,7 @@ export default function Scene({
 
   return (
     <Physics debug>
-      <OrbitControls />
+      <OrbitControls makeDefault />
       <ambientLight intensity={Math.PI / 2} />
       <SpaceShipHealth />
       <SpaceShipOverheat />

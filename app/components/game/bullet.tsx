@@ -69,21 +69,19 @@ export default function Bullet({
 
   const collisionGroupProps = useMemo(() => {
     if (owner === "spaceShip") {
-      // این تیر سفینه است
       return {
         collisionGroups: interactionGroups(
           COLLISION_GROUPS.SPACESHIP_BULLET,
           COLLISION_MASKS.SPACESHIP_BULLET
         ),
-      }; // عضو گروه 4، برخورد فقط با گروه 2
+      };
     } else {
-      // این تیر دشمن است
       return {
         collisionGroups: interactionGroups(
           COLLISION_GROUPS.ENEMY_BULLET,
           COLLISION_MASKS.ENEMY_BULLET
         ),
-      }; // عضو گروه 8، برخورد فقط با گروه 1
+      };
     }
   }, [owner]);
 
@@ -176,7 +174,6 @@ export function Blaster({ blaster, deleteAmmo, onCollision }: BlasterProps) {
       gravityScale={0}
       position={blaster.position}
       onCollisionEnter={({ other }) => {
-        console.log("hello there");
         if (other.rigidBodyObject?.name === "enemy") {
           onCollision(
             blaster.id,
