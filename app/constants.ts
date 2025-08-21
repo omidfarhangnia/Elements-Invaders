@@ -16,178 +16,55 @@ export const HEAT_PER_SHOOT_BLASTER = 20;
 export const INVINCIBILITY_DURATION = 2000; // 2 seconds
 
 // enemy attack wave
-export const ATTACK_WAVE_LEVEL_1: EnemyType[] = [
+export const ATTACK_WAVE_LEVEL_1: EnemyType[] = generateAttackWave(
   {
-    position: [-35, 50, 1],
     args: [3, 3, 1],
     color: "yellow",
-    id: uuidv4(),
     health: 100,
   },
+  3,
+  8,
+  { x: -35, y: 50 }
+);
+export const ATTACK_WAVE_LEVEL_2 = generateAttackWave(
   {
-    position: [-25, 50, 1],
     args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
+    color: "red",
     health: 100,
   },
+  3,
+  8,
+  { x: -35, y: 50 }
+);
+export const ATTACK_WAVE_LEVEL_3 = generateAttackWave(
   {
-    position: [-15, 50, 1],
     args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
+    color: "blue",
     health: 100,
   },
-  {
-    position: [-5, 50, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [5, 50, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [15, 50, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [25, 50, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [35, 50, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [-35, 35, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [-25, 35, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [-15, 35, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [-5, 35, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [5, 35, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [15, 35, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [25, 35, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [35, 35, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [-35, 20, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [-25, 20, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [-15, 20, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [-5, 20, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [5, 20, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [15, 20, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [25, 20, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-  {
-    position: [35, 20, 1],
-    args: [3, 3, 1],
-    color: "yellow",
-    id: uuidv4(),
-    health: 100,
-  },
-];
-export const ATTACK_WAVE_LEVEL_2 = [];
-export const ATTACK_WAVE_LEVEL_3 = [];
+  3,
+  8,
+  { x: -35, y: 50 }
+);
+
+function generateAttackWave(
+  enemyData: Omit<EnemyType, "id" | "position">,
+  rows: number,
+  cols: number,
+  startPostion: { x: number; y: number }
+) {
+  const attackWave: EnemyType[] = [];
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      attackWave.push({
+        position: [startPostion.x + 10 * j, startPostion.y - 15 * i, 1],
+        id: uuidv4(),
+        ...enemyData,
+      });
+    }
+  }
+  return attackWave;
+}
 
 // collision data
 export const COLLISION_GROUPS = {

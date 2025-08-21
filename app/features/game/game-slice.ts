@@ -20,6 +20,7 @@ interface GameStatus {
   isSpaceShipInvisible: boolean;
   bulletLevel: 1 | 2 | 3;
   gameStatus: "playing" | "ended" | "paused";
+  gameLevel: { lastOpenedLevel: number; selectedLevel: number };
 }
 
 const initialState: GameStatus = {
@@ -44,6 +45,8 @@ const initialState: GameStatus = {
   bulletLevel: 1,
   // tracking game status (playing, ended, paused)
   gameStatus: "playing",
+  // controlling level state
+  gameLevel: { lastOpenedLevel: 1, selectedLevel: 1 },
 };
 
 const gameSlice = createSlice({

@@ -12,6 +12,7 @@ import Bullet, { Blaster } from "../game/bullet";
 import Enemy from "../game/enemy";
 import type { EnemyArrangements } from "~/routes/lobby";
 import {
+  ATTACK_WAVE_LEVEL_1,
   BLASTER_DAMAGE,
   BULLET_DAMAGE_LEVEL_1,
   BULLET_DAMAGE_LEVEL_2,
@@ -47,6 +48,7 @@ export default function Scene({
     isSpaceShipInvisible,
     bulletLevel,
     gameStatus,
+    gameLevel,
   } = useAppSelector((state) => state.game);
   const dispatch = useAppDispatch();
 
@@ -75,11 +77,16 @@ export default function Scene({
 
   // initial value for enemies
   useEffect(() => {
-    dispatch(initializeEnemies(enemyArrangements[0].enemyArrangments));
-  }, [dispatch, enemyArrangements]);
+    dispatch(
+      initializeEnemies(
+        enemyArrangements[gameLevel.selectedLevel - 1].enemyArrangments
+      )
+    );
+  }, [dispatch, gameLevel.selectedLevel]);
 
   // interval lifecycle
   useEffect(() => {
+    console.log(ATTACK_WAVE_LEVEL_1.length);
     return () => {
       if (coolingIntervalRef.current) {
         clearInterval(coolingIntervalRef.current);
