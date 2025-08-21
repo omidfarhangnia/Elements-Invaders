@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { AmmoType } from "~/components/game/bullet";
+import type { AmmoType, Position } from "~/components/game/bullet";
 import type { EnemyType } from "~/components/game/enemy";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -8,10 +8,20 @@ import {
   HEAT_PER_SHOOT_BULLET,
 } from "~/constants";
 
+export interface PowerUpType {
+  position: Position;
+  args: [number];
+  color: string;
+  id: string;
+  type: "increaseHealthAmount" | "increaseBlasterNum" | "levelUpBullet";
+}
+
 interface GameStatus {
   bullets: AmmoType[];
   enemies: EnemyType[];
   blasters: AmmoType[];
+  powerUps: PowerUpType[];
+  killStatus: { count: number; lastKillPosition: Position };
   numberOfBlasters: number;
   enemiesBullets: AmmoType[];
   spaceShipHealth: number;
@@ -30,6 +40,10 @@ const initialState: GameStatus = {
   enemies: [],
   // all blasters are here (blaster will remove after moving out of scene)
   blasters: [],
+  // all powerUp items which currently located in scene are in this array
+  powerUps: [],
+  // some data about kills
+  killStatus: { count: 0, lastKillPosition: [0, 0, 1] },
   // number of blasters remaining
   numberOfBlasters: 3,
   // all enemies bullets are here (bullets will remove after moving out of scene)
@@ -150,6 +164,11 @@ const gameSlice = createSlice({
       if (enemyIndex !== -1) {
         state.enemies[enemyIndex].health -= action.payload.bulletDamage;
         if (state.enemies[enemyIndex].health <= 0) {
+          // filling killStatus state
+          state.killStatus.count++;
+          state.killStatus.lastKillPosition =
+            state.enemies[enemyIndex].position;
+          // removing dead enemies
           state.enemies = state.enemies.filter(
             (enemy) => enemy.id !== action.payload.enemyId
           );
@@ -158,6 +177,53 @@ const gameSlice = createSlice({
     },
     toggleSpaceShipVisibility(state) {
       state.isSpaceShipInvisible = !state.isSpaceShipInvisible;
+    },
+    addPowerUp(state, action: PayloadAction<Position>) {
+      const availableTypes = new Set<PowerUpType["type"]>([
+        "increaseHealthAmount",
+        "increaseBlasterNum",
+        "levelUpBullet",
+      ]);
+
+      // we dont want to give useless power up
+      if (state.spaceShipHealth === 100)
+        availableTypes.delete("increaseHealthAmount");
+      if (state.bulletLevel === 3) availableTypes.delete("levelUpBullet");
+      if (state.numberOfBlasters >= 5)
+        availableTypes.delete("increaseBlasterNum");
+
+      const availableTypesArray = [...availableTypes];
+
+      if (availableTypesArray.length === 0) return;
+
+      const randomIndex = Math.floor(
+        Math.random() * availableTypesArray.length
+      );
+      const newPowerUp: PowerUpType = {
+        args: [1],
+        color: "purple",
+        id: uuidv4(),
+        position: action.payload,
+        type: availableTypesArray[randomIndex],
+      };
+      state.powerUps.push(newPowerUp);
+    },
+    removePowerUp(state, action: PayloadAction<string>) {
+      state.powerUps = state.powerUps.filter(
+        (bullet) => bullet.id !== action.payload
+      );
+    },
+    setPowerUp(state, action: PayloadAction<PowerUpType["type"]>) {
+      if (action.payload === "increaseBlasterNum") {
+        if (state.numberOfBlasters >= 5) return;
+        state.numberOfBlasters++;
+      } else if (action.payload === "increaseHealthAmount") {
+        if (state.spaceShipHealth === 100) return;
+        state.spaceShipHealth += 20;
+      } else {
+        if (state.bulletLevel === 3) return;
+        state.bulletLevel++;
+      }
     },
   },
 });
@@ -171,5 +237,8 @@ export const {
   damageSpaceShip,
   damageEnemy,
   toggleSpaceShipVisibility,
+  addPowerUp,
+  removePowerUp,
+  setPowerUp,
 } = gameSlice.actions;
 export default gameSlice.reducer;

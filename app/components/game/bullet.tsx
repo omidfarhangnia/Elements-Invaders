@@ -9,8 +9,10 @@ import {
 } from "@react-three/rapier";
 import { COLLISION_GROUPS, COLLISION_MASKS } from "~/constants";
 
+export type Position = [number, number, 1];
+
 export interface AmmoType {
-  position: [number, number, 1];
+  position: Position;
   args: [number, number, number];
   color: string;
   id: string;
@@ -141,9 +143,15 @@ interface BlasterProps {
     enemyId: string,
     ammoType: "spaceShipBullet" | "spaceShipBlaster"
   ) => void;
+  deletePowerUp: (powerUpId: string) => void;
 }
 
-export function Blaster({ blaster, deleteAmmo, onCollision }: BlasterProps) {
+export function Blaster({
+  blaster,
+  deleteAmmo,
+  onCollision,
+  deletePowerUp,
+}: BlasterProps) {
   const { viewport } = useThree();
   const rigidBodyRef = useRef<RapierRigidBody>(null!);
   const blasterHalfHeight = blaster.args[0];
@@ -182,6 +190,8 @@ export function Blaster({ blaster, deleteAmmo, onCollision }: BlasterProps) {
           );
         } else if (other.rigidBodyObject?.name === "enemyBullet") {
           deleteAmmo(other.rigidBodyObject.userData.id, "enemyBullet");
+        } else if (other.rigidBodyObject?.name === "powerUp") {
+          deletePowerUp(other.rigidBodyObject.userData.id);
         }
       }}
     >

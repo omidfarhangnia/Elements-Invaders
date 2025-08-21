@@ -19,18 +19,24 @@ import {
   ENEMY_COLLISION_DAMAGE,
   ENEMY_SHOOT_DURATION,
   INVINCIBILITY_DURATION,
+  KILLS_PER_POWERUP,
 } from "~/constants";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
 import {
   addAmmo,
   addEnemiseBullet,
+  addPowerUp,
   coolingSystem,
   damageEnemy,
   damageSpaceShip,
   initializeEnemies,
   removeAmmo,
+  removePowerUp,
+  setPowerUp,
   toggleSpaceShipVisibility,
+  type PowerUpType,
 } from "~/features/game/game-slice";
+import PowerUp from "../game/powerUp";
 
 export default function Scene({
   enemyArrangements,
@@ -41,6 +47,8 @@ export default function Scene({
     enemies,
     bullets,
     blasters,
+    powerUps,
+    killStatus,
     numberOfBlasters,
     enemiesBullets,
     isOverheated,
@@ -71,8 +79,11 @@ export default function Scene({
     spaceShipAmmo: new Set<string>(),
     enemyAmmo: new Set<string>(),
     spaceShip: false,
+    powerUp: new Set<string>(),
   });
   const shotEnemiesRef = useRef(new Set<string>());
+  // a countdown for powerUp (... + 1 : we need + 1 to neutralize useEffect)
+  const killsUntilPowerUpRef = useRef(KILLS_PER_POWERUP + 1);
 
   // initial value for enemies
   useEffect(() => {
@@ -98,10 +109,12 @@ export default function Scene({
     };
   }, []);
 
+  // stop shooting after overheated
   useEffect(() => {
     handlePointerUpOnSpaceShip();
   }, [isOverheated]);
 
+  // interval for enemy shoots
   useEffect(() => {
     if (gameStatus === "playing") {
       enemyBulletIntervalRef.current = setInterval(
@@ -116,6 +129,17 @@ export default function Scene({
       }
     };
   }, [gameStatus, enemies.length]);
+
+  useEffect(() => {
+    // one new killed submited
+    killsUntilPowerUpRef.current--;
+
+    if (killsUntilPowerUpRef.current === 0) {
+      dispatch(addPowerUp(killStatus.lastKillPosition));
+      // reset needed kills
+      killsUntilPowerUpRef.current = KILLS_PER_POWERUP;
+    }
+  }, [killStatus]);
 
   /* functions */
   function handlePointerMove(event: ThreeEvent<PointerEvent>) {
@@ -211,6 +235,7 @@ export default function Scene({
     deleteAmmo(bulletId, ammoType);
 
     const bulletDamage = calcAmmoDamage(ammoType);
+
     dispatch(damageEnemy({ enemyId, bulletDamage }));
   }
 
@@ -245,7 +270,6 @@ export default function Scene({
   function collisionSpaceShipToEnemy() {
     // prevent duplicate collisions from being recorded or calculating damage for invisible space ship
     if (collisionEventsRef.current.spaceShip || isSpaceShipInvisible) return;
-
     collisionEventsRef.current.spaceShip = true;
 
     // now is not visibile
@@ -291,6 +315,19 @@ export default function Scene({
     createAmmo(arg, color, "blaster");
   }
 
+  function deletePowerUp(powerUpId: string) {
+    dispatch(removePowerUp(powerUpId));
+  }
+
+  function collisionPowerUpToSpaceShip(powerUp: PowerUpType) {
+    // prevent duplicate collisions from being recorded or calculating damage for invisible space ship
+    if (collisionEventsRef.current.powerUp.has(powerUp.id)) return;
+    collisionEventsRef.current.powerUp.add(powerUp.id);
+
+    dispatch(setPowerUp(powerUp.type));
+    dispatch(removePowerUp(powerUp.id));
+  }
+
   return (
     <Physics debug>
       <OrbitControls makeDefault />
@@ -325,6 +362,7 @@ export default function Scene({
             key={blaster.id}
             blaster={blaster}
             deleteAmmo={deleteAmmo}
+            deletePowerUp={deletePowerUp}
             onCollision={collisionAmmoToEnemy}
           />
         );
@@ -342,6 +380,16 @@ export default function Scene({
       })}
       {enemies.map((enemy) => {
         return <Enemy key={enemy.id} enemy={enemy} />;
+      })}
+      {powerUps.map((powerUp) => {
+        return (
+          <PowerUp
+            key={powerUp.id}
+            powerUp={powerUp}
+            deletePowerUp={deletePowerUp}
+            onCollision={collisionPowerUpToSpaceShip}
+          />
+        );
       })}
     </Physics>
   );

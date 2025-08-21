@@ -8,6 +8,7 @@ export const BULLET_DAMAGE_LEVEL_2 = 20;
 export const BULLET_DAMAGE_LEVEL_3 = 30;
 export const BLASTER_DAMAGE = 80;
 export const ENEMY_SHOOT_DURATION = 2000;
+export const KILLS_PER_POWERUP = 1;
 
 // space ship constants
 export const COOLING_RATE = 10;
@@ -26,7 +27,7 @@ export const ATTACK_WAVE_LEVEL_1: EnemyType[] = generateAttackWave(
   8,
   { x: -35, y: 50 }
 );
-export const ATTACK_WAVE_LEVEL_2 = generateAttackWave(
+export const ATTACK_WAVE_LEVEL_2: EnemyType[] = generateAttackWave(
   {
     args: [3, 3, 1],
     color: "red",
@@ -36,7 +37,7 @@ export const ATTACK_WAVE_LEVEL_2 = generateAttackWave(
   8,
   { x: -35, y: 50 }
 );
-export const ATTACK_WAVE_LEVEL_3 = generateAttackWave(
+export const ATTACK_WAVE_LEVEL_3: EnemyType[] = generateAttackWave(
   {
     args: [3, 3, 1],
     color: "blue",
@@ -73,12 +74,18 @@ export const COLLISION_GROUPS = {
   ENEMY_BULLET: 4,
   SPACESHIP_BULLET: 8,
   BLASTER: 16,
+  POWERUP: 32,
 };
 
 export const COLLISION_MASKS = {
-  SPACESHIP: [COLLISION_GROUPS.ENEMY, COLLISION_GROUPS.ENEMY_BULLET],
+  SPACESHIP: [
+    COLLISION_GROUPS.ENEMY,
+    COLLISION_GROUPS.ENEMY_BULLET,
+    COLLISION_GROUPS.POWERUP,
+  ],
   ENEMY: [COLLISION_GROUPS.SPACESHIP, COLLISION_GROUPS.SPACESHIP_BULLET],
   ENEMY_BULLET: [COLLISION_GROUPS.SPACESHIP, COLLISION_GROUPS.SPACESHIP_BULLET],
   SPACESHIP_BULLET: [COLLISION_GROUPS.ENEMY, COLLISION_GROUPS.ENEMY_BULLET],
   BLASTER: [COLLISION_GROUPS.ENEMY, COLLISION_GROUPS.ENEMY_BULLET],
+  POWERUP: [COLLISION_GROUPS.SPACESHIP],
 };
