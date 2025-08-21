@@ -1,12 +1,14 @@
 import { useThree } from "@react-three/fiber";
 import {
   CuboidCollider,
+  interactionGroups,
   RapierRigidBody,
   RigidBody,
 } from "@react-three/rapier";
 import { type Ref } from "react";
 import { useAppSelector } from "~/RTK/hook";
 import { Text } from "@react-three/drei";
+import { COLLISION_GROUPS, COLLISION_MASKS } from "~/constants";
 
 type SpaceShipProps = {
   startTheGunfire: () => void;
@@ -29,11 +31,15 @@ export default function SpaceShip({
 
   return (
     <RigidBody
+      type="kinematicPosition"
       name="spaceShip"
       ref={ref}
-      type="kinematicPosition"
       gravityScale={0}
       colliders={false}
+      collisionGroups={interactionGroups(
+        COLLISION_GROUPS.SPACESHIP,
+        COLLISION_MASKS.SPACESHIP
+      )}
       onIntersectionEnter={({ other }) => {
         if (other.rigidBodyObject?.name === "enemy") {
           onCollision();

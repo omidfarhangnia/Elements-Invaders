@@ -1,11 +1,13 @@
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   RigidBody,
   CuboidCollider,
   RapierRigidBody,
   BallCollider,
+  interactionGroups,
 } from "@react-three/rapier";
+import { COLLISION_GROUPS, COLLISION_MASKS } from "~/constants";
 
 export interface AmmoType {
   position: [number, number, 1];
@@ -53,12 +55,10 @@ export default function Bullet({
     if (rigidBodyRef.current) {
       const position = rigidBodyRef.current.translation();
 
-      const isOutOfRange =
-        owner === "spaceShip"
-          ? position.y > viewport.height / 2 + bulletHalfHeight
-          : position.y < -(viewport.height / 2 + bulletHalfHeight);
-
-      if (isOutOfRange) {
+      if (
+        position.y > viewport.height / 2 + bulletHalfHeight ||
+        position.y < -(viewport.height / 2 + bulletHalfHeight)
+      ) {
         deleteAmmo(
           bullet.id,
           owner === "spaceShip" ? "spaceShipBullet" : "enemyBullet"
@@ -66,6 +66,26 @@ export default function Bullet({
       }
     }
   });
+
+  const collisionGroupProps = useMemo(() => {
+    if (owner === "spaceShip") {
+      // این تیر سفینه است
+      return {
+        collisionGroups: interactionGroups(
+          COLLISION_GROUPS.SPACESHIP_BULLET,
+          COLLISION_MASKS.SPACESHIP_BULLET
+        ),
+      }; // عضو گروه 4، برخورد فقط با گروه 2
+    } else {
+      // این تیر دشمن است
+      return {
+        collisionGroups: interactionGroups(
+          COLLISION_GROUPS.ENEMY_BULLET,
+          COLLISION_MASKS.ENEMY_BULLET
+        ),
+      }; // عضو گروه 8، برخورد فقط با گروه 1
+    }
+  }, [owner]);
 
   return (
     <RigidBody
@@ -76,6 +96,7 @@ export default function Bullet({
       userData={{ id: bullet.id }}
       gravityScale={0}
       position={bullet.position}
+      {...collisionGroupProps}
       {...(owner === "enemy"
         ? {
             onIntersectionEnter: ({ other }) => {
@@ -155,6 +176,7 @@ export function Blaster({ blaster, deleteAmmo, onCollision }: BlasterProps) {
       gravityScale={0}
       position={blaster.position}
       onCollisionEnter={({ other }) => {
+        console.log("hello there");
         if (other.rigidBodyObject?.name === "enemy") {
           onCollision(
             blaster.id,
@@ -167,13 +189,17 @@ export function Blaster({ blaster, deleteAmmo, onCollision }: BlasterProps) {
       }}
     >
       <mesh>
-        <sphereGeometry
-          args={[blaster.args[0], blaster.args[1], blaster.args[2]]}
-        />
-        <meshBasicMaterial color="red" />
+        <sphereGeometry args={blaster.args} />
+        <meshBasicMaterial color={blaster.color} />
       </mesh>
 
-      <BallCollider args={[blaster.args[0]]} />
+      <BallCollider
+        args={[blaster.args[0]]}
+        collisionGroups={interactionGroups(
+          COLLISION_GROUPS.BLASTER,
+          COLLISION_MASKS.BLASTER
+        )}
+      />
     </RigidBody>
   );
 }

@@ -59,9 +59,20 @@ const gameSlice = createSlice({
       const newAmmo = { ...action.payload, id: uuidv4() };
 
       if (action.payload.type === "bullet") {
+        // we cant shoot if we dont have enough capacity
+        if (100 - state.spaceShipOverheat < HEAT_PER_SHOOT_BULLET) {
+          state.isOverheated = true;
+          return;
+        }
         state.bullets.push(newAmmo);
         state.spaceShipOverheat += HEAT_PER_SHOOT_BULLET;
       } else if (action.payload.type === "blaster") {
+        // we cant shoot if we dont have enough capacity
+        if (100 - state.spaceShipOverheat < HEAT_PER_SHOOT_BLASTER) {
+          state.isOverheated = true;
+          return;
+        }
+
         if (state.numberOfBlasters > 0) {
           state.blasters.push(newAmmo);
           state.spaceShipOverheat += HEAT_PER_SHOOT_BLASTER;

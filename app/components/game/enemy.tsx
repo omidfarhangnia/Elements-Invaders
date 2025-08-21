@@ -1,6 +1,11 @@
-import { CuboidCollider, RigidBody } from "@react-three/rapier";
+import {
+  CuboidCollider,
+  interactionGroups,
+  RigidBody,
+} from "@react-three/rapier";
 import { useRef } from "react";
 import * as THREE from "three";
+import { COLLISION_GROUPS, COLLISION_MASKS } from "~/constants";
 
 export interface EnemyType {
   position: [number, number, 1];
@@ -31,6 +36,10 @@ export default function Enemy({ enemy }: EnemyProps) {
       name="enemy"
       userData={{ id: enemy.id }}
       position={enemy.position}
+      collisionGroups={interactionGroups(
+        COLLISION_GROUPS.ENEMY,
+        COLLISION_MASKS.ENEMY
+      )}
     >
       <group ref={enemyRef}>
         {/* enemy space ship */}
@@ -56,6 +65,7 @@ export default function Enemy({ enemy }: EnemyProps) {
 
       <CuboidCollider
         args={[enemy.args[0] / 2, enemy.args[1] / 2, enemy.args[2] / 2]}
+        sensor
       />
     </RigidBody>
   );

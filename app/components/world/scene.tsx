@@ -277,10 +277,13 @@ export default function Scene({
     );
   }
 
-  function handlePointerDownRightClick() {
+  function handlePointerDownRightClick(
+    arg: [number, number, number],
+    color: string
+  ) {
     if (numberOfBlasters === 0) return;
 
-    createAmmo([1, 10, 10], "lime", "blaster");
+    createAmmo(arg, color, "blaster");
   }
 
   return (
@@ -292,7 +295,9 @@ export default function Scene({
       <SpaceShipAmmo />
       <SpaceShip
         startTheGunfire={() => handlePointerDownLeftClick([1, 1, 1], "red")}
-        shootTheBlaster={() => handlePointerDownRightClick()}
+        shootTheBlaster={() =>
+          handlePointerDownRightClick([1, 10, 10], "green")
+        }
         stopTheGunfire={handlePointerUpOnSpaceShip}
         ref={spaceShipRef}
         onCollision={collisionSpaceShipToEnemy}

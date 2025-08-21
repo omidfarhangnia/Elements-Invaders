@@ -1,7 +1,11 @@
 import { Canvas } from "@react-three/fiber";
 import type { EnemyType } from "~/components/game/enemy";
 import Scene from "~/components/world/scene";
-import { v4 as uuidv4 } from "uuid";
+import {
+  ATTACK_WAVE_LEVEL_1,
+  ATTACK_WAVE_LEVEL_2,
+  ATTACK_WAVE_LEVEL_3,
+} from "~/constants";
 
 export interface EnemyArrangements {
   level: 1 | 2 | 3;
@@ -13,43 +17,17 @@ const enemyArrangements: EnemyArrangements[] = [
   {
     level: 1,
     name: "level one",
-    enemyArrangments: [
-      {
-        position: [-20, 40, 1],
-        args: [3, 3, 1],
-        color: "yellow",
-        id: uuidv4(),
-        health: 100,
-      },
-      {
-        position: [-10, 40, 1],
-        args: [3, 3, 1],
-        color: "yellow",
-        id: uuidv4(),
-        health: 100,
-      },
-      {
-        position: [0, 40, 1],
-        args: [3, 3, 1],
-        color: "yellow",
-        id: uuidv4(),
-        health: 100,
-      },
-      {
-        position: [10, 40, 1],
-        args: [3, 3, 1],
-        color: "yellow",
-        id: uuidv4(),
-        health: 100,
-      },
-      {
-        position: [20, 40, 1],
-        args: [3, 3, 1],
-        color: "yellow",
-        id: uuidv4(),
-        health: 100,
-      },
-    ],
+    enemyArrangments: ATTACK_WAVE_LEVEL_1,
+  },
+  {
+    level: 2,
+    name: "level two",
+    enemyArrangments: ATTACK_WAVE_LEVEL_2,
+  },
+  {
+    level: 3,
+    name: "level three",
+    enemyArrangments: ATTACK_WAVE_LEVEL_3,
   },
 ];
 
