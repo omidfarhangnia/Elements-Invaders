@@ -4,6 +4,7 @@ import { Physics, RapierRigidBody } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
 import SpaceShip, {
   SpaceShipAmmo,
+  SpaceShipBulletLevel,
   SpaceShipHealth,
   SpaceShipOverheat,
 } from "../game/space-ship";
@@ -335,6 +336,7 @@ export default function Scene({
       <SpaceShipHealth />
       <SpaceShipOverheat />
       <SpaceShipAmmo />
+      <SpaceShipBulletLevel />
       <SpaceShip
         startTheGunfire={() => handlePointerDownLeftClick([1, 1, 1], "red")}
         shootTheBlaster={() =>

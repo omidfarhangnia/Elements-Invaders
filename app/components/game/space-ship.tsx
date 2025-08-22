@@ -83,26 +83,26 @@ export function SpaceShipHealth() {
   const { viewport } = useThree();
   const spaceShipHealth = useAppSelector((state) => state.game.spaceShipHealth);
 
-  const healthBarWidth = 25;
-  const healthBarHeight = 5;
+  const containerWidth = 25;
+  const containerHeight = 5;
 
   const healthFraction = spaceShipHealth / 100;
-  const healthPostionX = -(healthBarWidth * (1 - healthFraction)) / 2;
+  const healthPostionX = -(containerWidth * (1 - healthFraction)) / 2;
 
   return (
     <group
       position={[
-        (healthBarWidth - viewport.width + 8) / 2,
-        (healthBarHeight - viewport.height + 8) / 2,
+        (containerWidth - viewport.width + 8) / 2,
+        (containerHeight - viewport.height + 8) / 2,
         3,
       ]}
     >
       <mesh>
-        <planeGeometry args={[healthBarWidth, healthBarHeight]} />
+        <planeGeometry args={[containerWidth, containerHeight]} />
         <meshBasicMaterial color="pink" />
       </mesh>
       <mesh scale-x={healthFraction} position={[healthPostionX, 0, 0.3]}>
-        <planeGeometry args={[healthBarWidth - 5, healthBarHeight - 3]} />
+        <planeGeometry args={[containerWidth - 5, containerHeight - 3]} />
         <meshBasicMaterial color="blue" />
       </mesh>
     </group>
@@ -115,28 +115,28 @@ export function SpaceShipOverheat() {
     (state) => state.game.spaceShipOverheat
   );
 
-  const engineBarWidth = 10;
-  const engineBarHeight = 25;
+  const containerWidth = 10;
+  const containerHeight = 25;
 
   const engineFraction = spaceShipOverheat / 100;
-  const enginePositionY = -(engineBarHeight * (1 - engineFraction)) / 2;
+  const enginePositionY = -(containerHeight * (1 - engineFraction)) / 2;
 
   return (
     <group
       position={[
-        (viewport.width - engineBarWidth - 8) / 2,
-        (engineBarHeight - viewport.height + 12) / 2,
+        (viewport.width - containerWidth - 8) / 2,
+        (containerHeight - viewport.height + 12) / 2,
         3,
       ]}
     >
       <mesh>
-        <planeGeometry args={[engineBarWidth, engineBarHeight + 4]} />
+        <planeGeometry args={[containerWidth, containerHeight + 4]} />
         <meshBasicMaterial color="hotpink" />
       </mesh>
       <mesh position={[0, enginePositionY, 0.2]} scale-y={engineFraction}>
         <planeGeometry
           scale={[0, 0]}
-          args={[engineBarWidth - 4, engineBarHeight]}
+          args={[containerWidth - 4, containerHeight]}
         />
         <meshBasicMaterial
           color={
@@ -158,28 +158,61 @@ export function SpaceShipAmmo() {
     (state) => state.game.numberOfBlasters
   );
 
-  const ammoBarSideSize = 15;
+  const containerSize = 15;
 
   return (
     <group
       position={[
-        (ammoBarSideSize - viewport.width + 10) / 2,
-        (ammoBarSideSize - viewport.height + 24) / 2,
+        (containerSize - viewport.width + 10) / 2,
+        (containerSize - viewport.height + 24) / 2,
         3,
       ]}
     >
       <mesh>
-        <planeGeometry args={[ammoBarSideSize, ammoBarSideSize]} />
+        <planeGeometry args={[containerSize, containerSize]} />
         <meshBasicMaterial color="green" />
       </mesh>
       {Array.from({ length: numberOfBlasters }).map((_, index) => {
         return (
           <mesh
-            position={[index * 3 - 3, 0, 0]}
+            position={[index * 3 - 6, 0, 0]}
             rotation-x={Math.PI / 2}
             key={index}
           >
             <cylinderGeometry args={[1, 1, 2, 16]} />
+            <meshBasicMaterial color="red" />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+export function SpaceShipBulletLevel() {
+  const { viewport } = useThree();
+  const bulletLevel = useAppSelector((state) => state.game.bulletLevel);
+
+  const containerWidth = 5;
+  const containerHeight = 15;
+
+  return (
+    <group
+      position={[
+        (containerWidth - viewport.width + 45) / 2,
+        (containerHeight - viewport.height + 24) / 2,
+        3,
+      ]}
+    >
+      <mesh>
+        <planeGeometry args={[containerWidth, containerHeight]} />
+        <meshBasicMaterial color="pink" />
+      </mesh>
+      {Array.from({ length: bulletLevel }).map((_, index) => {
+        return (
+          <mesh position={[0, index * 3 - 3, 0.3]} key={index}>
+            <planeGeometry
+              args={[containerWidth * 0.7, containerHeight * 0.1]}
+            />
             <meshBasicMaterial color="red" />
           </mesh>
         );
