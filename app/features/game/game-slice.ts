@@ -43,7 +43,7 @@ const initialState: GameStatus = {
   // all powerUp items which currently located in scene are in this array
   powerUps: [],
   // some data about kills
-  killStatus: { count: 0, lastKillPosition: [0, 0, 1] },
+  killStatus: { count: 0, lastKillPosition: [100, 100, 1] },
   // number of blasters remaining
   numberOfBlasters: 3,
   // all enemies bullets are here (bullets will remove after moving out of scene)
