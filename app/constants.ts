@@ -17,39 +17,45 @@ export const HEAT_PER_SHOOT_BLASTER = 20;
 export const INVINCIBILITY_DURATION = 2000; // 2 seconds
 
 // enemy attack wave
+export const ATTACK_WAVE_LEVEL_1_COL_NUM = 3;
+export const ATTACK_WAVE_LEVEL_1_ROW_NUM = 9;
 export const ATTACK_WAVE_LEVEL_1: EnemyType[] = generateAttackWave(
   {
     args: [3, 3, 1],
     color: "yellow",
     health: 100,
   },
-  3,
-  8,
-  { x: -35, y: 50 }
+  ATTACK_WAVE_LEVEL_1_COL_NUM,
+  ATTACK_WAVE_LEVEL_1_ROW_NUM,
+  { x: -40, y: 50 }
 );
+export const ATTACK_WAVE_LEVEL_2_COL_NUM = 3;
+export const ATTACK_WAVE_LEVEL_2_ROW_NUM = 9;
 export const ATTACK_WAVE_LEVEL_2: EnemyType[] = generateAttackWave(
   {
     args: [3, 3, 1],
     color: "red",
     health: 100,
   },
-  3,
-  8,
-  { x: -35, y: 50 }
+  ATTACK_WAVE_LEVEL_2_COL_NUM,
+  ATTACK_WAVE_LEVEL_2_ROW_NUM,
+  { x: -40, y: 50 }
 );
+export const ATTACK_WAVE_LEVEL_3_COL_NUM = 3;
+export const ATTACK_WAVE_LEVEL_3_ROW_NUM = 9;
 export const ATTACK_WAVE_LEVEL_3: EnemyType[] = generateAttackWave(
   {
     args: [3, 3, 1],
     color: "blue",
     health: 100,
   },
-  3,
-  8,
-  { x: -35, y: 50 }
+  ATTACK_WAVE_LEVEL_3_COL_NUM,
+  ATTACK_WAVE_LEVEL_3_ROW_NUM,
+  { x: -40, y: 50 }
 );
 
 function generateAttackWave(
-  enemyData: Omit<EnemyType, "id" | "position">,
+  enemyData: Omit<EnemyType, "id" | "position" | "colData" | "rowData">,
   rows: number,
   cols: number,
   startPostion: { x: number; y: number }
@@ -61,6 +67,8 @@ function generateAttackWave(
         position: [startPostion.x + 10 * j, startPostion.y - 15 * i, 1],
         id: uuidv4(),
         ...enemyData,
+        rowData: {enemyRow: i, rowNum: rows},
+        colData: {enemyCol: j, colNum: cols},
       });
     }
   }
