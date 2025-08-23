@@ -21,7 +21,7 @@ export const ATTACK_WAVE_LEVEL_1_COL_NUM = 3;
 export const ATTACK_WAVE_LEVEL_1_ROW_NUM = 9;
 export const ATTACK_WAVE_LEVEL_1: EnemyType[] = generateAttackWave(
   {
-    args: [3, 3, 1],
+    args: [3, 3, 3],
     color: "yellow",
     health: 100,
   },
@@ -67,8 +67,8 @@ function generateAttackWave(
         position: [startPostion.x + 10 * j, startPostion.y - 15 * i, 1],
         id: uuidv4(),
         ...enemyData,
-        rowData: {enemyRow: i, rowNum: rows},
-        colData: {enemyCol: j, colNum: cols},
+        rowData: { enemyRow: i, rowNum: rows },
+        colData: { enemyCol: j, colNum: cols },
       });
     }
   }

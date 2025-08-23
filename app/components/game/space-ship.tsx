@@ -14,7 +14,7 @@ type SpaceShipProps = {
   shootTheBlaster: () => void;
   stopTheGunfire: () => void;
   ref: Ref<RapierRigidBody>;
-  onCollision: () => void;
+  onCollision: (enemyId: string) => void;
 };
 
 export default function SpaceShip({
@@ -24,8 +24,8 @@ export default function SpaceShip({
   ref,
   onCollision,
 }: SpaceShipProps) {
-  const isSpaceShipInvisible = useAppSelector(
-    (state) => state.game.isSpaceShipInvisible
+  const { isSpaceShipInvisible, isShieldActive } = useAppSelector(
+    (state) => state.game
   );
 
   return (
@@ -41,7 +41,7 @@ export default function SpaceShip({
       )}
       onIntersectionEnter={({ other }) => {
         if (other.rigidBodyObject?.name === "enemy") {
-          onCollision();
+          onCollision(other.rigidBodyObject.userData.id);
         }
       }}
     >
@@ -74,6 +74,12 @@ export default function SpaceShip({
         />
       </mesh>
 
+      {isShieldActive && (
+        <mesh position={[0, 0, 0.9]}>
+          <boxGeometry args={[6, 6, 1]} />
+          <meshBasicMaterial color={"#1090da"} />
+        </mesh>
+      )}
       <CuboidCollider args={[2.5, 2.5, 0.5]} sensor />
     </RigidBody>
   );
@@ -92,7 +98,7 @@ export function SpaceShipHealth() {
   return (
     <group
       position={[
-        (containerWidth - viewport.width + 8) / 2,
+        (containerWidth - viewport.width + viewport.width * 0.05) / 2,
         (containerHeight - viewport.height + 8) / 2,
         3,
       ]}
@@ -124,7 +130,7 @@ export function SpaceShipOverheat() {
   return (
     <group
       position={[
-        (viewport.width - containerWidth - 8) / 2,
+        (viewport.width - containerWidth - viewport.width * 0.05) / 2,
         (containerHeight - viewport.height + 12) / 2,
         3,
       ]}
@@ -163,7 +169,7 @@ export function SpaceShipAmmo() {
   return (
     <group
       position={[
-        (containerSize - viewport.width + 10) / 2,
+        (containerSize - viewport.width + viewport.width * 0.05) / 2,
         (containerSize - viewport.height + 24) / 2,
         3,
       ]}
@@ -179,7 +185,7 @@ export function SpaceShipAmmo() {
             rotation-x={Math.PI / 2}
             key={index}
           >
-            <cylinderGeometry args={[1, 1, 2, 16]} />
+            <cylinderGeometry args={[1, 1, 0.5, 16]} />
             <meshBasicMaterial color="red" />
           </mesh>
         );
@@ -198,7 +204,7 @@ export function SpaceShipBulletLevel() {
   return (
     <group
       position={[
-        (containerWidth - viewport.width + 45) / 2,
+        (containerWidth - viewport.width + 50) / 2,
         (containerHeight - viewport.height + 24) / 2,
         3,
       ]}
@@ -217,6 +223,37 @@ export function SpaceShipBulletLevel() {
           </mesh>
         );
       })}
+    </group>
+  );
+}
+
+export function SpaceShipShieldState() {
+  const { viewport } = useThree();
+  const isShieldActive = useAppSelector((state) => state.game.isShieldActive);
+
+  const containerWidth = 10;
+  const containerHeight = 10;
+
+  return (
+    <group
+      position={[
+        (viewport.width - containerWidth - viewport.width * 0.05) / 2,
+        (containerHeight - viewport.height + 70) / 2,
+        3,
+      ]}
+    >
+      <mesh>
+        <planeGeometry args={[containerWidth, containerHeight]} />
+        <meshBasicMaterial color="pink" />
+      </mesh>
+      {isShieldActive && (
+        <mesh>
+          <boxGeometry
+            args={[containerWidth * 0.6, containerHeight * 0.6, 0.5]}
+          />
+          <meshBasicMaterial color="blue" />
+        </mesh>
+      )}
     </group>
   );
 }

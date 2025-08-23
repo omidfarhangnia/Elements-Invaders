@@ -13,7 +13,11 @@ export interface PowerUpType {
   args: [number];
   color: string;
   id: string;
-  type: "increaseHealthAmount" | "increaseBlasterNum" | "levelUpBullet";
+  type:
+    | "increaseHealthAmount"
+    | "increaseBlasterNum"
+    | "levelUpBullet"
+    | "activeShield";
 }
 
 interface GameStatus {
@@ -21,6 +25,7 @@ interface GameStatus {
   enemies: EnemyType[];
   blasters: AmmoType[];
   powerUps: PowerUpType[];
+  isShieldActive: boolean;
   killStatus: { count: number; lastKillPosition: Position };
   numberOfBlasters: number;
   enemiesBullets: AmmoType[];
@@ -42,6 +47,7 @@ const initialState: GameStatus = {
   blasters: [],
   // all powerUp items which currently located in scene are in this array
   powerUps: [],
+  isShieldActive: false,
   // some data about kills
   killStatus: { count: 0, lastKillPosition: [100, 100, 1] },
   // number of blasters remaining
@@ -183,6 +189,7 @@ const gameSlice = createSlice({
         "increaseHealthAmount",
         "increaseBlasterNum",
         "levelUpBullet",
+        "activeShield",
       ]);
 
       // we dont want to give useless power up
@@ -191,6 +198,7 @@ const gameSlice = createSlice({
       if (state.bulletLevel === 3) availableTypes.delete("levelUpBullet");
       if (state.numberOfBlasters >= 5)
         availableTypes.delete("increaseBlasterNum");
+      if (state.isShieldActive) availableTypes.delete("activeShield");
 
       const availableTypesArray = [...availableTypes];
 
@@ -220,10 +228,16 @@ const gameSlice = createSlice({
       } else if (action.payload === "increaseHealthAmount") {
         if (state.spaceShipHealth === 100) return;
         state.spaceShipHealth += 20;
+      } else if (action.payload === "activeShield") {
+        if (state.isShieldActive) return;
+        state.isShieldActive = true;
       } else {
         if (state.bulletLevel === 3) return;
         state.bulletLevel++;
       }
+    },
+    toggleShieldActivation(state) {
+      state.isShieldActive = !state.isShieldActive;
     },
   },
 });
@@ -240,5 +254,6 @@ export const {
   addPowerUp,
   removePowerUp,
   setPowerUp,
+  toggleShieldActivation,
 } = gameSlice.actions;
 export default gameSlice.reducer;

@@ -6,6 +6,7 @@ import SpaceShip, {
   SpaceShipBulletLevel,
   SpaceShipHealth,
   SpaceShipOverheat,
+  SpaceShipShieldState,
 } from "../game/space-ship";
 import { Surface } from "./surface";
 import Bullet, { Blaster } from "../game/bullet";
@@ -63,6 +64,7 @@ export default function Scene({
     collisionSpaceShipToEnemy,
     deletePowerUp,
     deleteAmmo,
+    collisionBulletToShield,
   } = useCollisionHandler();
 
   return (
@@ -73,6 +75,7 @@ export default function Scene({
       <SpaceShipOverheat />
       <SpaceShipAmmo />
       <SpaceShipBulletLevel />
+      <SpaceShipShieldState />
       <SpaceShip
         startTheGunfire={() => handlePointerDownLeftClick([1, 1, 1], "red")}
         shootTheBlaster={() =>
@@ -113,6 +116,7 @@ export default function Scene({
             owner="enemy"
             deleteAmmo={deleteAmmo}
             onCollision={collisionBulletToSpaceShip}
+            onCollisionToShield={collisionBulletToShield}
           />
         );
       })}

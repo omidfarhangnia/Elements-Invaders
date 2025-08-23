@@ -7,6 +7,7 @@ import {
 } from "@react-three/rapier";
 import { useRef } from "react";
 import { COLLISION_GROUPS, COLLISION_MASKS } from "~/constants";
+import * as THREE from "three";
 
 export interface EnemyType {
   position: [number, number, 1];
@@ -63,28 +64,39 @@ export default function Enemy({ enemy }: EnemyProps) {
       const rowMoveSize = 0.6;
       const colMoveSpeed = 1.2;
       const colMoveSize = 1;
-      const newPosition = {
-        x:
-          enemy.position[0] +
+      const targetPosition = new THREE.Vector3(
+        enemy.position[0] +
           Math.sin(time * rowMoveSpeed + enemy.position[0]) *
             rowMoveSize *
             calcWhereSideIs(enemy.colData),
-        y:
-          enemy.position[1] +
+        enemy.position[1] +
           Math.sin(time * colMoveSpeed + enemy.position[1]) * colMoveSize,
-        z: enemy.position[2],
-      };
+        enemy.position[2]
+      );
 
-      rigidBodyRef.current.setNextKinematicTranslation(newPosition);
+      const currentPosition = new THREE.Vector3().copy(
+        rigidBodyRef.current.translation()
+      );
+      const direction = targetPosition.sub(currentPosition);
+
+      const velocity = direction.normalize().multiplyScalar(1);
+
+      rigidBodyRef.current.setLinvel(
+        { x: velocity.x, y: velocity.y, z: 0 },
+        true
+      );
     }
   });
 
   return (
     <RigidBody
       ref={rigidBodyRef}
-      type="kinematicPosition"
+      // type="kinematicPosition"
+      type="dynamic"
+      lockRotations
       name="enemy"
       userData={{ id: enemy.id }}
+      colliders={false}
       position={enemy.position}
       collisionGroups={interactionGroups(
         COLLISION_GROUPS.ENEMY,
@@ -115,7 +127,6 @@ export default function Enemy({ enemy }: EnemyProps) {
 
       <CuboidCollider
         args={[enemy.args[0] / 2, enemy.args[1] / 2, enemy.args[2] / 2]}
-        sensor
       />
     </RigidBody>
   );

@@ -8,6 +8,7 @@ import {
   interactionGroups,
 } from "@react-three/rapier";
 import { COLLISION_GROUPS, COLLISION_MASKS } from "~/constants";
+import { useAppSelector } from "~/RTK/hook";
 
 export type Position = [number, number, 1];
 
@@ -31,6 +32,7 @@ type BulletProps = {
     enemyId?: string,
     ammoType?: "spaceShipBullet" | "spaceShipBlaster"
   ) => void;
+  onCollisionToShield?: (bulletId: string) => void;
 };
 
 export default function Bullet({
@@ -38,7 +40,9 @@ export default function Bullet({
   owner,
   deleteAmmo,
   onCollision,
+  onCollisionToShield,
 }: BulletProps) {
+  const isShieldActive = useAppSelector((state) => state.game.isShieldActive);
   const rigidBodyRef = useRef<RapierRigidBody>(null!);
   const { viewport } = useThree();
   const bulletHalfHeight = bullet.args[1] / 2;
@@ -100,7 +104,12 @@ export default function Bullet({
       {...(owner === "enemy"
         ? {
             onIntersectionEnter: ({ other }) => {
-              if (other.rigidBodyObject?.name === rigidBodyTarget) {
+              if (isShieldActive) {
+                if (onCollisionToShield !== undefined) {
+                  onCollisionToShield(bullet.id);
+                }
+                deleteAmmo(other.rigidBodyObject?.userData.id, "enemyBullet");
+              } else if (other.rigidBodyObject?.name === rigidBodyTarget) {
                 onCollision(bullet.id);
               }
             },

@@ -13,13 +13,14 @@ import {
   removeAmmo,
   removePowerUp,
   setPowerUp,
+  toggleShieldActivation,
   toggleSpaceShipVisibility,
   type PowerUpType,
 } from "~/features/game/game-slice";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
 
 export default function useCollisionHandler() {
-  const { bulletLevel, isSpaceShipInvisible } = useAppSelector(
+  const { bulletLevel, isSpaceShipInvisible, isShieldActive } = useAppSelector(
     (state) => state.game
   );
   const dispatch = useAppDispatch();
@@ -28,6 +29,7 @@ export default function useCollisionHandler() {
     spaceShipAmmo: new Set<string>(),
     enemyAmmo: new Set<string>(),
     spaceShip: false,
+    shield: new Set<string>(),
     powerUp: new Set<string>(),
   });
 
@@ -72,14 +74,6 @@ export default function useCollisionHandler() {
     dispatch(damageEnemy({ enemyId, bulletDamage }));
   }
 
-  function makeVisibleSpaceShip() {
-    setTimeout(() => {
-      // now is visible
-      dispatch(toggleSpaceShipVisibility());
-      collisionEventsRef.current.spaceShip = false;
-    }, INVINCIBILITY_DURATION);
-  }
-
   function collisionBulletToSpaceShip(bulletId: string) {
     if (
       collisionEventsRef.current.enemyAmmo.has(bulletId) ||
@@ -94,22 +88,40 @@ export default function useCollisionHandler() {
     deleteAmmo(bulletId, "enemyBullet");
 
     // now is not visibile
-    dispatch(toggleSpaceShipVisibility());
     dispatch(damageSpaceShip(damage));
-
-    makeVisibleSpaceShip();
+    changeVisibility();
   }
 
-  function collisionSpaceShipToEnemy() {
+  function changeVisibility() {
+    dispatch(toggleSpaceShipVisibility());
+
+    setTimeout(() => {
+      // now is visible
+      dispatch(toggleSpaceShipVisibility());
+      collisionEventsRef.current.spaceShip = false;
+    }, INVINCIBILITY_DURATION);
+  }
+
+  function collisionSpaceShipToEnemy(enemyId: string) {
+    if (isShieldActive && !isSpaceShipInvisible) {
+      if (!enemyId) return;
+      // prevent duplicate collisions from being recorded
+      if (collisionEventsRef.current.shield.has(enemyId)) return;
+      collisionEventsRef.current.shield.add(enemyId);
+
+      // now is not visible
+      dispatch(toggleShieldActivation());
+      changeVisibility();
+      return;
+    }
+
     // prevent duplicate collisions from being recorded or calculating damage for invisible space ship
     if (collisionEventsRef.current.spaceShip || isSpaceShipInvisible) return;
     collisionEventsRef.current.spaceShip = true;
 
     // now is not visibile
-    dispatch(toggleSpaceShipVisibility());
     dispatch(damageSpaceShip(ENEMY_COLLISION_DAMAGE));
-
-    makeVisibleSpaceShip();
+    changeVisibility();
   }
 
   function collisionPowerUpToSpaceShip(powerUp: PowerUpType) {
@@ -125,6 +137,15 @@ export default function useCollisionHandler() {
     dispatch(removePowerUp(powerUpId));
   }
 
+  function collisionBulletToShield(bulletId: string) {
+    // prevent duplicate collisions from being recorded
+    if (collisionEventsRef.current.shield.has(bulletId)) return;
+    collisionEventsRef.current.shield.add(bulletId);
+
+    dispatch(toggleShieldActivation());
+    dispatch(removeAmmo({ id: bulletId, ammoType: "enemyBullet" }));
+  }
+
   return {
     collisionAmmoToEnemy,
     collisionBulletToSpaceShip,
@@ -132,5 +153,6 @@ export default function useCollisionHandler() {
     collisionPowerUpToSpaceShip,
     deletePowerUp,
     deleteAmmo,
+    collisionBulletToShield,
   };
 }
