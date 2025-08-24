@@ -1,7 +1,17 @@
 @import "tailwindcss";
 
-*{
-    margin: 0;
+@theme {
+  --font-exo2: "Exo 2", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
+  --color-custom-brown: #52393c;
+  --color-custom-red: #c81823;
+  --color-custom-pink: #8c56d0;
+  --color-custom-black: #0e0e0e;
+  --color-custom-purple: #29005c;
+}
+
+* {
+  margin: 0;
 }
 
 canvas {
