@@ -11,7 +11,7 @@ import SpaceShip, {
 import { Surface } from "./surface";
 import Bullet, { Blaster } from "../game/bullet";
 import Enemy from "../game/enemy";
-import type { EnemyArrangements } from "~/routes/lobby";
+import type { EnemyArrangements } from "~/routes/home";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
 import { initializeEnemies } from "~/features/game/game-slice";
 import PowerUp from "../game/powerUp";
