@@ -11,12 +11,17 @@
   --color-space: #000409;
 }
 
-* {
-  margin: 0;
-}
-
-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
+@layer utilities {
+  .border-custom {
+    --s: 7px;
+    border: 2px solid transparent;
+    padding: 3px 15px;
+    text-align: center;
+    mask:
+      conic-gradient(#000 0 0) content-box,
+      conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 /
+        calc(100% - var(--s)) calc(100% - var(--s));
+    transition: border-color 0.6s;
+    cursor: pointer;
+  }
 }

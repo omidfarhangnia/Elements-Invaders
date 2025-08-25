@@ -1,6 +1,7 @@
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import type { EnemyType } from "~/components/game/enemy";
+import Ring from "~/components/world/ring";
 import Stars from "~/components/world/stars";
 import {
   ATTACK_WAVE_LEVEL_1,
@@ -37,15 +38,30 @@ export function Model({ path }: { path: string }) {
   return <primitive object={scene} />;
 }
 
+function Rings() {
+  return (
+    <>
+      <Ring color="#3f091a" />
+      <Ring
+        radius={2.5}
+        height={0.3}
+        rotation={[0, 0, -Math.PI / 4]}
+        color="#390c16"
+      />
+      <Ring radius={2.9} color="#33051f" />
+    </>
+  );
+}
+
 function HomeScene() {
   return (
     <Canvas
-      camera={{ position: [0, 0, 2], fov: 75, near: 0.1, far: 300 }}
+      camera={{ position: [-2, 1, 5], fov: 75, near: 0.1, far: 300 }}
       className="bg-space"
     >
-      <OrbitControls makeDefault />
-      <directionalLight position={[10, 10, 5]} intensity={20} />
+      <pointLight color={"#ffffff"} intensity={150} position={[2, 2, 5]} />
       <Stars count={3000} radius={30} />
+      <Rings />
       <Model path={"../app/assets/models/boss_fight.glb"} />
     </Canvas>
   );
@@ -54,9 +70,18 @@ function HomeScene() {
 export default function Home() {
   return (
     <div className="w-full h-[100dvh] relative">
-      <div className=" absolute left-0 top-0 w-full h-full"></div>
       <div className="w-full h-full absolute left-0 top-0">
         <HomeScene />
+      </div>
+      <div className="absolute left-0 top-0 w-full h-full flex flex-col items-center justify-center gap-8 select-none">
+        <h1 className="uppercase text-white font-exo2 text-[calc(3rem_+_2vw)] text-center lg:text-[4.5rem] text-shadow-[2px_2px_15px_#ffffff]">
+          elements invaders
+        </h1>
+        <div className="border-b-2 border-[#ffffff4e] hover:border-transparent transition-all">
+          <button className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white">
+            play game
+          </button>
+        </div>
       </div>
     </div>
   );
