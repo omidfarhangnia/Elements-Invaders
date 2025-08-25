@@ -1,37 +1,9 @@
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import type { EnemyType } from "~/components/game/enemy";
+import { Link } from "react-router";
 import Ring from "~/components/world/ring";
 import Stars from "~/components/world/stars";
-import {
-  ATTACK_WAVE_LEVEL_1,
-  ATTACK_WAVE_LEVEL_2,
-  ATTACK_WAVE_LEVEL_3,
-} from "~/constants";
-
-export interface EnemyArrangements {
-  level: 1 | 2 | 3;
-  name: string;
-  enemyArrangments: EnemyType[];
-}
-
-const enemyArrangements: EnemyArrangements[] = [
-  {
-    level: 1,
-    name: "level one",
-    enemyArrangments: ATTACK_WAVE_LEVEL_1,
-  },
-  {
-    level: 2,
-    name: "level two",
-    enemyArrangments: ATTACK_WAVE_LEVEL_2,
-  },
-  {
-    level: 3,
-    name: "level three",
-    enemyArrangments: ATTACK_WAVE_LEVEL_3,
-  },
-];
+import bossModelPath from "~/assets/models/boss_fight.glb";
 
 export function Model({ path }: { path: string }) {
   const { scene } = useGLTF(path);
@@ -62,7 +34,7 @@ function HomeScene() {
       <pointLight color={"#ffffff"} intensity={150} position={[2, 2, 5]} />
       <Stars count={3000} radius={30} />
       <Rings />
-      <Model path={"../app/assets/models/boss_fight.glb"} />
+      <Model path={bossModelPath} />
     </Canvas>
   );
 }
@@ -78,9 +50,11 @@ export default function Home() {
           elements invaders
         </h1>
         <div className="border-b-2 border-[#ffffff4e] hover:border-transparent transition-all">
-          <button className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white">
-            play game
-          </button>
+          <Link to={"/levels"}>
+            <button className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white">
+              play game
+            </button>
+          </Link>
         </div>
       </div>
     </div>
