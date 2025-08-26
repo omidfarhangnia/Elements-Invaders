@@ -28,7 +28,7 @@ function Rings() {
 function HomeScene() {
   return (
     <Canvas
-      camera={{ position: [-2, 1, 5], fov: 75, near: 0.1, far: 300 }}
+      camera={{ position: [-2, 1, 5], fov: 75, near: 0.1, far: 50 }}
       className="bg-space"
     >
       <pointLight color={"#ffffff"} intensity={150} position={[2, 2, 5]} />
@@ -39,7 +39,7 @@ function HomeScene() {
   );
 }
 
-export default function Home() {
+function Home() {
   return (
     <div className="w-full h-[100dvh] relative">
       <div className="w-full h-full absolute left-0 top-0">
@@ -49,14 +49,17 @@ export default function Home() {
         <h1 className="uppercase text-white font-exo2 text-[calc(3rem_+_2vw)] text-center lg:text-[4.5rem] text-shadow-[2px_2px_15px_#ffffff]">
           elements invaders
         </h1>
-        <div className="border-b-2 border-[#ffffff4e] hover:border-transparent transition-all">
-          <Link to={"/levels"}>
-            <button className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white">
-              play game
-            </button>
+        <div className="bg-[#ffffff10] transition-all w-[300px] hover:bg-transparent text-center">
+          <Link
+            to={"/levels"}
+            className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white block"
+          >
+            play game
           </Link>
         </div>
       </div>
     </div>
   );
 }
+
+export default Home;
