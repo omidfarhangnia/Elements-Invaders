@@ -61,5 +61,5 @@ export default function useEnemyShooting(
         clearInterval(enemyBulletIntervalRef.current);
       }
     };
-  }, [gameStatus, enemies, dispatch]);
+  }, [gameStatus, enemies.length, dispatch]);
 }
