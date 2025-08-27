@@ -5,14 +5,21 @@ import * as THREE from "three";
 
 interface StarsProps {
   count: number;
-  radius: number;
+  outerRadius: number;
+  innerRadius: number;
 }
 
-function useStarPositions(count: number, radius: number) {
+function useStarPositions(
+  count: number,
+  outerRadius: number,
+  innerRadius: number
+) {
   const positions = useMemo(() => {
     const buffer = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      const r = radius * Math.cbrt(Math.random());
+      const r = Math.cbrt(
+        Math.random() * (outerRadius ** 3 - innerRadius ** 3) + innerRadius ** 3
+      );
       const theta = Math.random() * 2 * Math.PI;
       const phi = Math.acos(2 * Math.random() - 1);
 
@@ -23,14 +30,14 @@ function useStarPositions(count: number, radius: number) {
       buffer.set([x, y, z], i * 3);
     }
     return buffer;
-  }, [count, radius]);
+  }, [count, outerRadius, innerRadius]);
 
   return positions;
 }
 
-export default function Stars({ count, radius }: StarsProps) {
+export default function Stars({ count, outerRadius, innerRadius }: StarsProps) {
   const pointsRef = useRef<THREE.Points>(null!);
-  const positions = useStarPositions(count, radius);
+  const positions = useStarPositions(count, outerRadius, innerRadius);
 
   useFrame((_, delta) => {
     if (pointsRef.current) {
