@@ -14,7 +14,7 @@ export function Surface({ moveSpaceShip }: SurfaceProps) {
       scale={[viewport.width, viewport.height, 1]}
     >
       <planeGeometry />
-      <meshStandardMaterial color={"#D3D3D3"} />
+      <meshBasicMaterial transparent opacity={0} depthWrite={false} />
     </mesh>
   );
 }

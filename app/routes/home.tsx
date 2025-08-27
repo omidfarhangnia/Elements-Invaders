@@ -5,9 +5,17 @@ import Ring from "~/components/world/ring";
 import Stars from "~/components/world/stars";
 import bossModelPath from "~/assets/models/boss_fight.glb";
 
-export function Model({ path }: { path: string }) {
+export function Model({
+  path,
+  scale,
+  rotation,
+}: {
+  path: string;
+  scale?: [number, number, number];
+  rotation?: [number, number, number];
+}) {
   const { scene } = useGLTF(path);
-  return <primitive object={scene} />;
+  return <primitive object={scene} scale={scale} rotation={rotation} />;
 }
 
 function Rings() {

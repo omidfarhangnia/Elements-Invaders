@@ -21,7 +21,7 @@ export interface EnemyArrangements {
   enemyArrangments: EnemyType[];
 }
 
-const enemyArrangements: EnemyArrangements[] = [
+export const enemyArrangements: EnemyArrangements[] = [
   {
     levelNum: 1,
     name: "level one",
@@ -83,9 +83,15 @@ export function Flame() {
   );
 }
 
-function SpaceShipFire({ flameNumber }: { flameNumber: number }) {
+export function SpaceShipFire({
+  flameNumber,
+  scale = [1, 1, 1],
+}: {
+  flameNumber: number;
+  scale?: [number, number, number];
+}) {
   return (
-    <group>
+    <group scale={scale}>
       {Array.from({ length: flameNumber }).map((_, index) => (
         <Flame key={index} />
       ))}
