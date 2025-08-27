@@ -222,22 +222,28 @@ const gameSlice = createSlice({
       );
     },
     setPowerUp(state, action: PayloadAction<PowerUpType["type"]>) {
-      if (action.payload === "increaseBlasterNum") {
-        if (state.numberOfBlasters >= 5) return;
-        state.numberOfBlasters++;
-      } else if (action.payload === "increaseHealthAmount") {
-        if (state.spaceShipHealth === 100) return;
-        state.spaceShipHealth += 20;
-      } else if (action.payload === "activeShield") {
-        if (state.isShieldActive) return;
-        state.isShieldActive = true;
-      } else {
-        if (state.bulletLevel === 3) return;
-        state.bulletLevel++;
+      switch (action.payload) {
+        case "increaseBlasterNum":
+          if (state.numberOfBlasters < 5) state.numberOfBlasters++;
+          break;
+        case "increaseHealthAmount":
+          if (state.spaceShipHealth < 100) state.spaceShipHealth += 20;
+          break;
+        case "activeShield":
+          if (!state.isShieldActive) state.isShieldActive = true;
+          break;
+        case "levelUpBullet":
+          if (state.bulletLevel < 3) state.bulletLevel++;
+          break;
       }
     },
     toggleShieldActivation(state) {
       state.isShieldActive = !state.isShieldActive;
+    },
+    setLevel(state, action: PayloadAction<number>) {
+      if (action.payload <= state.gameLevel.lastOpenedLevel) {
+        state.gameLevel.selectedLevel = action.payload;
+      }
     },
   },
 });
@@ -255,5 +261,6 @@ export const {
   removePowerUp,
   setPowerUp,
   toggleShieldActivation,
+  setLevel,
 } = gameSlice.actions;
 export default gameSlice.reducer;

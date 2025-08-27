@@ -11,6 +11,9 @@ import { Model } from "./home";
 import playerSpaceShip from "~/assets/models/player_space_ship.glb";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { useAppDispatch, useAppSelector } from "~/RTK/hook";
+import { setLevel } from "~/features/game/game-slice";
+import { FiLock } from "react-icons/fi";
 
 export interface EnemyArrangements {
   levelNum: number;
@@ -101,7 +104,7 @@ function LevelScene() {
       }}
       className="bg-space"
     >
-      <Stars count={3000} radius={30} />
+      <Stars count={3000} outerRadius={30} innerRadius={10} />
       <pointLight color={"#ffffff"} intensity={150} position={[2, 2, 5]} />
       <pointLight color={"#FF9A00"} intensity={40} position={[0.8, -2, 0]} />
       <Model path={playerSpaceShip} />
@@ -111,6 +114,11 @@ function LevelScene() {
 }
 
 function Levels() {
+  const dispatch = useAppDispatch();
+  const lastOpenedLevel = useAppSelector(
+    (state) => state.game.gameLevel.lastOpenedLevel
+  );
+
   return (
     <div className="w-full h-[100dvh] relative select-none">
       <div className="w-full h-full absolute left-0 top-0">
@@ -118,20 +126,32 @@ function Levels() {
       </div>
       <div className="w-full h-full absolute left-0 top-0 flex flex-col gap-[10%] items-center justify-center">
         {enemyArrangements.map((level) => {
-          return (
-            <>
+          const isLocked = level.levelNum > lastOpenedLevel ? true : false;
+
+          if (isLocked) {
+            return (
               <div
                 key={level.levelNum}
-                className="bg-[#ffffff10] transition-all min-w-[200px] hover:bg-transparent text-center w-[30%] max-w-[300px]"
+                className="bg-[#ffffff10] transition-all min-w-[200px] disabled:hover:bg-[#ffffff10] text-center w-[30%] max-w-[300px] min-h-[80px] flex items-center justify-center"
               >
-                <Link
-                  to={"/battleground"}
-                  className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white block"
-                >
-                  {level.name}
-                </Link>
+                <FiLock color="#ffffff" size={30} />
               </div>
-            </>
+            );
+          }
+
+          return (
+            <div
+              onClick={() => dispatch(setLevel(level.levelNum))}
+              key={level.levelNum}
+              className="bg-[#ffffff10] transition-all min-w-[200px] hover:bg-transparent disabled:hover:bg-[#ffffff10] text-center w-[30%] max-w-[300px] min-h-[80px] flex items-center justify-center"
+            >
+              <Link
+                to={"/battleground"}
+                className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white block w-full h-full content-center"
+              >
+                {level.name}
+              </Link>
+            </div>
           );
         })}
       </div>
