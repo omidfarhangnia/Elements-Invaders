@@ -5,22 +5,23 @@ import {
   RapierRigidBody,
   RigidBody,
 } from "@react-three/rapier";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { COLLISION_GROUPS, COLLISION_MASKS } from "~/constants";
 import * as THREE from "three";
 
 export interface EnemyType {
   position: [number, number, 1];
   args: [number, number, number];
-  color: string;
   id: string;
   health: number; // percent 0 < health < 100
   rowData: { enemyRow: number; rowNum: number };
   colData: { enemyCol: number; colNum: number };
+  spaceShipModelNum: number;
 }
 
 type EnemyProps = {
   enemy: EnemyType;
+  scene: THREE.Group;
 };
 
 function calcWhereSideIs(colData: EnemyType["colData"]): -1 | 0 | 1 {
@@ -47,7 +48,7 @@ function calcWhereSideIs(colData: EnemyType["colData"]): -1 | 0 | 1 {
   }
 }
 
-export default function Enemy({ enemy }: EnemyProps) {
+export default function Enemy({ enemy, scene }: EnemyProps) {
   const rigidBodyRef = useRef<RapierRigidBody>(null!);
 
   const enemyHeight = enemy.args[1];
@@ -55,6 +56,8 @@ export default function Enemy({ enemy }: EnemyProps) {
 
   const healthFraction = enemy.health / 100;
   const healthPositionX = -(enemyWidth * (1 - healthFraction)) / 2;
+
+  const clonedScene = useMemo(() => scene.clone(), [scene]);
 
   useFrame((state) => {
     if (rigidBodyRef.current) {
@@ -91,9 +94,9 @@ export default function Enemy({ enemy }: EnemyProps) {
   return (
     <RigidBody
       ref={rigidBodyRef}
-      // type="kinematicPosition"
       type="dynamic"
       lockRotations
+      lockTranslations
       name="enemy"
       userData={{ id: enemy.id }}
       colliders={false}
@@ -105,24 +108,23 @@ export default function Enemy({ enemy }: EnemyProps) {
     >
       <group>
         {/* enemy space ship */}
-        <mesh>
-          <boxGeometry args={enemy.args} />
-          <meshStandardMaterial color={enemy.color} />
-        </mesh>
+        <primitive
+          object={clonedScene}
+          scale={[7, 7, 7]}
+          rotation={[0, -Math.PI / 2, 0]}
+        />
+        <pointLight color={"#ffffff"} intensity={20} position={[0, -2, 2]} />
 
         {/* enemy health */}
-        <group position={[0, enemyHeight, 0]}>
-          <mesh>
-            <planeGeometry args={[enemyWidth + 1, 1]} />
-            <meshStandardMaterial color="black" />
-          </mesh>
-          <mesh scale-x={healthFraction} position={[healthPositionX, 0, 0.3]}>
-            <planeGeometry args={[enemyWidth, 0.5]} />
-            <meshStandardMaterial
-              color={enemy.health > 50 ? "green" : "orange"}
-            />
-          </mesh>
-        </group>
+        <mesh
+          scale-x={healthFraction}
+          position={[healthPositionX, enemyHeight * 0.7, 0.3]}
+        >
+          <planeGeometry args={[enemyWidth, 0.5]} />
+          <meshStandardMaterial
+            color={enemy.health > 50 ? "#01CD24" : "#FF6812"}
+          />
+        </mesh>
       </group>
 
       <CuboidCollider

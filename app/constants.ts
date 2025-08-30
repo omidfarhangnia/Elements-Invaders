@@ -8,7 +8,7 @@ export const BULLET_DAMAGE_LEVEL_2 = 20;
 export const BULLET_DAMAGE_LEVEL_3 = 30;
 export const BLASTER_DAMAGE = 80;
 export const ENEMY_SHOOT_DURATION = 1000;
-export const KILLS_PER_POWERUP = 4;
+export const KILLS_PER_POWERUP = 1;
 
 // space ship constants
 export const COOLING_RATE = 10;
@@ -18,57 +18,77 @@ export const INVINCIBILITY_DURATION = 2000; // 2 seconds
 
 // enemy attack wave
 export const ATTACK_WAVE_LEVEL_1_COL_NUM = 3;
-export const ATTACK_WAVE_LEVEL_1_ROW_NUM = 9;
+export const ATTACK_WAVE_LEVEL_1_ROW_NUM = 5;
 export const ATTACK_WAVE_LEVEL_1: EnemyType[] = generateAttackWave(
   {
-    args: [3, 3, 3],
-    color: "yellow",
+    args: [6.5, 6.5, 1],
     health: 100,
   },
+  1,
   ATTACK_WAVE_LEVEL_1_COL_NUM,
   ATTACK_WAVE_LEVEL_1_ROW_NUM,
-  { x: -40, y: 50 }
+  { x: -30, y: 50 }
 );
 export const ATTACK_WAVE_LEVEL_2_COL_NUM = 3;
 export const ATTACK_WAVE_LEVEL_2_ROW_NUM = 9;
 export const ATTACK_WAVE_LEVEL_2: EnemyType[] = generateAttackWave(
   {
     args: [3, 3, 1],
-    color: "red",
     health: 100,
   },
+  2,
   ATTACK_WAVE_LEVEL_2_COL_NUM,
   ATTACK_WAVE_LEVEL_2_ROW_NUM,
   { x: -40, y: 50 }
 );
-export const ATTACK_WAVE_LEVEL_3_COL_NUM = 3;
-export const ATTACK_WAVE_LEVEL_3_ROW_NUM = 9;
+export const ATTACK_WAVE_LEVEL_3_COL_NUM = 1;
+export const ATTACK_WAVE_LEVEL_3_ROW_NUM = 1;
 export const ATTACK_WAVE_LEVEL_3: EnemyType[] = generateAttackWave(
   {
     args: [3, 3, 1],
-    color: "blue",
     health: 100,
   },
+  3,
   ATTACK_WAVE_LEVEL_3_COL_NUM,
   ATTACK_WAVE_LEVEL_3_ROW_NUM,
   { x: -40, y: 50 }
 );
 
 function generateAttackWave(
-  enemyData: Omit<EnemyType, "id" | "position" | "colData" | "rowData">,
+  enemyData: Omit<
+    EnemyType,
+    "id" | "position" | "colData" | "rowData" | "spaceShipModelNum"
+  >,
+  attackWaveLevel: number,
   rows: number,
   cols: number,
   startPostion: { x: number; y: number }
 ) {
+  const isBossFight = attackWaveLevel === 3;
+
+  if (isBossFight) {
+    return [
+      {
+        position: [startPostion.x, startPostion.y, 1] as [number, number, 1],
+        id: uuidv4(),
+        ...enemyData,
+        rowData: { enemyRow: 1, rowNum: rows },
+        colData: { enemyCol: 1, colNum: cols },
+        spaceShipModelNum: attackWaveLevel,
+      },
+    ];
+  }
+
   const attackWave: EnemyType[] = [];
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
       attackWave.push({
-        position: [startPostion.x + 10 * j, startPostion.y - 15 * i, 1],
+        position: [startPostion.x + 15 * j, startPostion.y - 15 * i, 1],
         id: uuidv4(),
         ...enemyData,
         rowData: { enemyRow: i, rowNum: rows },
         colData: { enemyCol: j, colNum: cols },
+        spaceShipModelNum: attackWaveLevel,
       });
     }
   }

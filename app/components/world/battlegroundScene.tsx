@@ -1,13 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Physics, RapierRigidBody } from "@react-three/rapier";
-import { OrbitControls } from "@react-three/drei";
-import SpaceShip, {
-  SpaceShipAmmo,
-  SpaceShipBulletLevel,
-  SpaceShipHealth,
-  SpaceShipOverheat,
-  SpaceShipShieldState,
-} from "../game/space-ship";
+import { useGLTF } from "@react-three/drei";
 import { Surface } from "./surface";
 import Bullet, { Blaster } from "../game/bullet";
 import Enemy from "../game/enemy";
@@ -21,6 +14,9 @@ import usePlayerShooting from "~/hooks/usePlayerShooting";
 import useCollisionHandler from "~/hooks/useCollisionHandler";
 import { enemyArrangements } from "~/routes/levels";
 import Stars from "./stars";
+import enemySpaceShipModel1 from "~/assets/models/enemy_space_ship_1.glb";
+import enemySpaceShipModel2 from "~/assets/models/enemy_space_ship_2.glb";
+import SpaceShip from "../game/space-ship";
 
 export default function BattlegroundScene() {
   const { enemies, bullets, blasters, powerUps, enemiesBullets, gameLevel } =
@@ -64,15 +60,12 @@ export default function BattlegroundScene() {
     collisionBulletToShield,
   } = useCollisionHandler();
 
+  const model1 = useGLTF(enemySpaceShipModel1);
+  const model2 = useGLTF(enemySpaceShipModel2);
+
   return (
     <Physics>
-      <OrbitControls makeDefault />
       <ambientLight intensity={Math.PI / 2} />
-      {/* <SpaceShipHealth />
-      <SpaceShipOverheat />
-      <SpaceShipAmmo />
-      <SpaceShipBulletLevel />
-      <SpaceShipShieldState /> */}
       <Stars count={3000} outerRadius={200} innerRadius={110} />
       <SpaceShip
         startTheGunfire={() => handlePointerDownLeftClick([1, 1, 1], "red")}
@@ -119,7 +112,13 @@ export default function BattlegroundScene() {
         );
       })}
       {enemies.map((enemy) => {
-        return <Enemy key={enemy.id} enemy={enemy} />;
+        return (
+          <Enemy
+            key={enemy.id}
+            enemy={enemy}
+            scene={enemy.spaceShipModelNum === 1 ? model1.scene : model2.scene}
+          />
+        );
       })}
       {powerUps.map((powerUp) => {
         return (

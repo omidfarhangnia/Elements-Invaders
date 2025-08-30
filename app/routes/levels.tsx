@@ -113,7 +113,7 @@ function LevelScene() {
       <Stars count={3000} outerRadius={30} innerRadius={10} />
       <pointLight color={"#ffffff"} intensity={150} position={[2, 2, 5]} />
       <pointLight color={"#FF9A00"} intensity={40} position={[0.8, -2, 0]} />
-      <Model path={playerSpaceShip} />
+      <Model path={playerSpaceShip} scale={[1, 1, 1]} rotation={[0, 0, 0]} />
       <SpaceShipFire flameNumber={100} />
     </Canvas>
   );
