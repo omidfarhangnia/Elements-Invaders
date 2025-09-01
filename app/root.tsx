@@ -10,6 +10,7 @@ import type { Route } from "./+types/root";
 import { Provider } from "react-redux";
 import { store } from "./RTK/store";
 import "./app.css";
+import { useEffect } from "react";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -25,6 +26,17 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    function disableContextMenu(event: Event) {
+      event.preventDefault();
+    }
+
+    document.addEventListener("contextmenu", disableContextMenu);
+
+    return () =>
+      document.removeEventListener("contextmenu", disableContextMenu);
+  }, []);
+
   return (
     <html lang="en">
       <head>

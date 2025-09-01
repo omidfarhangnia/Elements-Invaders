@@ -46,7 +46,7 @@ export default function Bullet({
   const rigidBodyRef = useRef<RapierRigidBody>(null!);
   const { viewport } = useThree();
   const bulletHalfHeight = bullet.args[1] / 2;
-  const speed = owner === "spaceShip" ? 50 : -60;
+  const speed = owner === "spaceShip" ? 30 : -30;
   const rigidBodyName = owner === "spaceShip" ? "bullet" : "enemyBullet";
   const rigidBodyTarget = owner === "spaceShip" ? "enemy" : "spaceShip";
 
@@ -167,7 +167,7 @@ export function Blaster({
 
   useEffect(() => {
     if (rigidBodyRef.current) {
-      rigidBodyRef.current.applyImpulse({ x: 0, y: 100, z: 0 }, true);
+      rigidBodyRef.current.applyImpulse({ x: 0, y: 120, z: 0 }, true);
     }
   }, []);
 
@@ -204,10 +204,16 @@ export function Blaster({
         }
       }}
     >
-      <mesh>
-        <sphereGeometry args={blaster.args} />
-        <meshBasicMaterial color={blaster.color} />
-      </mesh>
+      <group>
+        <mesh>
+          <octahedronGeometry args={[blaster.args[0], blaster.args[1]]} />
+          <meshBasicMaterial color={"#ff5d00"} />
+        </mesh>
+        <mesh>
+          <torusGeometry args={[1.5, 0.1, 8, 16]} />
+          <meshBasicMaterial color={blaster.color} />
+        </mesh>
+      </group>
 
       <BallCollider
         args={[blaster.args[0]]}

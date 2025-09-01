@@ -8,7 +8,7 @@ export const BULLET_DAMAGE_LEVEL_2 = 20;
 export const BULLET_DAMAGE_LEVEL_3 = 30;
 export const BLASTER_DAMAGE = 80;
 export const ENEMY_SHOOT_DURATION = 1000;
-export const KILLS_PER_POWERUP = 1;
+export const KILLS_PER_POWERUP = 3;
 
 // space ship constants
 export const COOLING_RATE = 10;

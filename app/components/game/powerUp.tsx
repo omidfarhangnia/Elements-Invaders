@@ -59,10 +59,20 @@ export default function PowerUp({
         }
       }}
     >
-      <mesh>
-        <octahedronGeometry args={powerUp.args} />
-        <meshStandardMaterial color={powerUp.color} />
-      </mesh>
+      <group>
+        <mesh>
+          <octahedronGeometry args={powerUp.args} />
+          <meshStandardMaterial color={powerUp.color} />
+        </mesh>
+        <mesh rotation={[Math.PI / 5, Math.PI / 5, 0]}>
+          <torusGeometry args={[2, 0.1, 8, 16]} />
+          <meshBasicMaterial color={"#D14FFF"} />
+        </mesh>
+        <mesh rotation={[-Math.PI / 5, Math.PI / 5, 0]}>
+          <torusGeometry args={[2, 0.1, 8, 16]} />
+          <meshBasicMaterial color={"#D14FFF"} />
+        </mesh>
+      </group>
       <BallCollider args={[powerUp.args[0]]} />
     </RigidBody>
   );

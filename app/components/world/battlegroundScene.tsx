@@ -38,7 +38,7 @@ export default function BattlegroundScene() {
 
   /* customHook */
   // controlling enemy shoots
-  useEnemyShooting([1.5, 1.5, 1.5], "green");
+  useEnemyShooting([0.5, 1.3, 0.7], "#E62727");
   // add power up
   usePowerUp();
   // controling space ship
@@ -68,9 +68,11 @@ export default function BattlegroundScene() {
       <ambientLight intensity={Math.PI / 2} />
       <Stars count={3000} outerRadius={200} innerRadius={110} />
       <SpaceShip
-        startTheGunfire={() => handlePointerDownLeftClick([1, 1, 1], "red")}
+        startTheGunfire={() =>
+          handlePointerDownLeftClick([0.5, 1.3, 0.7], "#FFD93D")
+        }
         shootTheBlaster={() =>
-          handlePointerDownRightClick([1, 10, 10], "green")
+          handlePointerDownRightClick([1, 1, 0], "#FAE500")
         }
         stopTheGunfire={handlePointerUpOnSpaceShip}
         ref={spaceShipRef}
