@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Physics, RapierRigidBody } from "@react-three/rapier";
-import { useGLTF } from "@react-three/drei";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import { Surface } from "./surface";
 import Bullet, { Blaster } from "../game/bullet";
 import Enemy from "../game/enemy";
@@ -65,6 +65,7 @@ export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
 
   return (
     <Physics paused={isPaused}>
+      <OrbitControls />
       <ambientLight intensity={Math.PI / 2} />
       <Stars
         count={3000}
@@ -123,6 +124,7 @@ export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
           <Enemy
             key={enemy.id}
             enemy={enemy}
+            modelNum={enemy.spaceShipModelNum}
             scene={enemy.spaceShipModelNum === 1 ? model1.scene : model2.scene}
           />
         );

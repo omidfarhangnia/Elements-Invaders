@@ -18,12 +18,11 @@ export const INVINCIBILITY_DURATION = 2000; // 2 seconds
 
 // enemy attack wave
 export const ATTACK_WAVE_LEVEL_1_COL_NUM = 3;
-// export const ATTACK_WAVE_LEVEL_1_ROW_NUM = 5;
-export const ATTACK_WAVE_LEVEL_1_ROW_NUM = 1;
+export const ATTACK_WAVE_LEVEL_1_ROW_NUM = 5;
 export const ATTACK_WAVE_LEVEL_1: EnemyType[] = generateAttackWave(
   {
     args: [6.5, 6.5, 1],
-    health: 5,
+    health: 100,
   },
   1,
   ATTACK_WAVE_LEVEL_1_COL_NUM,
@@ -31,16 +30,17 @@ export const ATTACK_WAVE_LEVEL_1: EnemyType[] = generateAttackWave(
   { x: -30, y: 50 }
 );
 export const ATTACK_WAVE_LEVEL_2_COL_NUM = 3;
-export const ATTACK_WAVE_LEVEL_2_ROW_NUM = 1;
+export const ATTACK_WAVE_LEVEL_2_ROW_NUM = 5;
 export const ATTACK_WAVE_LEVEL_2: EnemyType[] = generateAttackWave(
   {
-    args: [3, 3, 1],
+    args: [6.5, 6.5, 1],
+
     health: 100,
   },
   2,
   ATTACK_WAVE_LEVEL_2_COL_NUM,
   ATTACK_WAVE_LEVEL_2_ROW_NUM,
-  { x: -40, y: 50 }
+  { x: -30, y: 50 }
 );
 // export const ATTACK_WAVE_LEVEL_3_COL_NUM = 1;
 // export const ATTACK_WAVE_LEVEL_3_ROW_NUM = 1;

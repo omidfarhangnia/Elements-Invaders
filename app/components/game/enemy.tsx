@@ -22,6 +22,7 @@ export interface EnemyType {
 type EnemyProps = {
   enemy: EnemyType;
   scene: THREE.Group;
+  modelNum: number;
 };
 
 function calcWhereSideIs(colData: EnemyType["colData"]): -1 | 0 | 1 {
@@ -48,7 +49,7 @@ function calcWhereSideIs(colData: EnemyType["colData"]): -1 | 0 | 1 {
   }
 }
 
-export default function Enemy({ enemy, scene }: EnemyProps) {
+export default function Enemy({ enemy, scene, modelNum }: EnemyProps) {
   const rigidBodyRef = useRef<RapierRigidBody>(null!);
 
   const enemyHeight = enemy.args[1];
@@ -113,12 +114,14 @@ export default function Enemy({ enemy, scene }: EnemyProps) {
           scale={[7, 7, 7]}
           rotation={[0, -Math.PI / 2, 0]}
         />
-        <pointLight color={"#ffffff"} intensity={20} position={[0, -2, 2]} />
+        {modelNum === 1 && (
+          <pointLight color={"#ffffff"} intensity={20} position={[0, -2, 2]} />
+        )}
 
         {/* enemy health */}
         <mesh
           scale-x={healthFraction}
-          position={[healthPositionX, enemyHeight * 0.7, 0.3]}
+          position={[healthPositionX, enemyHeight * 0.8, 0.3]}
         >
           <planeGeometry args={[enemyWidth, 0.5]} />
           <meshStandardMaterial
