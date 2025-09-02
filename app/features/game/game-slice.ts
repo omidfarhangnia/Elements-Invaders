@@ -185,7 +185,7 @@ const gameSlice = createSlice({
             // opening next level if it exists
             if (state.gameLevel.lastOpenedLevel === enemyArrangements.length)
               return;
-            state.gameLevel.lastOpenedLevel++;
+            state.gameLevel.lastOpenedLevel = state.gameLevel.selectedLevel + 1;
             sessionStorage.setItem(
               "lastOpenedLevel",
               state.gameLevel.lastOpenedLevel.toString()
@@ -256,15 +256,18 @@ const gameSlice = createSlice({
     setLevel(state, action: PayloadAction<number>) {
       if (action.payload <= state.gameLevel.lastOpenedLevel) {
         state.gameLevel.selectedLevel = action.payload;
+        sessionStorage.setItem("selectedLevel", action.payload.toString());
+        state.gameStatus = "playing";
       }
     },
     setGameStatus(state, action: PayloadAction<GameStatus["gameStatus"]>) {
       state.gameStatus = action.payload;
     },
-    setNextLevel(state) {
-      // selecting next level if it exists
-      if (state.gameLevel.lastOpenedLevel === enemyArrangements.length) return;
-      state.gameLevel.selectedLevel++;
+    updateLevel(
+      state,
+      action: PayloadAction<{ lastOpenedLevel: number; selectedLevel: number }>
+    ) {
+      state.gameLevel = action.payload;
     },
   },
 });
@@ -284,6 +287,6 @@ export const {
   toggleShieldActivation,
   setLevel,
   setGameStatus,
-  setNextLevel,
+  updateLevel
 } = gameSlice.actions;
 export default gameSlice.reducer;

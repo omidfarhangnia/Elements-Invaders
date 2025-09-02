@@ -29,12 +29,12 @@ export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
   /* useEffect */
   // initial value for enemies
   useEffect(() => {
+    const selectedLevel = Number(sessionStorage.getItem("selectedLevel")) || 1;
+     
     dispatch(
-      initializeEnemies(
-        enemyArrangements[gameLevel.selectedLevel - 1].enemyArrangments
-      )
+      initializeEnemies(enemyArrangements[selectedLevel - 1].enemyArrangments)
     );
-  }, [dispatch, gameLevel.selectedLevel]);
+  }, [dispatch, gameLevel]);
 
   /* customHook */
   // controlling enemy shoots

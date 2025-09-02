@@ -12,8 +12,9 @@ import playerSpaceShip from "~/assets/models/player_space_ship.glb";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
-import { setGameStatus, setLevel } from "~/features/game/game-slice";
+import { setLevel, updateLevel } from "~/features/game/game-slice";
 import { FiLock } from "react-icons/fi";
+import { IoMdHome } from "react-icons/io";
 
 export interface EnemyArrangements {
   levelNum: number;
@@ -126,10 +127,13 @@ function LevelScene() {
 
 function Levels() {
   const dispatch = useAppDispatch();
-  const [lastOpenedLevel, setlastOpenedLevel] = useState(1);
+  const { lastOpenedLevel } = useAppSelector((state) => state.game.gameLevel);
 
   useEffect(() => {
-    setlastOpenedLevel(Number(sessionStorage.getItem("lastOpenedLevel")) || 1);
+    const lastOpenedLevel =
+      Number(sessionStorage.getItem("lastOpenedLevel")) || 1;
+    const selectedLevel = Number(sessionStorage.getItem("selectedLevel")) || 1;
+    dispatch(updateLevel({ lastOpenedLevel, selectedLevel }));
   }, []);
 
   return (
@@ -154,12 +158,15 @@ function Levels() {
 
           return (
             <div
-              onClick={() => dispatch(setLevel(level.levelNum))}
               key={level.levelNum}
+              onClick={() => {
+                dispatch(setLevel(level.levelNum));
+              }}
               className="bg-[#ffffff10] transition-all min-w-[200px] hover:bg-transparent disabled:hover:bg-[#ffffff10] text-center w-[30%] max-w-[300px] min-h-[80px] flex items-center justify-center"
             >
               <Link
                 to={"/battleground"}
+                reloadDocument
                 className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white block w-full h-full content-center"
               >
                 {level.name}
@@ -168,6 +175,13 @@ function Levels() {
           );
         })}
       </div>
+      {/* home link */}
+      <Link
+        to={"/"}
+        className="fixed top-[10px] right-[10px] w-[65px] h-[65px] p-[10px] flex justify-center items-center rounded-[10px] bg-[#ffffff10]"
+      >
+        <IoMdHome size={30} color="#ffffff" />
+      </Link>
     </div>
   );
 }
