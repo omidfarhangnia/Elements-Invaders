@@ -22,7 +22,7 @@ export const ATTACK_WAVE_LEVEL_1_ROW_NUM = 5;
 export const ATTACK_WAVE_LEVEL_1: EnemyType[] = generateAttackWave(
   {
     args: [6.5, 6.5, 1],
-    health: 100,
+    health: 5,
   },
   1,
   ATTACK_WAVE_LEVEL_1_COL_NUM,

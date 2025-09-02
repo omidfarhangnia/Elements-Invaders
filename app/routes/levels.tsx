@@ -9,10 +9,10 @@ import {
 } from "~/constants";
 import { Model } from "./home";
 import playerSpaceShip from "~/assets/models/player_space_ship.glb";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
-import { setLevel } from "~/features/game/game-slice";
+import { setGameStatus, setLevel } from "~/features/game/game-slice";
 import { FiLock } from "react-icons/fi";
 
 export interface EnemyArrangements {
@@ -110,7 +110,12 @@ function LevelScene() {
       }}
       className="bg-space"
     >
-      <Stars count={3000} outerRadius={30} innerRadius={10} />
+      <Stars
+        count={3000}
+        outerRadius={30}
+        innerRadius={10}
+        isLevelPage={true}
+      />
       <pointLight color={"#ffffff"} intensity={150} position={[2, 2, 5]} />
       <pointLight color={"#FF9A00"} intensity={40} position={[0.8, -2, 0]} />
       <Model path={playerSpaceShip} scale={[1, 1, 1]} rotation={[0, 0, 0]} />
@@ -121,9 +126,11 @@ function LevelScene() {
 
 function Levels() {
   const dispatch = useAppDispatch();
-  const lastOpenedLevel = useAppSelector(
-    (state) => state.game.gameLevel.lastOpenedLevel
-  );
+  const [lastOpenedLevel, setlastOpenedLevel] = useState(1);
+
+  useEffect(() => {
+    setlastOpenedLevel(Number(sessionStorage.getItem("lastOpenedLevel")) || 1);
+  }, []);
 
   return (
     <div className="w-full h-[100dvh] relative select-none">

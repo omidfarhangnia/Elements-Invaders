@@ -5,13 +5,16 @@ import { GiBlaster } from "react-icons/gi";
 import { FaGripfire } from "react-icons/fa6";
 import { BsFillShieldFill } from "react-icons/bs";
 import { BsShieldSlash } from "react-icons/bs";
-import { useAppSelector } from "~/RTK/hook";
-import { useEffect, useState } from "react";
+import { FaPause } from "react-icons/fa";
+import { useAppDispatch, useAppSelector } from "~/RTK/hook";
+import { useEffect, useRef, useState } from "react";
 import {
   BULLET_DAMAGE_LEVEL_1,
   BULLET_DAMAGE_LEVEL_2,
   BULLET_DAMAGE_LEVEL_3,
 } from "~/constants";
+import { setGameStatus, setNextLevel } from "~/features/game/game-slice";
+import { Link } from "react-router";
 
 function BattleGround() {
   const {
@@ -20,8 +23,15 @@ function BattleGround() {
     bulletLevel,
     spaceShipOverheat,
     isShieldActive,
+    gameLevel,
+    gameStatus,
   } = useAppSelector((state) => state.game);
+  const dispatch = useAppDispatch();
   const [bulletDamage, setBulletDamage] = useState(0);
+
+  useEffect(() => {
+    dispatch(setGameStatus("playing"));
+  }, []);
 
   useEffect(() => {
     switch (bulletLevel) {
@@ -48,8 +58,9 @@ function BattleGround() {
             far: 600,
           }}
           className="bg-space"
+          frameloop={gameStatus === "playing" ? "always" : "demand"}
         >
-          <BattlegroundScene />
+          <BattlegroundScene isPaused={gameStatus !== "playing"} />
         </Canvas>
       </div>
       {/* space ship health bar */}
@@ -90,6 +101,7 @@ function BattleGround() {
           ></div>{" "}
         </div>
       </div>
+      {/* space ship shield status */}
       <div className="fixed bottom-[270px] right-[10px] w-[65px] h-[65px] p-[10px] flex justify-center items-center rounded-[10px] bg-[#ffffff10]">
         {isShieldActive ? (
           <BsFillShieldFill size={30} color="#d3c032" />
@@ -97,6 +109,72 @@ function BattleGround() {
           <BsShieldSlash size={30} color="#d3c032" />
         )}
       </div>
+      {gameStatus === "playing" ? (
+        // pause button
+        <div
+          onClick={() => dispatch(setGameStatus("paused"))}
+          className="fixed top-[10px] cursor-pointer right-[10px] w-[65px] h-[65px] p-[10px] flex justify-center items-center rounded-[10px] bg-[#ffffff10]"
+        >
+          <FaPause size={25} color="#e5e5e5" />
+        </div>
+      ) : (
+        gameStatus !== "" && (
+          // paused menu
+          <div className="w-full h-full fixed cursor-default top-0 left-0 bg-[#ffffff10] flex items-center justify-center">
+            <div className="w-[600px] h-[500px]">
+              <div className="w-full h-full bg-[#000000] flex flex-col items-center justify-center gap-[2rem] text-[#ffffff]">
+                <h1 className="text-[2.5rem] font-exo2 capitalize text-shadow-[2px_2px_15px_#ffffff]">
+                  {gameStatus === "paused" &&
+                    `current level : ${gameLevel.selectedLevel}`}
+                  {gameStatus === "ended-losed" && `you losed`}
+                  {gameStatus === "ended-won" && `you won`}
+                </h1>
+                {gameStatus === "paused" && (
+                  <div
+                    onClick={() => dispatch(setGameStatus("playing"))}
+                    className="bg-[#ffffff10] transition-all min-w-[200px] hover:bg-transparent disabled:hover:bg-[#ffffff10] text-center w-[40%] max-w-[350px] min-h-[60px] flex items-center justify-center"
+                  >
+                    <span className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white block w-full h-full content-center">
+                      resume
+                    </span>
+                  </div>
+                )}
+                {(gameStatus === "ended-losed" || gameStatus === "paused") && (
+                  <div className="bg-[#ffffff10] transition-all min-w-[200px] hover:bg-transparent disabled:hover:bg-[#ffffff10] text-center w-[40%] max-w-[350px] min-h-[60px] flex items-center justify-center">
+                    <Link
+                      to={"/battleground"}
+                      reloadDocument
+                      className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white block w-full h-full content-center"
+                    >
+                      restart
+                    </Link>
+                  </div>
+                )}
+                {gameStatus === "ended-won" && (
+                  <div className="bg-[#ffffff10] transition-all min-w-[200px] hover:bg-transparent disabled:hover:bg-[#ffffff10] text-center w-[40%] max-w-[350px] min-h-[60px] flex items-center justify-center">
+                    <Link
+                      to={"/battleground"}
+                      onClick={() => dispatch(setNextLevel())}
+                      className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white block w-full h-full content-center"
+                    >
+                      next level
+                    </Link>
+                  </div>
+                )}
+                <div className="bg-[#ffffff10] transition-all min-w-[200px] hover:bg-transparent disabled:hover:bg-[#ffffff10] text-center w-[40%] max-w-[350px] min-h-[60px] flex items-center justify-center">
+                  <Link
+                    to={"/levels"}
+                    reloadDocument
+                    className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white block w-full h-full content-center"
+                  >
+                    level page
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      )}
     </div>
   );
 }

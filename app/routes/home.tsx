@@ -40,7 +40,12 @@ function HomeScene() {
       className="bg-space"
     >
       <pointLight color={"#ffffff"} intensity={150} position={[2, 2, 5]} />
-      <Stars count={3000} outerRadius={30} innerRadius={10} />
+      <Stars
+        count={3000}
+        outerRadius={30}
+        innerRadius={10}
+        isLevelPage={false}
+      />
       <Rings />
       <Model path={bossModelPath} />
     </Canvas>

@@ -7,6 +7,7 @@ import {
   HEAT_PER_SHOOT_BLASTER,
   HEAT_PER_SHOOT_BULLET,
 } from "~/constants";
+import { enemyArrangements } from "~/routes/levels";
 
 export interface PowerUpType {
   position: Position;
@@ -34,7 +35,7 @@ interface GameStatus {
   isOverheated: boolean;
   isSpaceShipInvisible: boolean;
   bulletLevel: 1 | 2 | 3;
-  gameStatus: "playing" | "ended" | "paused";
+  gameStatus: "playing" | "ended-won" | "ended-losed" | "paused" | "";
   gameLevel: { lastOpenedLevel: number; selectedLevel: number };
 }
 
@@ -64,7 +65,7 @@ const initialState: GameStatus = {
   // space ship selected bullet type
   bulletLevel: 1,
   // tracking game status (playing, ended, paused)
-  gameStatus: "playing",
+  gameStatus: "",
   // controlling level state
   gameLevel: { lastOpenedLevel: 1, selectedLevel: 1 },
 };
@@ -150,7 +151,7 @@ const gameSlice = createSlice({
 
       // game over
       if (newHealth <= 0) {
-        state.gameStatus = "ended";
+        state.gameStatus = "ended-losed";
         state.spaceShipHealth = 0;
       }
 
@@ -178,6 +179,18 @@ const gameSlice = createSlice({
           state.enemies = state.enemies.filter(
             (enemy) => enemy.id !== action.payload.enemyId
           );
+          if (state.enemies.length === 0) {
+            state.gameStatus = "ended-won";
+
+            // opening next level if it exists
+            if (state.gameLevel.lastOpenedLevel === enemyArrangements.length)
+              return;
+            state.gameLevel.lastOpenedLevel++;
+            sessionStorage.setItem(
+              "lastOpenedLevel",
+              state.gameLevel.lastOpenedLevel.toString()
+            );
+          }
         }
       }
     },
@@ -245,6 +258,14 @@ const gameSlice = createSlice({
         state.gameLevel.selectedLevel = action.payload;
       }
     },
+    setGameStatus(state, action: PayloadAction<GameStatus["gameStatus"]>) {
+      state.gameStatus = action.payload;
+    },
+    setNextLevel(state) {
+      // selecting next level if it exists
+      if (state.gameLevel.lastOpenedLevel === enemyArrangements.length) return;
+      state.gameLevel.selectedLevel++;
+    },
   },
 });
 
@@ -262,5 +283,7 @@ export const {
   setPowerUp,
   toggleShieldActivation,
   setLevel,
+  setGameStatus,
+  setNextLevel,
 } = gameSlice.actions;
 export default gameSlice.reducer;

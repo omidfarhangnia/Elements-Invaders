@@ -7,6 +7,7 @@ interface StarsProps {
   count: number;
   outerRadius: number;
   innerRadius: number;
+  isLevelPage: boolean;
 }
 
 function useStarPositions(
@@ -35,13 +36,22 @@ function useStarPositions(
   return positions;
 }
 
-export default function Stars({ count, outerRadius, innerRadius }: StarsProps) {
+export default function Stars({
+  count,
+  outerRadius,
+  innerRadius,
+  isLevelPage,
+}: StarsProps) {
   const pointsRef = useRef<THREE.Points>(null!);
   const positions = useStarPositions(count, outerRadius, innerRadius);
 
   useFrame((_, delta) => {
     if (pointsRef.current) {
-      pointsRef.current.rotation.y += delta * 0.02;
+      if (isLevelPage) {
+        pointsRef.current.rotation.z += delta * 0.02;
+      } else {
+        pointsRef.current.rotation.y += delta * 0.02;
+      }
     }
   });
 

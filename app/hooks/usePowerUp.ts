@@ -4,7 +4,7 @@ import { addPowerUp } from "~/features/game/game-slice";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
 
 export default function usePowerUp() {
-  const killStatus = useAppSelector((state) => state.game.killStatus);
+  const { killStatus, enemies } = useAppSelector((state) => state.game);
   const dispatch = useAppDispatch();
   // a countdown for powerUp (... + 1 : we need + 1 to neutralize useEffect)
   const killsUntilPowerUpRef = useRef(KILLS_PER_POWERUP + 1);
@@ -13,9 +13,10 @@ export default function usePowerUp() {
     // one new killed submited
     killsUntilPowerUpRef.current--;
 
-    if (killsUntilPowerUpRef.current === 0) {
+    if (killsUntilPowerUpRef.current === 0 && enemies.length > 0) {
       // reset needed kills
       killsUntilPowerUpRef.current = KILLS_PER_POWERUP;
+
       dispatch(addPowerUp(killStatus.lastKillPosition));
     }
   }, [killStatus.count]);

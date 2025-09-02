@@ -18,7 +18,7 @@ import enemySpaceShipModel1 from "~/assets/models/enemy_space_ship_1.glb";
 import enemySpaceShipModel2 from "~/assets/models/enemy_space_ship_2.glb";
 import SpaceShip from "../game/space-ship";
 
-export default function BattlegroundScene() {
+export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
   const { enemies, bullets, blasters, powerUps, enemiesBullets, gameLevel } =
     useAppSelector((state) => state.game);
   const dispatch = useAppDispatch();
@@ -64,9 +64,14 @@ export default function BattlegroundScene() {
   const model2 = useGLTF(enemySpaceShipModel2);
 
   return (
-    <Physics>
+    <Physics paused={isPaused}>
       <ambientLight intensity={Math.PI / 2} />
-      <Stars count={3000} outerRadius={200} innerRadius={110} />
+      <Stars
+        count={3000}
+        outerRadius={200}
+        innerRadius={110}
+        isLevelPage={false}
+      />
       <SpaceShip
         startTheGunfire={() =>
           handlePointerDownLeftClick([0.5, 1.3, 0.7], "#FFD93D")
