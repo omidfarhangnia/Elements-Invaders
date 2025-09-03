@@ -27,10 +27,10 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    // disabling right click context menu
     function disableContextMenu(event: Event) {
       event.preventDefault();
     }
-
     document.addEventListener("contextmenu", disableContextMenu);
 
     return () =>
@@ -46,6 +46,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <div id="initial-loader" className="initial-loader">
+          <div className="loader-spinner"></div>
+          <p>Loading...</p>
+        </div>
         <Provider store={store}>{children}</Provider>
         <ScrollRestoration />
         <Scripts />

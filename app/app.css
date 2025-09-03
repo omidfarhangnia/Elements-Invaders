@@ -25,3 +25,34 @@
     cursor: pointer;
   }
 }
+
+.initial-loader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #000409;
+  color: white;
+  font-family: monospace;
+  z-index: 1000;
+  transition: opacity 0.5s ease-out;
+}
+.initial-loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.loader-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

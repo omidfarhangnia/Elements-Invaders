@@ -7,15 +7,16 @@ import {
   ATTACK_WAVE_LEVEL_2,
   ATTACK_WAVE_LEVEL_3,
 } from "~/constants";
-import { Model } from "./home";
+import { AssetLoadReporter, Model } from "./home";
 import playerSpaceShip from "~/assets/models/player_space_ship.glb";
-import { useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
 import { setLevel, updateLevel } from "~/features/game/game-slice";
 import { FiLock } from "react-icons/fi";
 import { IoMdHome } from "react-icons/io";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import Loader from "~/components/loader/loader";
 
 export interface EnemyArrangements {
   levelNum: number;
@@ -143,62 +144,65 @@ function Levels() {
   };
 
   return (
-    <div className="w-full h-[100dvh] relative select-none">
-      <div className="w-full h-full absolute left-0 top-0">
-        <LevelScene />
-      </div>
-      <div className="w-full h-full absolute left-0 top-0 flex flex-col gap-[10%] items-center justify-center">
-        {enemyArrangements.map((level) => {
-          const isLocked = level.levelNum > lastOpenedLevel ? true : false;
+    <Suspense fallback={<Loader />}>
+      <div className="w-full h-[100dvh] relative select-none">
+        <div className="w-full h-full absolute left-0 top-0">
+          <LevelScene />
+        </div>
+        <div className="w-full h-full absolute left-0 top-0 flex flex-col gap-[10%] items-center justify-center">
+          {enemyArrangements.map((level) => {
+            const isLocked = level.levelNum > lastOpenedLevel ? true : false;
 
-          if (isLocked) {
+            if (isLocked) {
+              return (
+                <div
+                  key={level.levelNum}
+                  className="bg-[#ffffff10] transition-all min-w-[200px] disabled:hover:bg-[#ffffff10] text-center w-[30%] max-w-[300px] min-h-[80px] flex items-center justify-center"
+                >
+                  <FiLock color="#ffffff" size={30} />
+                </div>
+              );
+            }
+
             return (
               <div
                 key={level.levelNum}
-                className="bg-[#ffffff10] transition-all min-w-[200px] disabled:hover:bg-[#ffffff10] text-center w-[30%] max-w-[300px] min-h-[80px] flex items-center justify-center"
+                onClick={() => {
+                  dispatch(setLevel(level.levelNum));
+                }}
+                className="bg-[#ffffff10] transition-all min-w-[200px] hover:bg-transparent disabled:hover:bg-[#ffffff10] text-center w-[30%] max-w-[300px] min-h-[80px] flex items-center justify-center"
               >
-                <FiLock color="#ffffff" size={30} />
+                <Link
+                  to={"/battleground"}
+                  reloadDocument
+                  className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white block w-full h-full content-center"
+                >
+                  {level.name}
+                </Link>
               </div>
             );
-          }
-
-          return (
-            <div
-              key={level.levelNum}
-              onClick={() => {
-                dispatch(setLevel(level.levelNum));
-              }}
-              className="bg-[#ffffff10] transition-all min-w-[200px] hover:bg-transparent disabled:hover:bg-[#ffffff10] text-center w-[30%] max-w-[300px] min-h-[80px] flex items-center justify-center"
-            >
-              <Link
-                to={"/battleground"}
-                reloadDocument
-                className="text-[1.8rem] text-white font-roboto capitalize text-center border-custom hover:border-white block w-full h-full content-center"
-              >
-                {level.name}
-              </Link>
-            </div>
-          );
-        })}
+          })}
+        </div>
+        {/* home link */}
+        <Link
+          to={"/"}
+          className="fixed top-[10px] right-[10px] w-[65px] h-[65px] p-[10px] flex justify-center items-center rounded-[10px] bg-[#ffffff10]"
+        >
+          <IoMdHome size={30} color="#ffffff" />
+        </Link>
+        {/* clear level datas */}
+        <Link
+          to={"/levels"}
+          reloadDocument
+          onClick={handleClearStorage}
+          title="start a new game"
+          className="fixed top-[10px] cursor-pointer left-[10px] w-[65px] h-[65px] p-[10px] flex justify-center items-center rounded-[10px] bg-[#ffffff10]"
+        >
+          <RiDeleteBin6Line size={25} color="#e5e5e5" />
+        </Link>
       </div>
-      {/* home link */}
-      <Link
-        to={"/"}
-        className="fixed top-[10px] right-[10px] w-[65px] h-[65px] p-[10px] flex justify-center items-center rounded-[10px] bg-[#ffffff10]"
-      >
-        <IoMdHome size={30} color="#ffffff" />
-      </Link>
-      {/* clear level datas */}
-      <Link
-        to={"/levels"}
-        reloadDocument
-        onClick={handleClearStorage}
-        title="start a new game"
-        className="fixed top-[10px] cursor-pointer left-[10px] w-[65px] h-[65px] p-[10px] flex justify-center items-center rounded-[10px] bg-[#ffffff10]"
-      >
-        <RiDeleteBin6Line size={25} color="#e5e5e5" />
-      </Link>
-    </div>
+      <AssetLoadReporter />
+    </Suspense>
   );
 }
 
