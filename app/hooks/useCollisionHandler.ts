@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   BLASTER_DAMAGE,
   BULLET_DAMAGE_LEVEL_1,
@@ -20,9 +20,8 @@ import {
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
 
 export default function useCollisionHandler() {
-  const { bulletLevel, isSpaceShipInvisible, isShieldActive } = useAppSelector(
-    (state) => state.game
-  );
+  const { bulletLevel, isSpaceShipInvisible, isShieldActive, gameLevel } =
+    useAppSelector((state) => state.game);
   const dispatch = useAppDispatch();
   // prevent duplicate collisions from being recorded
   const collisionEventsRef = useRef({
@@ -32,6 +31,17 @@ export default function useCollisionHandler() {
     shield: new Set<string>(),
     powerUp: new Set<string>(),
   });
+
+  useEffect(() => {
+    // Clear collision events at the start of each level
+    collisionEventsRef.current = {
+      spaceShipAmmo: new Set<string>(),
+      enemyAmmo: new Set<string>(),
+      spaceShip: false,
+      shield: new Set<string>(),
+      powerUp: new Set<string>(),
+    };
+  }, [gameLevel]);
 
   function deleteAmmo(
     id: string,

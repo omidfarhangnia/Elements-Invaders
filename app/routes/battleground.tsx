@@ -121,6 +121,7 @@ function BattleGround() {
           <BsShieldSlash size={30} color="#d3c032" />
         )}
       </div>
+      {/* space ship pause button and menu */}
       {gameStatus === "playing" ? (
         // pause button
         <div

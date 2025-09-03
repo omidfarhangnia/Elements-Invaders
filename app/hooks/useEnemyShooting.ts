@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ENEMY_SHOOT_DURATION } from "~/constants";
+import { BOSS_FIGHT_LEVEL, BOSS_FIGHT_SHOOT_DURATION, ENEMY_SHOOT_DURATION } from "~/constants";
 import { addEnemiseBullet } from "~/features/game/game-slice";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
 
@@ -8,7 +8,9 @@ export default function useEnemyShooting(
   color: string
 ) {
   const dispatch = useAppDispatch();
-  const { gameStatus, enemies } = useAppSelector((state) => state.game);
+  const { gameStatus, enemies, gameLevel } = useAppSelector(
+    (state) => state.game
+  );
 
   const shotEnemiesRef = useRef(new Set<string>());
   const enemyBulletIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
@@ -49,10 +51,34 @@ export default function useEnemyShooting(
       );
     }
 
-    if (gameStatus === "playing") {
+    function bossFightShoot() {
+      if (enemies.length === 0) return;
+      const bossFight = enemies[0];
+
+      const xPosition =
+        Math.floor((Math.random() * bossFight.args[0]) / 2) *
+        (Math.floor(Math.random() * 2) % 2 === 0 ? 1 : -1);
+      const yPosition = 35;
+
+      dispatch(
+        addEnemiseBullet({
+          position: [xPosition, yPosition, 1],
+          args,
+          color,
+          type: "bullet",
+        })
+      );
+    }
+
+    if (gameStatus === "playing" && gameLevel.selectedLevel < BOSS_FIGHT_LEVEL) {
       enemyBulletIntervalRef.current = setInterval(
         enemyShoot,
         ENEMY_SHOOT_DURATION
+      );
+    } else if (gameStatus === "playing" && gameLevel.selectedLevel === BOSS_FIGHT_LEVEL) {
+      enemyBulletIntervalRef.current = setInterval(
+        bossFightShoot,
+        BOSS_FIGHT_SHOOT_DURATION
       );
     }
 

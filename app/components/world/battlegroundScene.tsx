@@ -5,7 +5,10 @@ import { Surface } from "./surface";
 import Bullet, { Blaster } from "../game/bullet";
 import Enemy from "../game/enemy";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
-import { initializeEnemies } from "~/features/game/game-slice";
+import {
+  initializeEnemies,
+  resetPlayerState,
+} from "~/features/game/game-slice";
 import PowerUp from "../game/powerUp";
 import useEnemyShooting from "~/hooks/useEnemyShooting";
 import usePowerUp from "~/hooks/usePowerUp";
@@ -16,12 +19,18 @@ import { enemyArrangements } from "~/routes/levels";
 import Stars from "./stars";
 import enemySpaceShipModel1 from "~/assets/models/enemy_space_ship_1.glb";
 import enemySpaceShipModel2 from "~/assets/models/enemy_space_ship_2.glb";
+import bossFight from "~/assets/models/boss_fight.glb";
 import SpaceShip from "../game/space-ship";
 
 export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
   const { enemies, bullets, blasters, powerUps, enemiesBullets, gameLevel } =
     useAppSelector((state) => state.game);
   const dispatch = useAppDispatch();
+
+  // reset player space ship data
+  useEffect(() => {
+    dispatch(resetPlayerState());
+  }, [gameLevel]);
 
   /* useRef */
   // including the whole space ship
@@ -30,7 +39,7 @@ export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
   // initial value for enemies
   useEffect(() => {
     const selectedLevel = Number(sessionStorage.getItem("selectedLevel")) || 1;
-     
+
     dispatch(
       initializeEnemies(enemyArrangements[selectedLevel - 1].enemyArrangments)
     );
@@ -62,10 +71,11 @@ export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
 
   const model1 = useGLTF(enemySpaceShipModel1);
   const model2 = useGLTF(enemySpaceShipModel2);
+  const model3 = useGLTF(bossFight);
+  const models = [model1, model2, model3];
 
   return (
     <Physics paused={isPaused}>
-      <OrbitControls />
       <ambientLight intensity={Math.PI / 2} />
       <Stars
         count={3000}
@@ -124,8 +134,8 @@ export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
           <Enemy
             key={enemy.id}
             enemy={enemy}
-            modelNum={enemy.spaceShipModelNum}
-            scene={enemy.spaceShipModelNum === 1 ? model1.scene : model2.scene}
+            attackWaveLevel={enemy.attackWaveLevel}
+            scene={models[enemy.attackWaveLevel - 1].scene}
           />
         );
       })}

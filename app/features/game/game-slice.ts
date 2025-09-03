@@ -27,7 +27,11 @@ interface GameStatus {
   blasters: AmmoType[];
   powerUps: PowerUpType[];
   isShieldActive: boolean;
-  killStatus: { count: number; lastKillPosition: Position };
+  combatReport: {
+    kills: number;
+    lastKillPosition: Position;
+    numOfBulletsThatHit: number;
+  };
   numberOfBlasters: number;
   enemiesBullets: AmmoType[];
   spaceShipHealth: number;
@@ -50,7 +54,11 @@ const initialState: GameStatus = {
   powerUps: [],
   isShieldActive: false,
   // some data about kills
-  killStatus: { count: 0, lastKillPosition: [100, 100, 1] },
+  combatReport: {
+    kills: 0,
+    lastKillPosition: [100, 100, 1],
+    numOfBulletsThatHit: 0,
+  },
   // number of blasters remaining
   numberOfBlasters: 3,
   // all enemies bullets are here (bullets will remove after moving out of scene)
@@ -170,10 +178,11 @@ const gameSlice = createSlice({
 
       if (enemyIndex !== -1) {
         state.enemies[enemyIndex].health -= action.payload.bulletDamage;
+        state.combatReport.numOfBulletsThatHit++;
         if (state.enemies[enemyIndex].health <= 0) {
-          // filling killStatus state
-          state.killStatus.count++;
-          state.killStatus.lastKillPosition =
+          // filling combatReport state
+          state.combatReport.kills++;
+          state.combatReport.lastKillPosition =
             state.enemies[enemyIndex].position;
           // removing dead enemies
           state.enemies = state.enemies.filter(
@@ -269,6 +278,16 @@ const gameSlice = createSlice({
     ) {
       state.gameLevel = action.payload;
     },
+    resetPlayerState(state) {
+      state.numberOfBlasters = 3;
+      state.isShieldActive = false;
+      state.combatReport = { kills: 0, lastKillPosition: [100, 100, 1], numOfBulletsThatHit: 0 };
+      state.spaceShipHealth = 100;
+      state.spaceShipOverheat = 0;
+      state.isOverheated = false;
+      state.isSpaceShipInvisible = false;
+      state.bulletLevel = 1;
+    },
   },
 });
 
@@ -287,6 +306,7 @@ export const {
   toggleShieldActivation,
   setLevel,
   setGameStatus,
-  updateLevel
+  updateLevel,
+  resetPlayerState,
 } = gameSlice.actions;
 export default gameSlice.reducer;
