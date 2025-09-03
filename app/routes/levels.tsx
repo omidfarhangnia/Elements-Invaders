@@ -9,12 +9,13 @@ import {
 } from "~/constants";
 import { Model } from "./home";
 import playerSpaceShip from "~/assets/models/player_space_ship.glb";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useAppDispatch, useAppSelector } from "~/RTK/hook";
 import { setLevel, updateLevel } from "~/features/game/game-slice";
 import { FiLock } from "react-icons/fi";
 import { IoMdHome } from "react-icons/io";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 export interface EnemyArrangements {
   levelNum: number;
@@ -136,6 +137,11 @@ function Levels() {
     dispatch(updateLevel({ lastOpenedLevel, selectedLevel }));
   }, []);
 
+  const handleClearStorage = () => {
+    sessionStorage.setItem("selectedLevel", "1");
+    sessionStorage.setItem("lastOpenedLevel", "1");
+  };
+
   return (
     <div className="w-full h-[100dvh] relative select-none">
       <div className="w-full h-full absolute left-0 top-0">
@@ -181,6 +187,16 @@ function Levels() {
         className="fixed top-[10px] right-[10px] w-[65px] h-[65px] p-[10px] flex justify-center items-center rounded-[10px] bg-[#ffffff10]"
       >
         <IoMdHome size={30} color="#ffffff" />
+      </Link>
+      {/* clear level datas */}
+      <Link
+        to={"/levels"}
+        reloadDocument
+        onClick={handleClearStorage}
+        title="start a new game"
+        className="fixed top-[10px] cursor-pointer left-[10px] w-[65px] h-[65px] p-[10px] flex justify-center items-center rounded-[10px] bg-[#ffffff10]"
+      >
+        <RiDeleteBin6Line size={25} color="#e5e5e5" />
       </Link>
     </div>
   );
