@@ -1,12 +1,13 @@
 import { useFrame } from "@react-three/fiber";
 import {
+  BallCollider,
   CuboidCollider,
   interactionGroups,
   RapierRigidBody,
   RigidBody,
 } from "@react-three/rapier";
 import { useMemo, useRef } from "react";
-import { COLLISION_GROUPS, COLLISION_MASKS } from "~/constants";
+import { BOSS_FIGHT_LEVEL, COLLISION_GROUPS, COLLISION_MASKS } from "~/constants";
 import * as THREE from "three";
 
 export interface EnemyType {
@@ -16,13 +17,13 @@ export interface EnemyType {
   health: number; // percent 0 < health < 100
   rowData: { enemyRow: number; rowNum: number };
   colData: { enemyCol: number; colNum: number };
-  spaceShipModelNum: number;
+  attackWaveLevel: number;
 }
 
 type EnemyProps = {
   enemy: EnemyType;
   scene: THREE.Group;
-  modelNum: number;
+  attackWaveLevel: number;
 };
 
 function calcWhereSideIs(colData: EnemyType["colData"]): -1 | 0 | 1 {
@@ -49,18 +50,20 @@ function calcWhereSideIs(colData: EnemyType["colData"]): -1 | 0 | 1 {
   }
 }
 
-export default function Enemy({ enemy, scene, modelNum }: EnemyProps) {
+export default function Enemy({ enemy, scene, attackWaveLevel }: EnemyProps) {
   const rigidBodyRef = useRef<RapierRigidBody>(null!);
+  const modelRef = useRef<THREE.Group>(null!);
 
   const enemyHeight = enemy.args[1];
   const enemyWidth = enemy.args[0];
 
-  const healthFraction = enemy.health / 100;
+  const healthFraction =
+    enemy.health / (attackWaveLevel === BOSS_FIGHT_LEVEL ? 2000 : attackWaveLevel === 2 ? 200 : 100);
   const healthPositionX = -(enemyWidth * (1 - healthFraction)) / 2;
 
   const clonedScene = useMemo(() => scene.clone(), [scene]);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (rigidBodyRef.current) {
       const time = state.clock.getElapsedTime();
 
@@ -90,14 +93,18 @@ export default function Enemy({ enemy, scene, modelNum }: EnemyProps) {
         true
       );
     }
+
+    if (modelRef.current && attackWaveLevel === BOSS_FIGHT_LEVEL) {
+      modelRef.current.rotation.z += delta * 0.04;
+    }
   });
 
   return (
     <RigidBody
       ref={rigidBodyRef}
       type="dynamic"
-      lockRotations
       lockTranslations
+      lockRotations={attackWaveLevel !== BOSS_FIGHT_LEVEL}
       name="enemy"
       userData={{ id: enemy.id }}
       colliders={false}
@@ -107,32 +114,106 @@ export default function Enemy({ enemy, scene, modelNum }: EnemyProps) {
         COLLISION_MASKS.ENEMY
       )}
     >
-      <group>
-        {/* enemy space ship */}
-        <primitive
-          object={clonedScene}
-          scale={[7, 7, 7]}
-          rotation={[0, -Math.PI / 2, 0]}
-        />
-        {modelNum === 1 && (
-          <pointLight color={"#ffffff"} intensity={20} position={[0, -2, 2]} />
-        )}
+      {/* enemy space ship */}
+      {attackWaveLevel !== BOSS_FIGHT_LEVEL ? (
+        <>
+          <group>
+            <primitive
+              object={clonedScene}
+              scale={[7, 7, 7]}
+              rotation={[0, -Math.PI / 2, 0]}
+            />
 
-        {/* enemy health */}
-        <mesh
-          scale-x={healthFraction}
-          position={[healthPositionX, enemyHeight * 0.8, 0.3]}
-        >
-          <planeGeometry args={[enemyWidth, 0.5]} />
-          <meshStandardMaterial
-            color={enemy.health > 50 ? "#01CD24" : "#FF6812"}
+            {attackWaveLevel === 1 ? (
+              <pointLight
+                color={"#ffffff"}
+                intensity={30}
+                position={[0, 0, 2]}
+              />
+            ) : (
+              <>
+                <pointLight
+                  color={"#ffffff"}
+                  intensity={60}
+                  position={[0, -3, 4]}
+                />
+              </>
+            )}
+
+            {/* enemy health */}
+            <mesh
+              scale-x={healthFraction}
+              position={[healthPositionX, enemyHeight * 0.8, 0.3]}
+            >
+              <planeGeometry args={[enemyWidth, 0.5]} />
+              <meshStandardMaterial
+                color={enemy.health > 50 ? "#01CD24" : "#FF6812"}
+              />
+            </mesh>
+          </group>
+
+          <CuboidCollider
+            args={[enemy.args[0] / 2, enemy.args[1] / 2, enemy.args[2] / 2]}
           />
-        </mesh>
-      </group>
+        </>
+      ) : (
+        <>
+          <group>
+            <primitive
+              ref={modelRef}
+              object={clonedScene}
+              scale={[100, 100, 100]}
+              rotation={[Math.PI / 2, 0, 0]}
+            />
+            {/* lights */}
+            <>
+              <pointLight
+                color={"#ffffff"}
+                intensity={400}
+                position={[0, -50, 15]}
+              />
+              <pointLight
+                color={"#ffffff"}
+                intensity={300}
+                position={[30, -40, 20]}
+              />
+              <pointLight
+                color={"#ffffff"}
+                intensity={300}
+                position={[-30, -40, 20]}
+              />
+              <pointLight
+                color={"#ffffff"}
+                intensity={100}
+                position={[30, -30, 20]}
+              />
+              <pointLight
+                color={"#ffffff"}
+                intensity={100}
+                position={[-30, -30, 20]}
+              />
+              <pointLight
+                color={"#ffffff"}
+                intensity={100}
+                position={[0, -35, 35]}
+              />
+            </>
 
-      <CuboidCollider
-        args={[enemy.args[0] / 2, enemy.args[1] / 2, enemy.args[2] / 2]}
-      />
+            {/* enemy health */}
+            <mesh
+              scale-x={healthFraction}
+              position={[healthPositionX, -enemyHeight * 0.8, 40]}
+            >
+              <planeGeometry args={[enemyWidth, 1.5]} />
+              <meshStandardMaterial
+                color={enemy.health > 50 ? "#01CD24" : "#FF6812"}
+              />
+            </mesh>
+          </group>
+
+          <BallCollider args={[enemy.args[0] / 2]} />
+        </>
+      )}
     </RigidBody>
   );
 }

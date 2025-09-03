@@ -6,9 +6,12 @@ export const ENEMY_COLLISION_DAMAGE = 20;
 export const BULLET_DAMAGE_LEVEL_1 = 15;
 export const BULLET_DAMAGE_LEVEL_2 = 20;
 export const BULLET_DAMAGE_LEVEL_3 = 30;
+export const BOSS_FIGHT_LEVEL = 3;
 export const BLASTER_DAMAGE = 80;
 export const ENEMY_SHOOT_DURATION = 1000;
-export const KILLS_PER_POWERUP = 3;
+export const BOSS_FIGHT_SHOOT_DURATION = 700;
+export const KILLS_PER_POWERUP = 3; // you must kill 3 enemies to get a power up
+export const BULLETS_PER_POWERUP = 20; // you must shoot 5 bullets at enemies to get power up
 
 // space ship constants
 export const COOLING_RATE = 10;
@@ -35,49 +38,37 @@ export const ATTACK_WAVE_LEVEL_2: EnemyType[] = generateAttackWave(
   {
     args: [6.5, 6.5, 1],
 
-    health: 100,
+    health: 200,
   },
   2,
   ATTACK_WAVE_LEVEL_2_COL_NUM,
   ATTACK_WAVE_LEVEL_2_ROW_NUM,
   { x: -30, y: 50 }
 );
-// export const ATTACK_WAVE_LEVEL_3_COL_NUM = 1;
-// export const ATTACK_WAVE_LEVEL_3_ROW_NUM = 1;
-// export const ATTACK_WAVE_LEVEL_3: EnemyType[] = generateAttackWave(
-//   {
-//     args: [3, 3, 1],
-//     health: 100,
-//   },
-//   3,
-//   ATTACK_WAVE_LEVEL_3_COL_NUM,
-//   ATTACK_WAVE_LEVEL_3_ROW_NUM,
-//   { x: -40, y: 50 }
-// );
-export const ATTACK_WAVE_LEVEL_3_COL_NUM = 3;
+export const ATTACK_WAVE_LEVEL_3_COL_NUM = 1;
 export const ATTACK_WAVE_LEVEL_3_ROW_NUM = 1;
 export const ATTACK_WAVE_LEVEL_3: EnemyType[] = generateAttackWave(
   {
-    args: [6.5, 6.5, 1],
-    health: 5,
+    args: [85, 35, 1],
+    health: 2000,
   },
-  1,
+  3,
   ATTACK_WAVE_LEVEL_3_COL_NUM,
   ATTACK_WAVE_LEVEL_3_ROW_NUM,
-  { x: -30, y: 50 }
+  { x: 0, y: 60 }
 );
 
 function generateAttackWave(
   enemyData: Omit<
     EnemyType,
-    "id" | "position" | "colData" | "rowData" | "spaceShipModelNum"
+    "id" | "position" | "colData" | "rowData" | "attackWaveLevel"
   >,
   attackWaveLevel: number,
   rows: number,
   cols: number,
   startPostion: { x: number; y: number }
 ) {
-  const isBossFight = attackWaveLevel === 3;
+  const isBossFight = attackWaveLevel === BOSS_FIGHT_LEVEL;
 
   if (isBossFight) {
     return [
@@ -87,7 +78,7 @@ function generateAttackWave(
         ...enemyData,
         rowData: { enemyRow: 1, rowNum: rows },
         colData: { enemyCol: 1, colNum: cols },
-        spaceShipModelNum: attackWaveLevel,
+        attackWaveLevel: attackWaveLevel,
       },
     ];
   }
@@ -101,7 +92,7 @@ function generateAttackWave(
         ...enemyData,
         rowData: { enemyRow: i, rowNum: rows },
         colData: { enemyCol: j, colNum: cols },
-        spaceShipModelNum: attackWaveLevel,
+        attackWaveLevel: attackWaveLevel,
       });
     }
   }
