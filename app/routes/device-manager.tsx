@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router";
+import { AssetLoadReporter } from "./home";
 
 function MobileMessage() {
   return (
@@ -24,7 +25,12 @@ export default function DeviceManager() {
   }, []);
 
   if (isTouchDevice) {
-    return <MobileMessage />;
+    return (
+      <>
+        <MobileMessage />
+        <AssetLoadReporter />
+      </>
+    );
   }
 
   return (
