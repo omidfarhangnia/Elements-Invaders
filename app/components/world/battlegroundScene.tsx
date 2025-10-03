@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Physics, RapierRigidBody } from "@react-three/rapier";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { Surface } from "./surface";
 import Bullet, { Blaster } from "../game/bullet";
 import Enemy from "../game/enemy";
@@ -17,9 +17,6 @@ import usePlayerShooting from "~/hooks/usePlayerShooting";
 import useCollisionHandler from "~/hooks/useCollisionHandler";
 import { enemyArrangements } from "~/routes/levels";
 import Stars from "./stars";
-import enemySpaceShipModel1 from "~/assets/models/enemy_space_ship_1.glb";
-import enemySpaceShipModel2 from "~/assets/models/enemy_space_ship_2.glb";
-import bossFight from "~/assets/models/boss_fight.glb";
 import SpaceShip from "../game/space-ship";
 
 export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
@@ -69,14 +66,8 @@ export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
     collisionBulletToShield,
   } = useCollisionHandler();
 
-  const model1 = useGLTF(enemySpaceShipModel1);
-  const model2 = useGLTF(enemySpaceShipModel2);
-  const model3 = useGLTF(bossFight);
-  const models = [model1, model2, model3];
-
   return (
     <Physics paused={isPaused}>
-      <OrbitControls />
       <ambientLight intensity={Math.PI / 2} />
       <Stars
         count={3000}
@@ -136,7 +127,6 @@ export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
             key={enemy.id}
             enemy={enemy}
             attackWaveLevel={enemy.attackWaveLevel}
-            scene={models[enemy.attackWaveLevel - 1].scene}
           />
         );
       })}
