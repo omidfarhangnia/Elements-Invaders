@@ -64,6 +64,7 @@ function BattleGround() {
   return (
     <Suspense fallback={<Loader />}>
       <div className="w-full h-[100dvh] relative cursor-none">
+        {/* battleground scene */}
         <div className="absolute w-full h-full top-0 left-0">
           <Canvas
             camera={{

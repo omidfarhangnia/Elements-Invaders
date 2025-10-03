@@ -76,6 +76,7 @@ export default function BattlegroundScene({ isPaused }: { isPaused: boolean }) {
 
   return (
     <Physics paused={isPaused}>
+      <OrbitControls />
       <ambientLight intensity={Math.PI / 2} />
       <Stars
         count={3000}
