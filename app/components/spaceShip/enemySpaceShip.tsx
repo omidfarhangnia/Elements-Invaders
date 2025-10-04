@@ -3,6 +3,7 @@ import { BOSS_FIGHT_LEVEL } from "~/constants";
 import type { EnemyProps } from "../game/enemy";
 import EnemySpaceShipModel1 from "./enemySpaceShipModel1";
 import EnemySpaceShipModel2 from "./enemySpaceShipModel2";
+import BossFightSpaceShip from "./bossSpaceShip";
 
 export default function EnemySpaceShip({ enemy, attackWaveLevel }: EnemyProps) {
   const enemyHeight = enemy.args[1];
@@ -47,45 +48,7 @@ export default function EnemySpaceShip({ enemy, attackWaveLevel }: EnemyProps) {
       ) : (
         <>
           <group>
-            {/* <primitive
-              ref={modelRef}
-              object={clonedScene}
-              scale={[100, 100, 100]}
-              rotation={[Math.PI / 2, 0, 0]}
-            /> */}
-            {/* lights */}
-            <>
-              <pointLight
-                color={"#ffffff"}
-                intensity={400}
-                position={[0, -50, 15]}
-              />
-              <pointLight
-                color={"#ffffff"}
-                intensity={300}
-                position={[30, -40, 20]}
-              />
-              <pointLight
-                color={"#ffffff"}
-                intensity={300}
-                position={[-30, -40, 20]}
-              />
-              <pointLight
-                color={"#ffffff"}
-                intensity={100}
-                position={[30, -30, 20]}
-              />
-              <pointLight
-                color={"#ffffff"}
-                intensity={100}
-                position={[-30, -30, 20]}
-              />
-              <pointLight
-                color={"#ffffff"}
-                intensity={100}
-                position={[0, -35, 35]}
-              />
-            </>
+            <BossFightSpaceShip />
 
             {/* enemy health */}
             <mesh
@@ -98,7 +61,6 @@ export default function EnemySpaceShip({ enemy, attackWaveLevel }: EnemyProps) {
               />
             </mesh>
           </group>
-
           <BallCollider args={[enemy.args[0] / 2]} />
         </>
       )}
